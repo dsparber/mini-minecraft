@@ -2,8 +2,8 @@
 #include <la.h>
 
 Drawable::Drawable(OpenGLContext* context)
-    : bufIdx(), bufPos(), bufNor(), bufCol(),
-      idxBound(false), posBound(false), norBound(false), colBound(false),
+    : bufIdx(), bufAll(),//bufPos(), bufNor(), bufCol(),
+      idxBound(false), allBound(false), //posBound(false), norBound(false), colBound(false),
       context(context)
 {}
 
@@ -14,9 +14,9 @@ Drawable::~Drawable()
 void Drawable::destroy()
 {
     context->glDeleteBuffers(1, &bufIdx);
-    context->glDeleteBuffers(1, &bufPos);
-    context->glDeleteBuffers(1, &bufNor);
-    context->glDeleteBuffers(1, &bufCol);
+    context->glDeleteBuffers(1, &bufAll);
+//    context->glDeleteBuffers(1, &bufNor);
+//    context->glDeleteBuffers(1, &bufCol);
 }
 
 GLenum Drawable::drawMode()
@@ -42,26 +42,34 @@ void Drawable::generateIdx()
     context->glGenBuffers(1, &bufIdx);
 }
 
-void Drawable::generatePos()
+
+void Drawable::generateAll()
 {
-    posBound = true;
+    allBound = true;
     // Create a VBO on our GPU and store its handle in bufPos
-    context->glGenBuffers(1, &bufPos);
+    context->glGenBuffers(1, &bufAll);
 }
 
-void Drawable::generateNor()
-{
-    norBound = true;
-    // Create a VBO on our GPU and store its handle in bufNor
-    context->glGenBuffers(1, &bufNor);
-}
+//void Drawable::generatePos()
+//{
+//    posBound = true;
+//    // Create a VBO on our GPU and store its handle in bufPos
+//    context->glGenBuffers(1, &bufPos);
+//}
 
-void Drawable::generateCol()
-{
-    colBound = true;
-    // Create a VBO on our GPU and store its handle in bufCol
-    context->glGenBuffers(1, &bufCol);
-}
+//void Drawable::generateNor()
+//{
+//    norBound = true;
+//    // Create a VBO on our GPU and store its handle in bufNor
+//    context->glGenBuffers(1, &bufNor);
+//}
+
+//void Drawable::generateCol()
+//{
+//    colBound = true;
+//    // Create a VBO on our GPU and store its handle in bufCol
+//    context->glGenBuffers(1, &bufCol);
+//}
 
 bool Drawable::bindIdx()
 {
@@ -71,26 +79,34 @@ bool Drawable::bindIdx()
     return idxBound;
 }
 
-bool Drawable::bindPos()
+bool Drawable::bindAll()
 {
-    if(posBound){
-        context->glBindBuffer(GL_ARRAY_BUFFER, bufPos);
+    if(allBound) {
+        context->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufAll);
     }
-    return posBound;
+    return idxBound;
 }
 
-bool Drawable::bindNor()
-{
-    if(norBound){
-        context->glBindBuffer(GL_ARRAY_BUFFER, bufNor);
-    }
-    return norBound;
-}
+//bool Drawable::bindPos()
+//{
+//    if(posBound){
+//        context->glBindBuffer(GL_ARRAY_BUFFER, bufPos);
+//    }
+//    return posBound;
+//}
 
-bool Drawable::bindCol()
-{
-    if(colBound){
-        context->glBindBuffer(GL_ARRAY_BUFFER, bufCol);
-    }
-    return colBound;
-}
+//bool Drawable::bindNor()
+//{
+//    if(norBound){
+//        context->glBindBuffer(GL_ARRAY_BUFFER, bufNor);
+//    }
+//    return norBound;
+//}
+
+//bool Drawable::bindCol()
+//{
+//    if(colBound){
+//        context->glBindBuffer(GL_ARRAY_BUFFER, bufCol);
+//    }
+//    return colBound;
+//}

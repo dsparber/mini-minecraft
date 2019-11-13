@@ -1,6 +1,7 @@
 #pragma once
 #include <QList>
 #include <la.h>
+#include <drawable.h>
 #include <scene/terrain.h>
 
 // C++ 11 allows us to define the size of an enum. This lets us use only one byte
@@ -11,16 +12,19 @@
 class Chunk: public Drawable
 {
 public:
-    Chunk();
-    BlockType m_blocks[16 * 256 * 16];                    // A 3D list of the blocks in the world.
+    Chunk(OpenGLContext* context);
+    //16 * 256 * 16
+    BlockType m_blocks[65536];                    // A 3D list of the blocks in the world.
                                                            // You'll need to replace this with a far more
     BlockType getBlockAt(int x, int y, int z) const;   // Given a world-space coordinate (which may have negative
                                                        // values) return the block stored at that point in space.
     BlockType& getBlockAt(int x, int y, int z);
 
-    create();
+    void setBlockAt(int x, int y, int z, BlockType t);
 
-    void setBlockAt(int x, int y, int z, BlockType t); // Given a world-space coordinate (which may have negative
-                                                           // values) set the block at that point in space to the
-                                                           // given type.
+    glm::vec4 pos;
+    Terrain* terrain;
+
+    void create();
+    void drawFace(glm::vec4 pos, std::vector<GLuint>& idx, std::vector<glm::vec4>& all, int faceNum);
 };
