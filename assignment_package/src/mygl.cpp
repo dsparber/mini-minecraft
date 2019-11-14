@@ -146,6 +146,8 @@ void MyGL::GLDrawScene()
                     case STONE:
                         mp_progLambert->setGeometryColor(glm::vec4(0.5f));
                         break;
+                    case LAVA:
+                        mp_progLambert->setGeometryColor(glm::vec4(1.f, 0.f, 0.f, 0.f));
                     default:
                         // Other types are as of yet not defined
                         break;
@@ -201,4 +203,12 @@ void MyGL::keyPressEvent(QKeyEvent *e)
         *mp_camera = Camera(this->width(), this->height());
     }
     mp_camera->RecomputeAttributes();
+}
+
+void MyGL::mousePressEvent(QMouseEvent *e) {
+    if (e->buttons() == Qt::RightButton) {
+        mp_terrain->addBlock(mp_camera->look);
+    } else if (e->buttons() == Qt::LeftButton) {
+        mp_terrain->removeBlock(mp_camera->look);
+    }
 }

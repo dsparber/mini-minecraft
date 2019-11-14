@@ -8,7 +8,7 @@
 // block types, but in the scope of this project we'll never get anywhere near that many.
 enum BlockType : unsigned char
 {
-    EMPTY, GRASS, DIRT, STONE
+    EMPTY, GRASS, DIRT, STONE, LAVA
 };
 
 class Terrain
@@ -27,4 +27,7 @@ public:
     void setBlockAt(int x, int y, int z, BlockType t); // Given a world-space coordinate (which may have negative
                                                            // values) set the block at that point in space to the
                                                            // given type.
+    void addBlock(glm::vec3 look);
+    void removeBlock(glm::vec3 look);
+    glm::vec3 rayMarch(glm::vec3 look);
 };
