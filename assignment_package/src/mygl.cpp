@@ -66,7 +66,6 @@ void MyGL::initializeGL()
 
     //Create the instance of Cube
     mp_geomCube->create();
-    //mp_worldAxes->create();
     mp_terrain->CreateTestScene();
     //mp_chunk->create();
     mp_progLambert->setModelMatrix(glm::mat4());
@@ -130,17 +129,13 @@ void MyGL::paintGL()
 
     GLDrawScene();
 
-    //    glDisable(GL_DEPTH_TEST);
-    //    mp_progFlat->setModelMatrix(glm::mat4());
-    //    mp_progFlat->draw(*mp_worldAxes);
-    //    glEnable(GL_DEPTH_TEST);
 }
 
 void MyGL::GLDrawScene()
 {
 
-    for(auto entry : mp_terrain->chunkMap){
-        Chunk c = entry.second;
+    //for(auto entry : mp_terrain->chunkMap){
+        //Chunk c = entry.second;
         //        //*mp_chunk = entry.second;
         //        entry.second.destroy();
         //        entry.second.create();
@@ -153,7 +148,7 @@ void MyGL::GLDrawScene()
             {
                 for(int z = 0; z < 16; ++z)
                 {
-                    BlockType t = c.getBlockAt(x,y,z);
+                    BlockType t = mp_terrain->getBlockAt(x,y,z);
                     if(t != EMPTY)
                     {
                         switch(t)
@@ -181,7 +176,7 @@ void MyGL::GLDrawScene()
 
     }
 
-}
+//}
 
 
 
