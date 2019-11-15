@@ -10,7 +10,7 @@ MyGL::MyGL(QWidget *parent)
     : OpenGLContext(parent),
       mp_geomCube(mkU<Cube>(this)), mp_worldAxes(mkU<WorldAxes>(this)),
       mp_progLambert(mkU<ShaderProgram>(this)), mp_progFlat(mkU<ShaderProgram>(this)),
-      mp_camera(mkU<Camera>()), mp_terrain(mkU<Terrain>())
+      mp_camera(mkU<Camera>()), mp_terrain(mkU<Terrain>(Terrain(this)))
 {
     // Connect the timer to a function so that when the timer ticks the function is executed
     connect(&timer, SIGNAL(timeout()), this, SLOT(timerUpdate()));
@@ -60,8 +60,9 @@ void MyGL::initializeGL()
     glGenVertexArrays(1, &vao);
 
     //Create the instance of Cube
-    mp_geomCube->create();
-    mp_worldAxes->create();
+    //mp_geomCube->create();
+    //mp_worldAxes->create();
+   // std::cout<<"--end of create world axes error"<<std::endl;
 
     // Create and set up the diffuse shader
     mp_progLambert->create(":/glsl/lambert.vert.glsl", ":/glsl/lambert.frag.glsl");
@@ -75,10 +76,12 @@ void MyGL::initializeGL()
 
     // We have to have a VAO bound in OpenGL 3.2 Core. But if we're not
     // using multiple VAOs, we can just bind one once.
-//    vao.bind();
+    //    vao.bind();
     glBindVertexArray(vao);
 
-    mp_terrain->CreateTestScene();
+     mp_terrain->CreateTestScene();
+//     printGLErrorLog();
+//     std::cout<<"--end of create test scene error"<<std::endl;
 }
 
 void MyGL::resizeGL(int w, int h)
@@ -86,15 +89,15 @@ void MyGL::resizeGL(int w, int h)
     //This code sets the concatenated view and perspective projection matrices used for
     //our scene's camera view.
     *mp_camera = Camera(w, h, glm::vec3(mp_terrain->dimensions.x, mp_terrain->dimensions.y * 0.75, mp_terrain->dimensions.z),
-                       glm::vec3(mp_terrain->dimensions.x / 2, mp_terrain->dimensions.y / 2, mp_terrain->dimensions.z / 2), glm::vec3(0,1,0));
+                        glm::vec3(mp_terrain->dimensions.x / 2, mp_terrain->dimensions.y / 2, mp_terrain->dimensions.z / 2), glm::vec3(0,1,0));
     glm::mat4 viewproj = mp_camera->getViewProj();
 
     // Upload the view-projection matrix to our shaders (i.e. onto the graphics card)
 
     mp_progLambert->setViewProjMatrix(viewproj);
     mp_progFlat->setViewProjMatrix(viewproj);
-
     printGLErrorLog();
+    std::cout<<"--end of resize GL error"<<std::endl;
 }
 
 
@@ -118,45 +121,55 @@ void MyGL::paintGL()
 
     GLDrawScene();
 
-    glDisable(GL_DEPTH_TEST);
-    mp_progFlat->setModelMatrix(glm::mat4());
-    mp_progFlat->draw(*mp_worldAxes);
-    glEnable(GL_DEPTH_TEST);
+//    glDisable(GL_DEPTH_TEST);
+//    mp_progFlat->setModelMatrix(glm::mat4());
+//    mp_progFlat->draw(*mp_worldAxes);
+//    glEnable(GL_DEPTH_TEST);
 }
 
 void MyGL::GLDrawScene()
 {
-    for(int x = 0; x < mp_terrain->dimensions.x; ++x)
-    {
-        for(int y = 0; y < mp_terrain->dimensions.y; ++y)
-        {
-            for(int z = 0; z < mp_terrain->dimensions.z; ++z)
-            {
-                BlockType t;
-                if((t = mp_terrain->m_blocks[x][y][z]) != EMPTY)
-                {
-                    switch(t)
-                    {
-                    case DIRT:
-                        mp_progLambert->setGeometryColor(glm::vec4(121.f, 85.f, 58.f, 255.f) / 255.f);
-                        break;
-                    case GRASS:
-                        mp_progLambert->setGeometryColor(glm::vec4(95.f, 159.f, 53.f, 255.f) / 255.f);
-                        break;
-                    case STONE:
-                        mp_progLambert->setGeometryColor(glm::vec4(0.5f));
-                        break;
-                    default:
-                        // Other types are as of yet not defined
-                        break;
-                    }
-                    mp_progLambert->setModelMatrix(glm::translate(glm::mat4(), glm::vec3(x, y, z)));
-                    mp_progLambert->draw(*mp_geomCube);
-                }
-            }
-        }
+
+    for(auto entry : mp_terrain->chunkMap){
+        Chunk c = entry.second;
+        mp_progLambert->draw(c);
+
+//        for(int x = 0; x < 16; ++x)
+//        {
+//            for(int y = 0; y < 256; ++y)
+//            {
+//                for(int z = 0; z < 16; ++z)
+//                {
+//                    BlockType t = c.getBlockAt(x,y,z);
+//                    if(t != EMPTY)
+//                    {
+//                        switch(t)
+//                        {
+//                        case DIRT:
+//                            mp_progLambert->setGeometryColor(glm::vec4(121.f, 85.f, 58.f, 255.f) / 255.f);
+//                            break;
+//                        case GRASS:
+//                            mp_progLambert->setGeometryColor(glm::vec4(95.f, 159.f, 53.f, 255.f) / 255.f);
+//                            break;
+//                        case STONE:
+//                            mp_progLambert->setGeometryColor(glm::vec4(0.5f));
+//                            break;
+//                        default:
+//                            // Other types are as of yet not defined
+//                            break;
+//                        }
+//                        mp_progLambert->setModelMatrix(glm::translate(glm::mat4(), glm::vec3(x, y, z)));
+//                        //mp_progLambert->draw(*mp_geomCube);
+//                    }
+
+//                }
+//            }
+//        }
+
     }
+
 }
+
 
 
 void MyGL::keyPressEvent(QKeyEvent *e)

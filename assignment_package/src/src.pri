@@ -32,4 +32,5 @@ HEADERS += \
     $$PWD/scene/terrain.h \
     $$PWD/scene/worldaxes.h \
     $$PWD/smartpointerhelp.h \
-    $$PWD/scene/chunk.h
+    $$PWD/scene/chunk.h \
+    $$PWD/scene/blocktype.h
