@@ -25,6 +25,7 @@ MyGL::MyGL(QWidget *parent)
     setFocusPolicy(Qt::ClickFocus);
 
     mp_player->setCamera(mp_camera.get());
+    mp_player->setTerrain(mp_terrain.get());
 
     setMouseTracking(true); // MyGL will track the mouse's movements even if a mouse button is not pressed
     setCursor(Qt::BlankCursor); // Make the cursor invisible
@@ -97,6 +98,7 @@ void MyGL::resizeGL(int w, int h)
                        glm::vec3(mp_terrain->dimensions.x / 2, mp_terrain->dimensions.y / 2, mp_terrain->dimensions.z / 2), glm::vec3(0,1,0));
     glm::mat4 viewproj = mp_camera->getViewProj();
 
+    MoveMouseToCenter();
     // Upload the view-projection matrix to our shaders (i.e. onto the graphics card)
 
     mp_progLambert->setViewProjMatrix(viewproj);
