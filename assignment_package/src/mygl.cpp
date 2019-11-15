@@ -63,6 +63,7 @@ void MyGL::initializeGL()
     //Create the instance of Cube
     //mp_geomCube->create();
     //mp_worldAxes->create();
+    mp_terrain->CreateTestScene();
     mp_chunk->create();
 
     // Create and set up the diffuse shader
@@ -79,8 +80,6 @@ void MyGL::initializeGL()
     // using multiple VAOs, we can just bind one once.
     //    vao.bind();
     glBindVertexArray(vao);
-
-     mp_terrain->CreateTestScene();
 
      printGLErrorLog();
 //     std::cout<<"--end of create test scene error"<<std::endl;

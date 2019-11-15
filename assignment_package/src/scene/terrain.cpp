@@ -34,7 +34,7 @@ void Terrain::setMap(){
     chunkMap.insert(std::make_pair(k4, c4));
     */
     Chunk c(context, glm::vec4(0,0,0,0));
-    c.setBlockAt(0,0,0,GRASS);
+    c.setBlockAt(0,0,0,STONE);
     int64_t k1 = Terrain::getHashKey(0, 0);
     chunkMap.insert({k1, c});
     //chunkMap.at(k1).create();
@@ -93,11 +93,12 @@ void Terrain::setBlockAt(int x, int y, int z, BlockType t)
             break;
         }
     }
-    return c.setBlockAt(x, y, z, t);
+    c.setBlockAt(x, y, z, t);
 }
 
 void Terrain::CreateTestScene()
 {
+    setBlockAt(0,0,0,STONE);
 //    // Create the basic terrain floor
 //    for(int x = 0; x < 64; ++x)
 //    {
