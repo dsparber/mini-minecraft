@@ -7,6 +7,7 @@
 #include <scene/cube.h>
 #include <scene/worldaxes.h>
 #include "camera.h"
+#include "player/player.h"
 #include <scene/terrain.h>
 
 #include <QOpenGLVertexArrayObject>
@@ -26,8 +27,11 @@ private:
     GLuint vao; // A handle for our vertex array object. This will store the VBOs created in our geometry classes.
                 // Don't worry too much about this. Just know it is necessary in order to render geometry.
 
+    uPtr<Player> mp_player;
     uPtr<Camera> mp_camera;
     uPtr<Terrain> mp_terrain;
+
+    long lastUpdate; // Save when the timer update was last called
 
     /// Timer linked to timerUpdate(). Fires approx. 60 times per second
     QTimer timer;
@@ -48,7 +52,10 @@ public:
     void GLDrawScene();
 
 protected:
-    void keyPressEvent(QKeyEvent *e);
+    void keyPressEvent(QKeyEvent*);
+    void keyReleaseEvent(QKeyEvent*);
+    void mouseMoveEvent(QMouseEvent*);
+    void mousePressEvent(QMouseEvent*);
 
 private slots:
     /// Slot that gets called ~60 times per second

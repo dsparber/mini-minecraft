@@ -24,6 +24,8 @@ Camera::Camera(unsigned int w, unsigned int h, const glm::vec3 &e, const glm::ve
     far_clip(1000),
     eye(e),
     ref(r),
+    theta(0),
+    phi(0),
     world_up(worldUp)
 {
     RecomputeAttributes();
@@ -49,9 +51,13 @@ Camera::Camera(const Camera &c):
 
 void Camera::RecomputeAttributes()
 {
-    look = glm::normalize(ref - eye);
-    right = glm::normalize(glm::cross(look, world_up));
-    up = glm::cross(right, look);
+    glm::mat3 transform = glm::mat3(glm::rotate(glm::mat4(), theta, glm::vec3(0, 1, 0))
+            * glm::rotate(glm::mat4(), phi, glm::vec3(1, 0, 0)));
+
+    look = transform * glm::vec3(0, 0, 1);
+    up = transform * world_up;
+    ref = eye + look;
+    right = glm::normalize(glm::cross(look, up));
 
     float tan_fovy = tan(glm::radians(fovy/2));
     float len = glm::length(ref - eye);
@@ -62,7 +68,7 @@ void Camera::RecomputeAttributes()
 
 glm::mat4 Camera::getViewProj()
 {
-    return glm::perspective(glm::radians(fovy), width / (float)height, near_clip, far_clip) * glm::lookAt(eye, ref, up);
+    return glm::perspective(glm::radians(fovy), width / (float)height, near_clip, far_clip) * glm::lookAt(eye, ref, world_up);
 }
 
 void Camera::RotateAboutUp(float deg)
