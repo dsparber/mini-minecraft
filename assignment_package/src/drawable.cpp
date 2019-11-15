@@ -2,9 +2,8 @@
 #include <la.h>
 
 Drawable::Drawable(OpenGLContext* context)
-    : bufIdx(), bufAll(),//bufPos(), bufNor(), bufCol(),
-      idxBound(false), allBound(false), //posBound(false), norBound(false), colBound(false),
-      context(context)
+    : bufIdx(), bufAll(),
+      idxBound(false), allBound(false), context(context)
 {}
 
 Drawable::~Drawable()
@@ -15,8 +14,6 @@ void Drawable::destroy()
 {
     context->glDeleteBuffers(1, &bufIdx);
     context->glDeleteBuffers(1, &bufAll);
-//    context->glDeleteBuffers(1, &bufNor);
-//    context->glDeleteBuffers(1, &bufCol);
 }
 
 GLenum Drawable::drawMode()
@@ -46,30 +43,9 @@ void Drawable::generateIdx()
 void Drawable::generateAll()
 {
     allBound = true;
-    // Create a VBO on our GPU and store its handle in bufPos
+    // Create a VBO on our GPU and store its handle in bufAll
     context->glGenBuffers(1, &bufAll);
 }
-
-//void Drawable::generatePos()
-//{
-//    posBound = true;
-//    // Create a VBO on our GPU and store its handle in bufPos
-//    context->glGenBuffers(1, &bufPos);
-//}
-
-//void Drawable::generateNor()
-//{
-//    norBound = true;
-//    // Create a VBO on our GPU and store its handle in bufNor
-//    context->glGenBuffers(1, &bufNor);
-//}
-
-//void Drawable::generateCol()
-//{
-//    colBound = true;
-//    // Create a VBO on our GPU and store its handle in bufCol
-//    context->glGenBuffers(1, &bufCol);
-//}
 
 bool Drawable::bindIdx()
 {
@@ -86,27 +62,3 @@ bool Drawable::bindAll()
     }
     return allBound;
 }
-
-//bool Drawable::bindPos()
-//{
-//    if(posBound){
-//        context->glBindBuffer(GL_ARRAY_BUFFER, bufPos);
-//    }
-//    return posBound;
-//}
-
-//bool Drawable::bindNor()
-//{
-//    if(norBound){
-//        context->glBindBuffer(GL_ARRAY_BUFFER, bufNor);
-//    }
-//    return norBound;
-//}
-
-//bool Drawable::bindCol()
-//{
-//    if(colBound){
-//        context->glBindBuffer(GL_ARRAY_BUFFER, bufCol);
-//    }
-//    return colBound;
-//}

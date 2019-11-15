@@ -10,7 +10,7 @@ MyGL::MyGL(QWidget *parent)
     : OpenGLContext(parent),
       mp_geomCube(mkU<Cube>(this)), mp_worldAxes(mkU<WorldAxes>(this)),
       mp_progLambert(mkU<ShaderProgram>(this)), mp_progFlat(mkU<ShaderProgram>(this)),
-      mp_camera(mkU<Camera>()), mp_terrain(mkU<Terrain>(Terrain(this)))
+      mp_camera(mkU<Camera>()), mp_terrain(mkU<Terrain>(Terrain(this))), mp_chunk(mkU<Chunk>(Chunk(this)))
 {
     // Connect the timer to a function so that when the timer ticks the function is executed
     connect(&timer, SIGNAL(timeout()), this, SLOT(timerUpdate()));
@@ -27,6 +27,7 @@ MyGL::~MyGL()
     makeCurrent();
     glDeleteVertexArrays(1, &vao);
     mp_geomCube->destroy();
+    mp_chunk->destroy();
 }
 
 
@@ -62,7 +63,7 @@ void MyGL::initializeGL()
     //Create the instance of Cube
     //mp_geomCube->create();
     //mp_worldAxes->create();
-   // std::cout<<"--end of create world axes error"<<std::endl;
+    mp_chunk->create();
 
     // Create and set up the diffuse shader
     mp_progLambert->create(":/glsl/lambert.vert.glsl", ":/glsl/lambert.frag.glsl");
@@ -80,7 +81,8 @@ void MyGL::initializeGL()
     glBindVertexArray(vao);
 
      mp_terrain->CreateTestScene();
-//     printGLErrorLog();
+
+     printGLErrorLog();
 //     std::cout<<"--end of create test scene error"<<std::endl;
 }
 
@@ -97,7 +99,6 @@ void MyGL::resizeGL(int w, int h)
     mp_progLambert->setViewProjMatrix(viewproj);
     mp_progFlat->setViewProjMatrix(viewproj);
     printGLErrorLog();
-    std::cout<<"--end of resize GL error"<<std::endl;
 }
 
 
@@ -131,8 +132,8 @@ void MyGL::GLDrawScene()
 {
 
     for(auto entry : mp_terrain->chunkMap){
-        Chunk c = entry.second;
-        mp_progLambert->draw(c);
+        mp_progLambert->setModelMatrix(glm::mat4());
+        mp_progLambert->draw(*mp_chunk);
 
 //        for(int x = 0; x < 16; ++x)
 //        {

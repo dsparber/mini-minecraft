@@ -28,6 +28,7 @@ private:
 
     uPtr<Camera> mp_camera;
     uPtr<Terrain> mp_terrain;
+    uPtr<Chunk> mp_chunk;
 
     /// Timer linked to timerUpdate(). Fires approx. 60 times per second
     QTimer timer;

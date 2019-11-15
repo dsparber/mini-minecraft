@@ -121,6 +121,7 @@ void Chunk::create(){
                 //std::cout<<"blockType: " <<b<<"at"<<x<<y<<z<<std::endl;
 
                 if(b != EMPTY){
+                    std::cout<<"draw cube at "<<x<<y<<z<<std::endl;
                     //check all 6 sides
                     for(int i = 0; i < 6; i++){
                         //coordinate of the neighbor
@@ -156,7 +157,6 @@ void Chunk::create(){
 }
 
 void Chunk::drawFace(glm::vec4 pos, std::vector<GLuint>& idx, std::vector<glm::vec4>& all, int faceNum){
-    std::cout<<"drawFace is called!"<<std::endl;
     GLuint si; //start index
     if(idx.size()==0){
         si = 0;
@@ -183,18 +183,18 @@ void Chunk::drawFace(glm::vec4 pos, std::vector<GLuint>& idx, std::vector<glm::v
 }
 
 void Chunk::drawOutFace(glm::vec4 pos, std::vector<GLuint>& idx, std::vector<glm::vec4>& all, int faceNum){
-    Chunk* adjC;
+    Chunk* adjC = nullptr;
     glm::vec4 adjPos;
-    if(faceNum == 1){
+    if(faceNum == 0){
         adjC = front;
         adjPos = glm::vec4(pos.x, pos.y, 16, 1);
-    } else if(faceNum == 2){
+    } else if(faceNum == 1){
         adjC = right;
         adjPos = glm::vec4(0, pos.y, pos.z, 1);
-    } else if(faceNum == 3){
+    } else if(faceNum == 2){
         adjC = back;
         adjPos = glm::vec4(pos.x, pos.y, 0, 1);
-    } else if(faceNum == 4){
+    } else if(faceNum == 3){
         adjC = left;
         adjPos = glm::vec4(16.f, pos.y, pos.z, 1);
     } else {
