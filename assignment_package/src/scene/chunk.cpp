@@ -64,7 +64,6 @@ Chunk::Chunk(OpenGLContext* context) : Drawable(context), mp_context(context), p
     front(nullptr), back(nullptr), m_blocks()
 {
     //std::fill(this->m_blocks.begin(), this->m_blocks.end(), EMPTY);
-    setBlockAt(0,0,0,STONE);
 }
 
 Chunk::Chunk(OpenGLContext* context, glm::vec4 pos): Drawable(context), mp_context(context), pos(pos), left(nullptr), right(nullptr),

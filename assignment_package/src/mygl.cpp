@@ -27,7 +27,11 @@ MyGL::~MyGL()
     makeCurrent();
     glDeleteVertexArrays(1, &vao);
     mp_geomCube->destroy();
-    mp_chunk->destroy();
+    //    for(auto entry : mp_terrain->chunkMap){
+    //        entry.second.destroy();
+    //    }
+
+
 }
 
 
@@ -61,10 +65,15 @@ void MyGL::initializeGL()
     glGenVertexArrays(1, &vao);
 
     //Create the instance of Cube
-    //mp_geomCube->create();
+    mp_geomCube->create();
     //mp_worldAxes->create();
     mp_terrain->CreateTestScene();
-    mp_chunk->create();
+    //mp_chunk->create();
+    mp_progLambert->setModelMatrix(glm::mat4());
+    //    for(auto entry : mp_terrain->chunkMap){
+    //        entry.second.create();
+    //    }
+
 
     // Create and set up the diffuse shader
     mp_progLambert->create(":/glsl/lambert.vert.glsl", ":/glsl/lambert.frag.glsl");
@@ -81,8 +90,8 @@ void MyGL::initializeGL()
     //    vao.bind();
     glBindVertexArray(vao);
 
-     printGLErrorLog();
-//     std::cout<<"--end of create test scene error"<<std::endl;
+    printGLErrorLog();
+    //     std::cout<<"--end of create test scene error"<<std::endl;
 }
 
 void MyGL::resizeGL(int w, int h)
@@ -121,50 +130,54 @@ void MyGL::paintGL()
 
     GLDrawScene();
 
-//    glDisable(GL_DEPTH_TEST);
-//    mp_progFlat->setModelMatrix(glm::mat4());
-//    mp_progFlat->draw(*mp_worldAxes);
-//    glEnable(GL_DEPTH_TEST);
+    //    glDisable(GL_DEPTH_TEST);
+    //    mp_progFlat->setModelMatrix(glm::mat4());
+    //    mp_progFlat->draw(*mp_worldAxes);
+    //    glEnable(GL_DEPTH_TEST);
 }
 
 void MyGL::GLDrawScene()
 {
 
     for(auto entry : mp_terrain->chunkMap){
-        mp_progLambert->setModelMatrix(glm::mat4());
-        mp_progLambert->draw(*mp_chunk);
+        Chunk c = entry.second;
+        //        //*mp_chunk = entry.second;
+        //        entry.second.destroy();
+        //        entry.second.create();
 
-//        for(int x = 0; x < 16; ++x)
-//        {
-//            for(int y = 0; y < 256; ++y)
-//            {
-//                for(int z = 0; z < 16; ++z)
-//                {
-//                    BlockType t = c.getBlockAt(x,y,z);
-//                    if(t != EMPTY)
-//                    {
-//                        switch(t)
-//                        {
-//                        case DIRT:
-//                            mp_progLambert->setGeometryColor(glm::vec4(121.f, 85.f, 58.f, 255.f) / 255.f);
-//                            break;
-//                        case GRASS:
-//                            mp_progLambert->setGeometryColor(glm::vec4(95.f, 159.f, 53.f, 255.f) / 255.f);
-//                            break;
-//                        case STONE:
-//                            mp_progLambert->setGeometryColor(glm::vec4(0.5f));
-//                            break;
-//                        default:
-//                            // Other types are as of yet not defined
-//                            break;
-//                        }
-//                        mp_progLambert->setModelMatrix(glm::translate(glm::mat4(), glm::vec3(x, y, z)));
-//                        //mp_progLambert->draw(*mp_geomCube);
-//                    }
+        //        mp_progLambert->draw(entry.second);
 
-//                }
-//            }
-//        }
+        for(int x = 0; x < 16; ++x)
+        {
+            for(int y = 0; y < 256; ++y)
+            {
+                for(int z = 0; z < 16; ++z)
+                {
+                    BlockType t = c.getBlockAt(x,y,z);
+                    if(t != EMPTY)
+                    {
+                        switch(t)
+                        {
+                        case DIRT:
+                            mp_progLambert->setGeometryColor(glm::vec4(121.f, 85.f, 58.f, 255.f) / 255.f);
+                            break;
+                        case GRASS:
+                            mp_progLambert->setGeometryColor(glm::vec4(95.f, 159.f, 53.f, 255.f) / 255.f);
+                            break;
+                        case STONE:
+                            mp_progLambert->setGeometryColor(glm::vec4(0.5f));
+                            break;
+                        default:
+                            // Other types are as of yet not defined
+                            break;
+                        }
+                        mp_progLambert->setModelMatrix(glm::translate(glm::mat4(), glm::vec3(x, y, z)));
+                        mp_progLambert->draw(*mp_geomCube);
+                    }
+
+                }
+            }
+        }
 
     }
 
