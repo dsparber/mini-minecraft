@@ -14,6 +14,7 @@ class Chunk: public Drawable
 public:
     Chunk(OpenGLContext* context);
     Chunk(OpenGLContext* context, glm::vec4 pos);
+    Chunk(OpenGLContext* context, const Chunk &Chunk);
     OpenGLContext* mp_context;
 
     //16 * 256 * 16

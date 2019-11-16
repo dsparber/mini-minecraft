@@ -11,33 +11,33 @@ Terrain::Terrain (OpenGLContext* context) : context(context), dimensions(64, 256
 
 void Terrain::setMap(){
 
-//    Chunk c1 = Chunk(context, glm::vec4(0,0,0,0));
-//    Chunk c2 = Chunk(context, glm::vec4(0,16,16,0));
-//    Chunk c3 = Chunk(context, glm::vec4(0,16,0,0));
-//    Chunk c4 = Chunk(context, glm::vec4(0,0,16,0));
-//    c1.right = &c2;
-//    c1.back = &c4;
-//    c2.left = &c1;
-//    c2.back = &c3;
-//    c3.front = &c2;
-//    c3.left = &c4;
-//    c4.front = &c1;
-//    c4.right = &c3;
-//    //keys
-//    int64_t k1 = Terrain::getHashKey(0, 0);
-//    int64_t k2 = Terrain::getHashKey(0, 16);
-//    int64_t k3 = Terrain::getHashKey(16, 0);
-//    int64_t k4 = Terrain::getHashKey(16, 16);
-//    chunkMap.insert(std::make_pair(k1, c1));
-//    chunkMap.insert(std::make_pair(k2, c2));
-//    chunkMap.insert(std::make_pair(k3, c3));
-//    chunkMap.insert(std::make_pair(k4, c4));
-
-    Chunk c(context, glm::vec4(0,0,0,0));
-    c.setBlockAt(0,0,0,STONE);
-    BlockType t = c.getBlockAt(0,0,0);
+    Chunk c1 = Chunk(context, glm::vec4(0,0,0,0));
+    Chunk c2 = Chunk(context, glm::vec4(16,0,16,0));
+    Chunk c3 = Chunk(context, glm::vec4(16,0,0,0));
+    Chunk c4 = Chunk(context, glm::vec4(0,0,16,0));
+    c1.right = &c2;
+    c1.back = &c4;
+    c2.left = &c1;
+    c2.back = &c3;
+    c3.front = &c2;
+    c3.left = &c4;
+    c4.front = &c1;
+    c4.right = &c3;
+    //keys
     int64_t k1 = Terrain::getHashKey(0, 0);
-    chunkMap.insert({k1, c});
+    int64_t k2 = Terrain::getHashKey(0, 16);
+    int64_t k3 = Terrain::getHashKey(16, 0);
+    int64_t k4 = Terrain::getHashKey(16, 16);
+    chunkMap.insert(std::make_pair(k1, c1));
+    chunkMap.insert(std::make_pair(k2, c2));
+    chunkMap.insert(std::make_pair(k3, c3));
+    chunkMap.insert(std::make_pair(k4, c4));
+
+//    Chunk c(context, glm::vec4(0,0,0,0));
+//    c.setBlockAt(0,0,0,STONE);
+//    BlockType t = c.getBlockAt(0,0,0);
+//    int64_t k1 = Terrain::getHashKey(0, 0);
+//    chunkMap.insert({k1, c});
 }
 
 //x is in lower 32 bits, z is in upper 32 bits
@@ -95,7 +95,6 @@ void Terrain::setBlockAt(int x, int y, int z, BlockType t)
 
 void Terrain::CreateTestScene()
 {
-
     setBlockAt(0,0,0,STONE);
     // Create the basic terrain floor
     for(int x = 0; x < 64; ++x)
@@ -128,13 +127,13 @@ void Terrain::CreateTestScene()
         setBlockAt(x,129,0,GRASS);
         setBlockAt(x,130,0,GRASS);
         setBlockAt(x,129,63,GRASS);
-        setBlockAt(x,130,x,GRASS);
+        setBlockAt(0,130,x,GRASS);
     }
     for(int y = 129; y < 140; ++y)
     {
         setBlockAt(32,y,32,GRASS);
     }
-//    for(auto entry : chunkMap){
-//        entry.second.create();
-//    }
+    for(auto entry : chunkMap){
+        entry.second.create();
+    }
 }

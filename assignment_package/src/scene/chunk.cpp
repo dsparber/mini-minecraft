@@ -68,83 +68,92 @@ Chunk::Chunk(OpenGLContext* context) : Drawable(context), mp_context(context), p
 }
 
 Chunk::Chunk(OpenGLContext* context, glm::vec4 pos): Drawable(context), mp_context(context), pos(pos), left(nullptr), right(nullptr),
-    front(nullptr), back(nullptr)
+    front(nullptr), back(nullptr), m_blocks()
 {
     std::fill(this->m_blocks.begin(), this->m_blocks.end(), EMPTY);
     tempTest();
 }
 
-void Chunk::tempTest(){
-//    setBlockAt(0,0,0,STONE);
-//    setBlockAt(0,0,1,STONE);
-//    setBlockAt(1,0,0,STONE);
-//    setBlockAt(1,0,1,STONE);
+Chunk::Chunk(OpenGLContext* context, const Chunk& c): Drawable(context), mp_context(context), pos(c.pos), left(c.left), right(c.right),
+    front(c.front), back(c.back), m_blocks(c.m_blocks)
+{
+    std::fill(this->m_blocks.begin(), this->m_blocks.end(), EMPTY);
+}
 
-        for(int x = 0; x < 16; ++x)
+
+
+void Chunk::tempTest(){
+    //        setBlockAt(0,0,0,STONE);
+    //        setBlockAt(1,0,1,GRASS);
+    //    setBlockAt(1,0,0,STONE);
+    //    setBlockAt(1,0,1,STONE);
+
+    for(int x = 0; x < 16; ++x)
+    {
+        for(int z = 0; z < 16; ++z)
         {
-            for(int z = 0; z < 16; ++z)
+            for(int y = 127; y < 256; ++y)
             {
-                for(int y = 127; y < 256; ++y)
+                if(y <= 128)
                 {
-                    if(y <= 128)
+                    if((x + z) % 2 == 0)
                     {
-                        if((x + z) % 2 == 0)
-                        {
-                            setBlockAt(x,y,z,STONE);
-                        }
-                        else
-                        {
-                            setBlockAt(x,y,z,DIRT);
-                        }
+                        setBlockAt(x,y,z,STONE);
                     }
                     else
                     {
-                        setBlockAt(x,y,z,EMPTY);
+                        setBlockAt(x,y,z,DIRT);
                     }
+                }
+                else
+                {
+                    setBlockAt(x,y,z,EMPTY);
                 }
             }
         }
-        // Add "walls" for collision testing
-        for(int x = 0; x < 16; ++x)
-        {
-            setBlockAt(x,129,0,GRASS);
-            setBlockAt(x,130,0,GRASS);
-            setBlockAt(x,129,63,GRASS);
-            setBlockAt(x,130,x,GRASS);
-        }
-        for(int y = 129; y < 140; ++y)
-        {
-            setBlockAt(32,y,32,GRASS);
-        }
+    }
+    // Add "walls" for collision testing
+    for(int x = 0; x < 16; ++x)
+    {
+        setBlockAt(x,129,0,GRASS);
+        setBlockAt(x,130,0,GRASS);
+        setBlockAt(x,129,63,GRASS);
+        setBlockAt(0,130,x,GRASS);
+    }
+    for(int y = 129; y < 140; ++y)
+    {
+        setBlockAt(32,y,32,GRASS);
+    }
 }
 
 BlockType Chunk::getBlockAt(int x, int y, int z) const
 {
     if(x < 0 || y < 0 || z < 0
-            || x > 16 || y > 256 || z > 16) {
+            || x >= 16 || y >= 256 || z >= 16) {
         return EMPTY;
     }
-    int idx = 16 * 256 * z + 16 * y + x;
-    if(idx < 65536 && idx >= 0){
+    int idx = 16 * 256 * x + 16 * y + z;
+    //if(idx < 65536 && idx >= 0){
         return m_blocks[idx];
-    }
+    //
     return EMPTY;
 }
 
 BlockType& Chunk::getBlockAt(int x, int y, int z)
 {
     if(x < 0 || y < 0 || z < 0
-            || x > 16 || y > 256 || z > 16) {
+            || x >= 16 || y >= 256 || z >= 16) {
+
     }
-    int idx = 16 * 256 * z + 16 * y + x;
-    if(idx < 65536 && idx >= 0){
+    int idx = 16 * 256 * x + 16 * y + z;
+    //if(idx <= 65536 && idx >= 0){
         return m_blocks[idx];
-    }
+    //}
 }
 
 void Chunk::setBlockAt(int x, int y, int z, BlockType t)
 {
-    int idx = 16 * 256 * z + 16 * y + x;
+    int idx = 16 * 256 * x + 16 * y + z;
     if(idx < 65536 && idx >= 0){
         m_blocks[idx] = t;
     }
@@ -167,7 +176,6 @@ void Chunk::create(){
                 //std::cout<<"blockType: " <<b<<"at"<<x<<y<<z<<std::endl;
 
                 if(b != EMPTY){
-                    //std::cout<<"draw cube at "<<x<<y<<z<<std::endl;
                     //check all 6 sides
                     for(int i = 0; i < 6; i++){
                         //coordinate of the neighbor
@@ -224,7 +232,25 @@ void Chunk::drawFace(glm::vec4 pos, std::vector<GLuint>& idx, std::vector<glm::v
         //normal
         all.push_back(nors[faceNum]);
         //color
-        all.push_back(glm::vec4(1,1,1,1));
+        BlockType t = getBlockAt(pos.x,pos.y,pos.z);
+        if(t != EMPTY)
+        {
+            switch(t)
+            {
+            case DIRT:
+                all.push_back(glm::vec4(121.f, 85.f, 58.f, 255.f) / 255.f);
+                break;
+            case GRASS:
+                all.push_back(glm::vec4(95.f, 159.f, 53.f, 255.f) / 255.f);
+                break;
+            case STONE:
+                all.push_back(glm::vec4(0.5f));
+                break;
+            default:
+                // Other types are as of yet not defined
+                break;
+            }
+        }
     }
 }
 
