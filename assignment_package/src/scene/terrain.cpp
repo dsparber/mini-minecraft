@@ -14,6 +14,9 @@ BlockType Terrain::getBlockAt(int x, int y, int z) const
 
 void Terrain::setBlockAt(int x, int y, int z, BlockType t)
 {
+    // take in a world value
+    // change to chunk space
+    // set block within the chunk --> call the chunks setBlockAt function
     // TODO: Make this work with your new block storage!
     m_blocks[x][y][z] = t;
 }
@@ -71,13 +74,14 @@ void Terrain::CreateTestScene()
                 else
                 {
                     // Terrain generation
+                    // multiple by 32 and add 128
                     float rawFBM = fbm(x / 64.f, z / 64.f);
                     float fbmVal = 85.f * powf(rawFBM, 4.f);
                     int intFBM = 128 + (int) fbmVal;
 
-                    //for (int i = 129; i < intFBM; i++) {
-                      //  m_blocks[x][i][z] = DIRT;
-                    //}
+                    for (int i = 129; i < intFBM; i++) {
+                        m_blocks[x][i][z] = DIRT;
+                    }
 
                     m_blocks[x][intFBM][z] = GRASS;
                 }
@@ -126,62 +130,54 @@ void Terrain::CreateTestScene()
 //    }
 //}
 
-void Terrain::addBlock(glm::vec3 look) {
-    //std::cout << "test right click" << std::endl;
-    glm::vec3 coords(rayMarch(look));
+void Terrain::addBlock(glm::vec3 eye, glm::vec3 look)
+{
+    glm::vec3 addPos = rayMarch(eye, look) - 0.75f * look;
+    glm::vec3 coords(glm::floor(addPos));
+    setBlockAt(coords.x, coords.y, coords.z, LAVA);
+}
+
+void Terrain::removeBlock(glm::vec3 eye, glm::vec3 look)
+{
+    glm::vec3 coords(glm::floor(rayMarch(eye, look)));
     setBlockAt(coords.x, coords.y, coords.z, EMPTY);
 }
 
-void Terrain::removeBlock(glm::vec3 look) {
-    //std::cout << "test left click" << std::endl;
-    glm::vec3 coords(rayMarch(look));
-    setBlockAt(coords.x, coords.y, coords.z, EMPTY);
-}
+glm::vec3 Terrain::rayMarch(glm::vec3 eye, glm::vec3 look)
+{
+    float maxLen = 8.f;
+    bool hit = false;
+    glm::vec3 currPos = eye;
+    float step = 0.75;
 
-glm::vec3 Terrain::rayMarch(glm::vec3 look) {
-    glm::vec3 r0(look);
-    glm::vec3 rd(0.f, 0.f, 0.f/* directon of vector*/);
-    glm::vec3 min(0.f, 0.f, 0.f);
-    glm::vec3 max(0.f, 0.f, 0.f);
-    glm::vec3 tnear(FLT_MIN, FLT_MIN, FLT_MIN);
-    glm::vec3 tfar(FLT_MAX, FLT_MAX, FLT_MAX);
-
-    //For each pair of planes associated with the X, Y, and Z axes (the example uses the X “slab”):
-    for (int i = 0; i < 3; i++) {
-        if(r0[i] >= min[i] && r0[i] <= max[i]) //don't miss the box
+    while(!hit && glm::length(currPos - eye) < maxLen)
+    {
+        currPos = currPos + step * look;
+        if(getBlockAt(glm::floor(currPos.x), glm::floor(currPos.y), glm::floor(currPos.z)) != EMPTY)
         {
-            float t0 = (min[i] - r0[i]) / rd[i];
-            float t1 = (max[i] - r0[i]) / rd[i];
-
-            if(t0 > t1)
-            {
-                float temp = t0;
-                t0 = t1;
-                t1 = temp;
-            }
-
-            if(t0 > tnear[i])
-            {
-                tnear[i] = t0;
-            }
-
-            if(t1 < tfar[i])
-            {
-                tfar[i] = t1;
-            }
+            hit = true;
         }
     }
 
-    if(tnear.length() > tfar.length()) {
-        return glm::vec3(-1.f, -1.f, -1.f); //miss the box
-    } else {
-        return tnear;
-    }
+    return currPos;
 }
 
 // Generating new terrain
+// How/when/where to check characters position to call this function
+// need consistent checking, checking in every direction, put it in the game loop (paintGL)
+    // every time timer ticks, check what area of world the character is in, if that location is close to the edge of that part of the world,
+    // then check if the blocks on the edge have neighbors, if not generate new terrain
+    // add new chunks to map of chunks
+// get current coordinates from camera, check if camera's (x,z) is in the map or use getBlockAt to see if a block exists there (could create a
+//      block type called NO_BLOCK (different than empty)
+
 // Need a function from Amelia to generate a new chunk, each time the player is
 //      within ___ of the edge, generate a new chunk
+void Terrain::generateTerrain(glm::vec3 currPos) {
+    // get current chunk position
+    // position of new chunk =
+//void createChunk(position of this chunk);
+}
 
 //    // Add "walls" for collision testing
 //    for(int x = 0; x < 64; ++x)

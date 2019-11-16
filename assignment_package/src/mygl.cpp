@@ -122,6 +122,13 @@ void MyGL::paintGL()
     mp_progFlat->setModelMatrix(glm::mat4());
     mp_progFlat->draw(*mp_worldAxes);
     glEnable(GL_DEPTH_TEST);
+
+    //if () {
+      //  mp_terrain->generateTerrain(mp_camera.look);
+    //}
+    // every time timer ticks, check what area of world the character is in, if that location is close to the edge of that part of the world,
+    // then check if the blocks on the edge have neighbors, if not generate new terrain
+    // add new chunks to map of chunks
 }
 
 void MyGL::GLDrawScene()
@@ -207,8 +214,8 @@ void MyGL::keyPressEvent(QKeyEvent *e)
 
 void MyGL::mousePressEvent(QMouseEvent *e) {
     if (e->buttons() == Qt::RightButton) {
-        mp_terrain->addBlock(mp_camera->look);
+        mp_terrain->addBlock(mp_camera->eye, mp_camera->look);
     } else if (e->buttons() == Qt::LeftButton) {
-        mp_terrain->removeBlock(mp_camera->look);
+        mp_terrain->removeBlock(mp_camera->eye, mp_camera->look);
     }
 }
