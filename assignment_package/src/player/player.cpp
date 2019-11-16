@@ -60,27 +60,62 @@ void Player::physicsUpdate(float dt) {
     float kph = mps / 3.6f; // Velocity unit km/h
 
     float g = 9.81 * m / s2; // gravitation
-    float maxVelocity = 12 * kph; // max. velocity
-    float flightVelocity = 30 * kph;
+    float horizontalAcceleration = 5 * m / s2; // Player acceleration, for moving
+    float maxVelocity = 15 * kph; // max. velocity
+    float flightVelocity = 30 * kph; // velocity for flying
     float omega = pi_2 / s; // default angular velocity
 
-    float jumpHeigth = 2 * m; // Jump c meters into the air
+    float jumpHeigth = 2 * m; // Jump h meters into the air
     float jumpTakeofVelocity = glm::sqrt(2 * g * jumpHeigth) * mps; // v = sqrt(mgh) [m/s]
 
-    // Velocity 
-    float vy = velocity.y;
-    // Move with max. velocity in requested direction
-    velocity = requestedDirection * (flightMode ? flightVelocity : maxVelocity);
-    if (!flightMode) {
-        // If grounded -> able to jump, else: falling
-        velocity.y = grounded & requestedDirection.y > 0 ? jumpTakeofVelocity : vy;
-        // Apply gravitation
-        velocity.y -= g * dt;
-        if (grounded) {
-            // If player on ground, no downwards velocity
-            velocity.y = glm::max(0.f, velocity.y);
+    // Orientation update
+    theta += requestedTheta * omega * dt;
+    phi = glm::clamp(phi + requestedPhi * omega * dt, -pi_2 + .1f, pi_2 - .1f);
+
+    // Handle flight mode
+    if (flightMode) {
+        velocity = requestedDirection * flightVelocity;
+        position += velocity * dt; // Position update
+        cameraUpdate(); // Update camera
+        return;
+    }
+
+    // Acceleration vector
+    glm::vec3 a;
+    if (grounded) {
+        // Stop
+        if (glm::length(requestedDirection) == 0) {
+            a = -horizontalAcceleration * velocity;
+        }
+        // Accelerate
+        else {
+            glm::vec3 horizontal = glm::vec3(requestedDirection.x, 0, requestedDirection.z);
+            a = horizontal * horizontalAcceleration;
+        }
+        // Slow down if max velocity violated
+        if (glm::length(velocity) > maxVelocity) {
+            a -= velocity * horizontalAcceleration;
         }
     }
+    // Airborne
+    else {
+        // Gravity only
+        a = glm::vec3(0, -g, 0);
+    }
+
+    // Velocity 
+    glm::vec3 dv = a * dt; // Delta velocity
+    velocity += dv;
+
+    if (grounded) {
+        // Handle jump via velocity instead of acceleration for simplicity
+        if (requestedDirection.y > 0) {
+            velocity.y = jumpTakeofVelocity;
+        }
+        // If player on ground, no downwards velocity
+        velocity.y = glm::max(0.f, velocity.y);
+    }
+
 
     // Calculate travel distance and collision distance
     glm::vec3 ds = velocity * dt; // delta s, distance that would be covered by moving v * dt
@@ -88,7 +123,7 @@ void Player::physicsUpdate(float dt) {
     float collisionDistance = getCollisionDistance(ds);
 
     // Move at most by collision distance
-    if (!flightMode && collisionDistance < travelDistance) {
+    if (collisionDistance < travelDistance) {
         // Adjust velocity and recalculate ds
         velocity = velocity / travelDistance * collisionDistance * .9f;
         ds = velocity * dt;
@@ -96,10 +131,6 @@ void Player::physicsUpdate(float dt) {
 
     // Position update
     position += ds;
-
-    // Orientation update
-    theta += requestedTheta * omega * dt;
-    phi = glm::clamp(phi + requestedPhi * omega * dt, -pi_2 + .1f, pi_2 - .1f);
 
     // Update camera
     cameraUpdate();
