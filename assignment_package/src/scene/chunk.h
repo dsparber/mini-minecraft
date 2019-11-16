@@ -36,4 +36,7 @@ public:
     void create();
     void drawFace(glm::vec4 pos, std::vector<GLuint>& idx, std::vector<glm::vec4>& all, int faceNum);
     void drawOutFace(glm::vec4 pos, std::vector<GLuint>& idx, std::vector<glm::vec4>& all, int faceNum);
+
+
+    void tempTest();
 };

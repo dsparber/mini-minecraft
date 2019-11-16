@@ -149,22 +149,6 @@ void ShaderProgram::draw(Drawable &d)
     // meaning that glVertexAttribPointer associates vs_Pos
     // (referred to by attrPos) with that VBO
 
-//    if (attrPos != -1 && attrNor != -1  && attrCol != -1 && d.bindAll()) {
-//        std::cout<<"drawing all 3 attributes! !"<<std::endl;
-//        context->glEnableVertexAttribArray(attrPos);
-//        context->glEnableVertexAttribArray(attrNor);
-//        context->glEnableVertexAttribArray(attrCol);
-//        context->glVertexAttribPointer(attrPos, 4, GL_FLOAT, false, 0, NULL);
-//        context->glVertexAttribPointer(attrNor, 4, GL_FLOAT, false, 3 * sizeof(glm::vec4),  (void*)sizeof(glm::vec4));
-//        context->glVertexAttribPointer(attrCol, 4, GL_FLOAT, false, 3 * sizeof(glm::vec4),  (void*)(2*sizeof(glm::vec4)));
-//    } else if (attrPos != -1  && attrCol != -1 && d.bindAll()){
-//       std::cout<<"only drawing position & normal!"<<std::endl;
-//        context->glEnableVertexAttribArray(attrPos);
-//        context->glEnableVertexAttribArray(attrNor);
-//        context->glVertexAttribPointer(attrPos, 4, GL_FLOAT, false, 0, NULL);
-//        context->glVertexAttribPointer(attrNor, 4, GL_FLOAT, false, 2 * sizeof(glm::vec4),  (void*)sizeof(glm::vec4));
-// }
-
     if (attrPos != -1 && d.bindAll()) {
         context->glEnableVertexAttribArray(attrPos);
         context->glVertexAttribPointer(attrPos, 4, GL_FLOAT, false, 3 * sizeof(glm::vec4),  NULL);
@@ -180,9 +164,9 @@ void ShaderProgram::draw(Drawable &d)
         context->glEnableVertexAttribArray(attrCol);
         context->glVertexAttribPointer(attrCol, 4, GL_FLOAT, false, 3 * sizeof(glm::vec4),  (void*)(2*sizeof(glm::vec4)));
   }
+    //std::cout<<"bind attributes error:"<<std::endl;
+    //context->printGLErrorLog();
 
-    context->printGLErrorLog();
-    //std::cout<<"end of bind attributes error:"<<std::endl;
 
     // Bind the index buffer and then draw shapes from it.
     // This invokes the shader program, which accesses the vertex buffers.
@@ -193,7 +177,7 @@ void ShaderProgram::draw(Drawable &d)
     if (attrNor != -1) context->glDisableVertexAttribArray(attrNor);
     if (attrCol != -1) context->glDisableVertexAttribArray(attrCol);
     //std::cout<<"shader program draw GL error:"<<std::endl;
-   // context->printGLErrorLog();
+    context->printGLErrorLog();
 }
 
 char* ShaderProgram::textFileRead(const char* fileName) {

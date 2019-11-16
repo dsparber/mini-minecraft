@@ -7,35 +7,35 @@
 std::vector<glm::vec4> poses =
 {
     //front
-    glm::vec4(0,1,0,1),
-    glm::vec4(0,0,0,1),
-    glm::vec4(1,0,0,1),
-    glm::vec4(1,1,0,1),
+    glm::vec4(0,1,0,0),
+    glm::vec4(0,0,0,0),
+    glm::vec4(1,0,0,0),
+    glm::vec4(1,1,0,0),
     //right
-    glm::vec4(1,1,0,1),
-    glm::vec4(1,0,0,1),
-    glm::vec4(1,0,1,1),
-    glm::vec4(1,1,1,1),
+    glm::vec4(1,1,0,0),
+    glm::vec4(1,0,0,0),
+    glm::vec4(1,0,1,0),
+    glm::vec4(1,1,1,0),
     //back
-    glm::vec4(0,1,1,1),
-    glm::vec4(0,0,1,1),
-    glm::vec4(1,0,1,1),
-    glm::vec4(1,1,1,1),
+    glm::vec4(0,1,1,0),
+    glm::vec4(0,0,1,0),
+    glm::vec4(1,0,1,0),
+    glm::vec4(1,1,1,0),
     //left
-    glm::vec4(0,1,0,1),
-    glm::vec4(0,0,0,1),
-    glm::vec4(0,0,1,1),
-    glm::vec4(0,1,1,1),
+    glm::vec4(0,1,0,0),
+    glm::vec4(0,0,0,0),
+    glm::vec4(0,0,1,0),
+    glm::vec4(0,1,1,0),
     //bottom
-    glm::vec4(0,0,1,1),
-    glm::vec4(0,0,0,1),
-    glm::vec4(1,0,0,1),
-    glm::vec4(1,0,1,1),
+    glm::vec4(0,0,1,0),
+    glm::vec4(0,0,0,0),
+    glm::vec4(1,0,0,0),
+    glm::vec4(1,0,1,0),
     //top
-    glm::vec4(0,1,1,1),
-    glm::vec4(0,1,0,1),
-    glm::vec4(1,1,0,1),
-    glm::vec4(1,1,1,1)
+    glm::vec4(0,1,1,0),
+    glm::vec4(0,1,0,0),
+    glm::vec4(1,1,0,0),
+    glm::vec4(1,1,1,0)
 };
 
 std::vector<glm::vec4> nors =
@@ -43,9 +43,9 @@ std::vector<glm::vec4> nors =
     //in order of front, right, back, left, bottom, top
     glm::vec4(0,0,1,1),
     glm::vec4(1,0,0,1),
-    glm::vec4(0,0,-1,1),
-    glm::vec4(-1,0,0,1),
-    glm::vec4(0,-1,0,1),
+    glm::vec4(0,0,-1,1),//-
+    glm::vec4(-1,0,0,1),//-
+    glm::vec4(0,-1,0,1),//-
     glm::vec4(0,1,0,1)
 };
 
@@ -53,42 +53,88 @@ std::vector<glm::vec4> nors =
 std::vector<glm::vec3> offsets =
 {
     glm::vec3(0,0,-1),
-    glm::vec3(-1,0,0),
-    glm::vec3(0,0,1),
     glm::vec3(1,0,0),
-    glm::vec3(0,1,0),
-    glm::vec3(0,-1,0)
+    glm::vec3(0,0,1),
+    glm::vec3(-1,0,0),
+    glm::vec3(0,-1,0),
+    glm::vec3(0,1,0)
 };
 
 Chunk::Chunk(OpenGLContext* context) : Drawable(context), mp_context(context), pos(glm::vec4(0,0,0,0)), left(nullptr), right(nullptr),
     front(nullptr), back(nullptr), m_blocks()
 {
-    //std::fill(this->m_blocks.begin(), this->m_blocks.end(), EMPTY);
+    std::fill(this->m_blocks.begin(), this->m_blocks.end(), EMPTY);
+    tempTest();
 }
 
 Chunk::Chunk(OpenGLContext* context, glm::vec4 pos): Drawable(context), mp_context(context), pos(pos), left(nullptr), right(nullptr),
     front(nullptr), back(nullptr)
 {
-    //std::fill(this->m_blocks.begin(), this->m_blocks.end(), EMPTY);
+    std::fill(this->m_blocks.begin(), this->m_blocks.end(), EMPTY);
+    tempTest();
+}
+
+void Chunk::tempTest(){
+//    setBlockAt(0,0,0,STONE);
+//    setBlockAt(0,0,1,STONE);
+//    setBlockAt(1,0,0,STONE);
+//    setBlockAt(1,0,1,STONE);
+
+        for(int x = 0; x < 16; ++x)
+        {
+            for(int z = 0; z < 16; ++z)
+            {
+                for(int y = 127; y < 256; ++y)
+                {
+                    if(y <= 128)
+                    {
+                        if((x + z) % 2 == 0)
+                        {
+                            setBlockAt(x,y,z,STONE);
+                        }
+                        else
+                        {
+                            setBlockAt(x,y,z,DIRT);
+                        }
+                    }
+                    else
+                    {
+                        setBlockAt(x,y,z,EMPTY);
+                    }
+                }
+            }
+        }
+        // Add "walls" for collision testing
+        for(int x = 0; x < 16; ++x)
+        {
+            setBlockAt(x,129,0,GRASS);
+            setBlockAt(x,130,0,GRASS);
+            setBlockAt(x,129,63,GRASS);
+            setBlockAt(x,130,x,GRASS);
+        }
+        for(int y = 129; y < 140; ++y)
+        {
+            setBlockAt(32,y,32,GRASS);
+        }
 }
 
 BlockType Chunk::getBlockAt(int x, int y, int z) const
 {
     if(x < 0 || y < 0 || z < 0
-       || x > 16 || y > 256 || z > 16) {
+            || x > 16 || y > 256 || z > 16) {
         return EMPTY;
     }
     int idx = 16 * 256 * z + 16 * y + x;
     if(idx < 65536 && idx >= 0){
         return m_blocks[idx];
     }
+    return EMPTY;
 }
 
 BlockType& Chunk::getBlockAt(int x, int y, int z)
 {
     if(x < 0 || y < 0 || z < 0
-       || x > 16 || y > 256 || z > 16) {
-//        throw std::out
+            || x > 16 || y > 256 || z > 16) {
     }
     int idx = 16 * 256 * z + 16 * y + x;
     if(idx < 65536 && idx >= 0){
@@ -106,7 +152,7 @@ void Chunk::setBlockAt(int x, int y, int z, BlockType t)
 
 //only create vertex data for block faces that lie on the boundary between an EMPTY block and a filled block.
 void Chunk::create(){
-    std::cout<<"a chunk is created!"<<std::endl;
+    //std::cout<<"a chunk is created!"<<std::endl;
     //handle setting up the VBOs for any arbitrary mesh
     std::vector<GLuint> idx;
     std::vector<glm::vec4> all; //all attributes organized as vertex position, normal, and color
@@ -118,10 +164,10 @@ void Chunk::create(){
             for(int z = 0; z < 16; z++){
 
                 BlockType b = getBlockAt(x,y,z);
-                std::cout<<"blockType: " <<b<<"at"<<x<<y<<z<<std::endl;
+                //std::cout<<"blockType: " <<b<<"at"<<x<<y<<z<<std::endl;
 
                 if(b != EMPTY){
-                    std::cout<<"draw cube at "<<x<<y<<z<<std::endl;
+                    //std::cout<<"draw cube at "<<x<<y<<z<<std::endl;
                     //check all 6 sides
                     for(int i = 0; i < 6; i++){
                         //coordinate of the neighbor
@@ -197,12 +243,9 @@ void Chunk::drawOutFace(glm::vec4 pos, std::vector<GLuint>& idx, std::vector<glm
     } else if(faceNum == 3){
         adjC = left;
         adjPos = glm::vec4(16.f, pos.y, pos.z, 1);
-    } else {
-        //if it's on the edge of bottom and top, draw face
-        drawFace(pos, idx, all, faceNum);
     }
 
-    if(adjC != nullptr && adjC->getBlockAt(adjPos.x, adjPos.y, adjPos.z) == EMPTY){
+    if(adjC == nullptr || adjC->getBlockAt(adjPos.x, adjPos.y, adjPos.z) == EMPTY){
         //draw the current face
         drawFace(pos, idx, all, faceNum);
     }

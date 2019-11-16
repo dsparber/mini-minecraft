@@ -27,9 +27,10 @@ MyGL::~MyGL()
     makeCurrent();
     glDeleteVertexArrays(1, &vao);
     mp_geomCube->destroy();
-    //    for(auto entry : mp_terrain->chunkMap){
-    //        entry.second.destroy();
-    //    }
+    mp_chunk->destroy();
+    for(auto entry : mp_terrain->chunkMap){
+        entry.second.destroy();
+    }
 
 
 }
@@ -64,14 +65,6 @@ void MyGL::initializeGL()
     // Create a Vertex Attribute Object
     glGenVertexArrays(1, &vao);
 
-    //Create the instance of Cube
-    mp_geomCube->create();
-    mp_terrain->CreateTestScene();
-    //mp_chunk->create();
-    mp_progLambert->setModelMatrix(glm::mat4());
-    //    for(auto entry : mp_terrain->chunkMap){
-    //        entry.second.create();
-    //    }
 
 
     // Create and set up the diffuse shader
@@ -84,13 +77,22 @@ void MyGL::initializeGL()
     // This makes your geometry render green.
     mp_progLambert->setGeometryColor(glm::vec4(0,1,0,1));
 
+    //Create the instance of Cube
+    mp_geomCube->create();
+    mp_chunk->create();
+    //mp_terrain->CreateTestScene();
+    //mp_chunk->create();
+    for(auto entry : mp_terrain->chunkMap){
+        entry.second.create();
+    }
+
     // We have to have a VAO bound in OpenGL 3.2 Core. But if we're not
     // using multiple VAOs, we can just bind one once.
     //    vao.bind();
     glBindVertexArray(vao);
 
     printGLErrorLog();
-    //     std::cout<<"--end of create test scene error"<<std::endl;
+    std::cout<<"--end of create test scene error"<<std::endl;
 }
 
 void MyGL::resizeGL(int w, int h)
@@ -133,15 +135,15 @@ void MyGL::paintGL()
 
 void MyGL::GLDrawScene()
 {
+    mp_progLambert->setModelMatrix(glm::translate(glm::mat4(), glm::vec3(mp_chunk->pos)));
+    mp_progLambert->draw(*mp_chunk);
 
-    //for(auto entry : mp_terrain->chunkMap){
-        //Chunk c = entry.second;
-        //        //*mp_chunk = entry.second;
-        //        entry.second.destroy();
-        //        entry.second.create();
-
-        //        mp_progLambert->draw(entry.second);
-
+    for(auto entry : mp_terrain->chunkMap){
+        mp_progLambert->setModelMatrix(glm::translate(glm::mat4(), glm::vec3(entry.second.pos)));
+        entry.second.destroy();
+        entry.second.create();
+        //mp_progLambert->setModelMatrix(glm::mat4());
+        mp_progLambert->draw(entry.second);
         for(int x = 0; x < 16; ++x)
         {
             for(int y = 0; y < 256; ++y)
@@ -166,8 +168,6 @@ void MyGL::GLDrawScene()
                             // Other types are as of yet not defined
                             break;
                         }
-                        mp_progLambert->setModelMatrix(glm::translate(glm::mat4(), glm::vec3(x, y, z)));
-                        mp_progLambert->draw(*mp_geomCube);
                     }
 
                 }
@@ -176,7 +176,7 @@ void MyGL::GLDrawScene()
 
     }
 
-//}
+}
 
 
 
@@ -223,3 +223,4 @@ void MyGL::keyPressEvent(QKeyEvent *e)
     }
     mp_camera->RecomputeAttributes();
 }
+
