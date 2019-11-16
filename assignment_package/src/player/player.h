@@ -63,7 +63,7 @@ private:
     bool isGrounded();
 
     /// Computes the distance to the next collision along travel vector
-    float getCollisionDistance(glm::vec3&);
+    float getCollisionDistance(glm::vec3);
 
     /// Retunrs the edges of the players bounding box relative to the position
     std::vector<glm::vec3> getBoundingBox();

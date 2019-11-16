@@ -60,16 +60,17 @@ void Player::physicsUpdate(float dt) {
     float kph = mps / 3.6f; // Velocity unit km/h
 
     float g = 9.81 * m / s2; // gravitation
-    float maxV = 12 * kph; // max. velocity
+    float maxVelocity = 12 * kph; // max. velocity
+    float flightVelocity = 30 * kph;
     float omega = pi_2 / s; // default angular velocity
 
-    float jumpHeigth = 1 * m; // Jump 1 m into the air
+    float jumpHeigth = 2 * m; // Jump c meters into the air
     float jumpTakeofVelocity = glm::sqrt(2 * g * jumpHeigth) * mps; // v = sqrt(mgh) [m/s]
 
     // Velocity 
     float vy = velocity.y;
     // Move with max. velocity in requested direction
-    velocity = requestedDirection * maxV;
+    velocity = requestedDirection * (flightMode ? flightVelocity : maxVelocity);
     if (!flightMode) {
         // If grounded -> able to jump, else: falling
         velocity.y = grounded & requestedDirection.y > 0 ? jumpTakeofVelocity : vy;
@@ -87,8 +88,10 @@ void Player::physicsUpdate(float dt) {
     float collisionDistance = getCollisionDistance(ds);
 
     // Move at most by collision distance
-    if (collisionDistance < travelDistance) {
-        ds = ds / travelDistance * collisionDistance;
+    if (!flightMode && collisionDistance < travelDistance) {
+        // Adjust velocity and recalculate ds
+        velocity = velocity / travelDistance * collisionDistance * .9f;
+        ds = velocity * dt;
     }
 
     // Position update
@@ -102,34 +105,114 @@ void Player::physicsUpdate(float dt) {
     cameraUpdate();
 }
 
-float Player::getCollisionDistance(glm::vec3& ds) {
+float Player::getCollisionDistance(glm::vec3 ds) {
 
+    // Setup
     float tMax = glm::length(ds);
+    float tMin = tMax;
 
-    // TODO
+    // Get signs
+    glm::vec3 s = glm::sign(ds);
 
-    return tMax;
+    // Unit direction
+    glm::vec3 u = glm::normalize(ds);
+
+    // Max == 0 -> return
+    if (tMax <= eps) {
+        return 0;
+    }
+
+    for (glm::vec3 offset : getBoundingBox()) {
+
+        // Initialize starting point
+        glm::vec3 p = position + offset;
+        float t = 0;
+
+        // Keep track of first iteration
+        bool firstIteration = true;
+
+        // While max. not reached
+        while (t < tMax) {
+
+            // Current cube
+            glm::ivec3 cube = (glm::ivec3) glm::floor(p);
+
+            // Get nearest intersection
+            float intersectionDistance = 2;
+            glm::vec3 intersection;
+            glm::ivec3 block;
+
+            // For every coordinate i in [x,y,z]
+            for (int i = 0; i < 3; i++) {
+
+                float pi = cube[i] + s[i]; // position_[x/y/z] of intersection
+                float di = glm::abs(p[i] - pi); // distance in i direction
+
+                // First iteration started exactly on border
+                if (firstIteration && di == 1) {
+                    di = 0;
+                }
+                // Do not skip cells
+                if (glm::abs(di) > 1) {
+                    di -= 1;
+                }
+                // position of intersection
+                glm::vec3 pIntersect = p + di / glm::abs(u[i]) * u;
+
+                // Calculate distance
+                float d = glm::length(p - pIntersect);
+
+                // Update intersection if smallest distance
+                if (d < intersectionDistance) {
+                    intersectionDistance = d;
+                    intersection = pIntersect;
+
+                    // Block correctetion based on sign
+                    glm::ivec3 blockCorrection = glm::ivec3(((i == 0 && s[i] == -1) ? -1 : 0),
+                                                            ((i == 1 && s[i] == -1) ? -1 : 0),
+                                                            ((i == 2 && s[i] == -1) ? -1 : 0));
+                    // block position
+                    block = (glm::ivec3) glm::floor(pIntersect) + blockCorrection;
+                }
+            }
+
+            // Increment t
+            t += intersectionDistance;
+
+            // Update current point
+            p = intersection;
+
+            // If solid block -> break loop
+            if (terrain->getBlockOrEmpty(block.x, block.y, block.z) != EMPTY) {
+                tMin = glm::min(tMin, t);
+                break;
+            }
+
+            firstIteration = false;
+        }
+    }
+
+    if (tMin < eps) {
+        return 0;
+    }
+    return tMin;
 }
 
 
 bool Player::isGrounded() {
 
-    /*
-    // Blocks are only at integer positions
-    int y = glm::round(position.y);
-
     // If position.y not an integer -> trivially not grounded
-    if (glm::abs(position.y - y) > eps) {
+    if (glm::abs(position.y - glm::round(position.y)) > eps) {
         return false;
     }
-    */
+
 
     // Check if any of the corners of the bounding box is on a block
     for (glm::vec3 offset : getBoundingBox()) {
         glm::vec3 pos = position + offset;
         int x = (int) pos.x;
         int z = (int) pos.z;
-        int y = (int) pos.y;
+        int y = glm::round(pos.y);
 
         // If currently on non empty block
         if (terrain->getBlockOrEmpty(x, y - 1, z) != EMPTY) {
@@ -143,7 +226,7 @@ bool Player::isGrounded() {
 
 std::vector<glm::vec3> Player::getBoundingBox() {
 
-    if (boundingBox.size() == 8) {
+    if (boundingBox.size() == 12) {
         return boundingBox;
     }
 
@@ -153,16 +236,22 @@ std::vector<glm::vec3> Player::getBoundingBox() {
     // The eyes are at the center of the upper cube
 
     // Bottom
-    box.push_back(glm::vec3(.5f,  -1.5f,  .5f));
-    box.push_back(glm::vec3(.5f,  -1.5f, -.5f));
-    box.push_back(glm::vec3(-.5f, -1.5f,  .5f));
-    box.push_back(glm::vec3(-.5f, -1.5f, -.5f));
+    box.push_back(glm::vec3(.5f,  -2.f,  .5f));
+    box.push_back(glm::vec3(.5f,  -2.f, -.5f));
+    box.push_back(glm::vec3(-.5f, -2.f,  .5f));
+    box.push_back(glm::vec3(-.5f, -2.f, -.5f));
+
+    // Middle
+    box.push_back(glm::vec3(.5f,  -1.f,  .5f));
+    box.push_back(glm::vec3(.5f,  -1.f, -.5f));
+    box.push_back(glm::vec3(-.5f, -1.f,  .5f));
+    box.push_back(glm::vec3(-.5f, -1.f, -.5f));
 
     // Top
-    box.push_back(glm::vec3(.5f,  .5f,  .5f));
-    box.push_back(glm::vec3(.5f,  .5f, -.5f));
-    box.push_back(glm::vec3(-.5f, .5f,  .5f));
-    box.push_back(glm::vec3(-.5f, .5f, -.5f));
+    box.push_back(glm::vec3(.5f,  .0f,  .5f));
+    box.push_back(glm::vec3(.5f,  .0f, -.5f));
+    box.push_back(glm::vec3(-.5f, .0f,  .5f));
+    box.push_back(glm::vec3(-.5f, .0f, -.5f));
 
     boundingBox = box;
     return boundingBox;
