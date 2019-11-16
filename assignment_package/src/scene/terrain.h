@@ -19,7 +19,7 @@ public:
     ~Terrain();
     glm::ivec3 dimensions;
     //BlockType m_blocks[64][256][64];                    // A 3D list of the blocks in the world.
-    std::unordered_map<int64_t, uPtr<Chunk>> chunkMap;        //a map of chunk's coordinate coded in 64 bits as key to the chunk
+    std::unordered_map<int64_t, Chunk*> chunkMap;        //a map of chunk's coordinate coded in 64 bits as key to the chunk
     glm::vec4 pos; //global position of the left most block
     OpenGLContext* context;
 
