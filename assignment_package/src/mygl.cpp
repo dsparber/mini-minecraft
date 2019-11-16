@@ -79,8 +79,8 @@ void MyGL::initializeGL()
 
     //Create the instance of Cube
     mp_geomCube->create();
-    //mp_chunk->create();
-    //mp_terrain->CreateTestScene();
+    mp_chunk->create();
+    mp_terrain->CreateTestScene();
     for(auto entry : mp_terrain->chunkMap){
         entry.second.create();
     }
@@ -143,36 +143,6 @@ void MyGL::GLDrawScene()
         entry.second.create();
         //mp_progLambert->setModelMatrix(glm::mat4());
         mp_progLambert->draw(entry.second);
-//        for(int x = 0; x < 16; ++x)
-//        {
-//            for(int y = 0; y < 256; ++y)
-//            {
-//                for(int z = 0; z < 16; ++z)
-//                {
-//                    //BlockType t = mp_terrain->getBlockAt(x,y,z);
-//                    BlockType t = mp_chunk->getBlockAt(x,y,z);
-//                    if(t != EMPTY)
-//                    {
-//                        switch(t)
-//                        {
-//                        case DIRT:
-//                            mp_progLambert->setGeometryColor(glm::vec4(121.f, 85.f, 58.f, 255.f) / 255.f);
-//                            break;
-//                        case GRASS:
-//                            mp_progLambert->setGeometryColor(glm::vec4(95.f, 159.f, 53.f, 255.f) / 255.f);
-//                            break;
-//                        case STONE:
-//                            mp_progLambert->setGeometryColor(glm::vec4(0.5f));
-//                            break;
-//                        default:
-//                            // Other types are as of yet not defined
-//                            break;
-//                        }
-//                    }
-
-//                }
-//            }
-//        }
 
     }
 
