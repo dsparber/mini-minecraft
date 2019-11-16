@@ -10,7 +10,7 @@ MyGL::MyGL(QWidget *parent)
     : OpenGLContext(parent),
       mp_geomCube(mkU<Cube>(this)), mp_worldAxes(mkU<WorldAxes>(this)),
       mp_progLambert(mkU<ShaderProgram>(this)), mp_progFlat(mkU<ShaderProgram>(this)),
-      mp_camera(mkU<Camera>()), mp_terrain(mkU<Terrain>(Terrain(this))), mp_chunk(mkU<Chunk>(Chunk(this)))
+      mp_camera(mkU<Camera>()), mp_terrain(mkU<Terrain>(Terrain(this)))//, mp_chunk(mkU<Chunk>(Chunk(this)))
 {
     // Connect the timer to a function so that when the timer ticks the function is executed
     connect(&timer, SIGNAL(timeout()), this, SLOT(timerUpdate()));
@@ -27,10 +27,10 @@ MyGL::~MyGL()
     makeCurrent();
     glDeleteVertexArrays(1, &vao);
     mp_geomCube->destroy();
-    mp_chunk->destroy();
-    for(auto entry : mp_terrain->chunkMap){
-        entry.second.destroy();
-    }
+    //mp_chunk->destroy();
+//    for(auto& entry : mp_terrain->chunkMap){
+//        entry.second->destroy();
+//    }
 
 
 }
@@ -79,11 +79,11 @@ void MyGL::initializeGL()
 
     //Create the instance of Cube
     mp_geomCube->create();
-    mp_chunk->create();
+    //mp_chunk->create();
     mp_terrain->CreateTestScene();
-    for(auto entry : mp_terrain->chunkMap){
-        entry.second.create();
-    }
+//    for(auto& entry : mp_terrain->chunkMap){
+//        entry.second->create();
+//    }
 
     // We have to have a VAO bound in OpenGL 3.2 Core. But if we're not
     // using multiple VAOs, we can just bind one once.
@@ -137,14 +137,15 @@ void MyGL::GLDrawScene()
     //mp_progLambert->setModelMatrix(glm::translate(glm::mat4(), glm::vec3(mp_chunk->pos)));
     //mp_progLambert->draw(*mp_chunk);
 
-    for(auto entry : mp_terrain->chunkMap){
-        mp_progLambert->setModelMatrix(glm::translate(glm::mat4(), glm::vec3(entry.second.pos)));
-        //entry.second.destroy();
-        entry.second.create();
-        //mp_progLambert->setModelMatrix(glm::mat4());
-        mp_progLambert->draw(entry.second);
+//    for(auto& entry : mp_terrain->chunkMap){
+//        Chunk* c = entry.second.get();
+//        mp_progLambert->setModelMatrix(glm::translate(glm::mat4(), glm::vec3(c->pos)));
+//        //entry.second.destroy();
+//        //c->create();
+//        //mp_progLambert->setModelMatrix(glm::mat4());
+//        mp_progLambert->draw(*c);
 
-    }
+//    }
 
 }
 

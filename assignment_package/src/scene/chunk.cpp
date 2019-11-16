@@ -64,14 +64,14 @@ Chunk::Chunk(OpenGLContext* context) : Drawable(context), mp_context(context), p
     front(nullptr), back(nullptr), m_blocks()
 {
     std::fill(this->m_blocks.begin(), this->m_blocks.end(), EMPTY);
-    tempTest();
+    //tempTest();
 }
 
 Chunk::Chunk(OpenGLContext* context, glm::vec4 pos): Drawable(context), mp_context(context), pos(pos), left(nullptr), right(nullptr),
     front(nullptr), back(nullptr), m_blocks()
 {
     std::fill(this->m_blocks.begin(), this->m_blocks.end(), EMPTY);
-    tempTest();
+    //tempTest();
 }
 
 Chunk::Chunk(OpenGLContext* context, const Chunk& c): Drawable(context), mp_context(context), pos(c.pos), left(c.left), right(c.right),
@@ -83,8 +83,8 @@ Chunk::Chunk(OpenGLContext* context, const Chunk& c): Drawable(context), mp_cont
 
 
 void Chunk::tempTest(){
-    //        setBlockAt(0,0,0,STONE);
-    //        setBlockAt(1,0,1,GRASS);
+    //    setBlockAt(0,0,0,STONE);
+    //    setBlockAt(1,0,1,GRASS);
     //    setBlockAt(1,0,0,STONE);
     //    setBlockAt(1,0,1,STONE);
 

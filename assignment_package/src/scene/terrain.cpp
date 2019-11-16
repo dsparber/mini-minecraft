@@ -4,89 +4,99 @@
 #include <iostream>
 
 
-Terrain::Terrain (OpenGLContext* context) : context(context), dimensions(64, 256, 64),chunkMap()
+Terrain::Terrain (OpenGLContext* context) : context(context), dimensions(64, 256, 64), chunkMap()
 {
     setMap();
 }
 
 void Terrain::setMap(){
-    Chunk c1 = Chunk(context, glm::vec4(0,0,0,0));
-    Chunk c2 = Chunk(context, glm::vec4(16,0,0,0));
-    Chunk c3 = Chunk(context, glm::vec4(16,0,16,0));
-    Chunk c4 = Chunk(context, glm::vec4(0,0,16,0));
+//    uPtr<Chunk> c1 = mkU<Chunk>( Chunk(context, glm::vec4(0,0,0,0)));
+//    uPtr<Chunk> c2 = mkU<Chunk>( Chunk(context, glm::vec4(16,0,0,0)));
+//    uPtr<Chunk> c3 = mkU<Chunk>( Chunk(context, glm::vec4(16,0,16,0)));
+//    uPtr<Chunk> c4 = mkU<Chunk>( Chunk(context, glm::vec4(0,0,16,0)));
 
-    Chunk c5 = Chunk(context, glm::vec4(32,0,0,0));
-    Chunk c6 = Chunk(context, glm::vec4(48,0,0,0));
-    Chunk c7 = Chunk(context, glm::vec4(48,0,16,0));
-    Chunk c8 = Chunk(context, glm::vec4(32,0,16,0));
+//    uPtr<Chunk> c5 = mkU<Chunk>( Chunk(context, glm::vec4(32,0,0,0)));
+//    uPtr<Chunk> c6 = mkU<Chunk>( Chunk(context, glm::vec4(48,0,0,0)));
+//    uPtr<Chunk> c7 = mkU<Chunk>( Chunk(context, glm::vec4(48,0,16,0)));
+//    uPtr<Chunk> c8 = mkU<Chunk>( Chunk(context, glm::vec4(32,0,16,0)));
 
-    Chunk c9 = Chunk(context, glm::vec4(32,0,32,0));
-    Chunk c10 = Chunk(context, glm::vec4(48,0,32,0));
-    Chunk c11 = Chunk(context, glm::vec4(48,0,48,0));
-    Chunk c12 = Chunk(context, glm::vec4(32,0,48,0));
+//    uPtr<Chunk> c9 = mkU<Chunk>( Chunk(context, glm::vec4(32,0,32,0)));
+//    uPtr<Chunk> c10 = mkU<Chunk>( Chunk(context, glm::vec4(48,0,32,0)));
+//    uPtr<Chunk> c11 = mkU<Chunk>( Chunk(context, glm::vec4(48,0,48,0)));
+//    uPtr<Chunk> c12 = mkU<Chunk>( Chunk(context, glm::vec4(32,0,48,0)));
 
-    Chunk c13 = Chunk(context, glm::vec4(0,0,32,0));
-    Chunk c14 = Chunk(context, glm::vec4(16,0,32,0));
-    Chunk c15 = Chunk(context, glm::vec4(16,0,48,0));
-    Chunk c16 = Chunk(context, glm::vec4(0,0,48,0));
+//    uPtr<Chunk> c13 = mkU<Chunk>( Chunk(context, glm::vec4(0,0,32,0)));
+//    uPtr<Chunk> c14 = mkU<Chunk>( Chunk(context, glm::vec4(16,0,32,0)));
+//    uPtr<Chunk> c15 = mkU<Chunk>( Chunk(context, glm::vec4(16,0,48,0)));
+//    uPtr<Chunk> c16 = mkU<Chunk>( Chunk(context, glm::vec4(0,0,48,0)));
 
-    c1.right = &c2;
-    c1.back = &c4;
-    c2.left = &c1;
-    c2.back = &c3;
-    c2.right = &c5;
-    c3.front = &c2;
-    c3.left = &c4;
-    c4.front = &c1;
-    c4.right = &c3;
-    //keys
-    int64_t k1 = Terrain::getHashKey(0, 0);
-    int64_t k2 = Terrain::getHashKey(16, 0);
-    int64_t k3 = Terrain::getHashKey(16, 16);
-    int64_t k4 = Terrain::getHashKey(0, 16);
+//    c1->right = c2.get();
+//    c1->back = c4.get();
+//    c2->left = c1.get();
+//    c2->back = c3.get();
+//    c2->right = c5.get();
+//    c3->front = c2.get();
+//    c3->left = c4.get();
+//    c4->front = c1.get();
+//    c4->right = c3.get();
+//    //keys
+//    int64_t k1 = Terrain::getHashKey(0, 0);
+//    int64_t k2 = Terrain::getHashKey(16, 0);
+//    int64_t k3 = Terrain::getHashKey(16, 16);
+//    int64_t k4 = Terrain::getHashKey(0, 16);
 
-    int64_t k5 = Terrain::getHashKey(32, 0);
-    int64_t k6 = Terrain::getHashKey(48, 0);
-    int64_t k7 = Terrain::getHashKey(48, 16);
-    int64_t k8 = Terrain::getHashKey(32, 16);
+//    int64_t k5 = Terrain::getHashKey(32, 0);
+//    int64_t k6 = Terrain::getHashKey(48, 0);
+//    int64_t k7 = Terrain::getHashKey(48, 16);
+//    int64_t k8 = Terrain::getHashKey(32, 16);
 
-    int64_t k9 = Terrain::getHashKey(32, 32);
-    int64_t k10 = Terrain::getHashKey(48, 32);
-    int64_t k11 = Terrain::getHashKey(48, 48);
-    int64_t k12 = Terrain::getHashKey(32, 48);
+//    int64_t k9 = Terrain::getHashKey(32, 32);
+//    int64_t k10 = Terrain::getHashKey(48, 32);
+//    int64_t k11 = Terrain::getHashKey(48, 48);
+//    int64_t k12 = Terrain::getHashKey(32, 48);
 
-    int64_t k13 = Terrain::getHashKey(0, 32);
-    int64_t k14 = Terrain::getHashKey(16, 32);
-    int64_t k15 = Terrain::getHashKey(16, 48);
-    int64_t k16 = Terrain::getHashKey(0, 48);
+//    int64_t k13 = Terrain::getHashKey(0, 32);
+//    int64_t k14 = Terrain::getHashKey(16, 32);
+//    int64_t k15 = Terrain::getHashKey(16, 48);
+//    int64_t k16 = Terrain::getHashKey(0, 48);
 
-    chunkMap.insert(std::make_pair(k1, c1));
-    chunkMap.insert(std::make_pair(k2, c2));
-    chunkMap.insert(std::make_pair(k3, c3));
-    chunkMap.insert(std::make_pair(k4, c4));
+    //chunkMap.insert(std::make_pair(k1, std::move(c1)));
+//    chunkMap.insert(std::make_pair(k2, c2));
+//    chunkMap.insert(std::make_pair(k3, c3));
+//    chunkMap.insert(std::make_pair(k4, c4));
 
-    chunkMap.insert(std::make_pair(k5, c5));
-    chunkMap.insert(std::make_pair(k6, c6));
-    chunkMap.insert(std::make_pair(k7, c7));
-    chunkMap.insert(std::make_pair(k8, c8));
+//    chunkMap.insert(std::make_pair(k5, c5));
+//    chunkMap.insert(std::make_pair(k6, c6));
+//    chunkMap.insert(std::make_pair(k7, c7));
+//    chunkMap.insert(std::make_pair(k8, c8));
 
-    chunkMap.insert(std::make_pair(k9, c9));
-    chunkMap.insert(std::make_pair(k10, c10));
-    chunkMap.insert(std::make_pair(k11, c11));
-    chunkMap.insert(std::make_pair(k12, c12));
+//    chunkMap.insert(std::make_pair(k9, c9));
+//    chunkMap.insert(std::make_pair(k10, c10));
+//    chunkMap.insert(std::make_pair(k11, c11));
+//    chunkMap.insert(std::make_pair(k12, c12));
 
-    chunkMap.insert(std::make_pair(k13, c13));
-    chunkMap.insert(std::make_pair(k14, c14));
-    chunkMap.insert(std::make_pair(k15, c15));
-    chunkMap.insert(std::make_pair(k16, c16));
+//    chunkMap.insert(std::make_pair(k13, c13));
+//    chunkMap.insert(std::make_pair(k14, c14));
+//    chunkMap.insert(std::make_pair(k15, c15));
+//    chunkMap.insert(std::make_pair(k16, c16));
 
-    //CreateTestScene();
-    //    Chunk c(context, glm::vec4(0,0,0,0));
-    //    c.setBlockAt(0,0,0,STONE);
-    //    BlockType t = c.getBlockAt(0,0,0);
+    //    //CreateTestScene();
+    //    Chunk* c = new Chunk(context, glm::vec4(0,0,0,0));
     //    int64_t k1 = Terrain::getHashKey(0, 0);
     //    chunkMap.insert({k1, c});
+    //    setBlockAt(0,0,0,STONE);
+    //    //getBlockAt(0,0,0) = STONE;
+    //    //Chunk c1 = chunkMap[(int64_t)0];
+    //    //BlockType test = c1.m_blocks[0];
+    //    BlockType t = getBlockAt(0,0,0);
 }
+
+void Terrain::addChunk(glm::vec4 pos){
+//    uPtr<Chunk> c = mkU<Chunk>(Chunk<context, pos>);
+//    int64_t k = Terrain::getHashKey(pos.x, pos.z);
+//    chunkMap.insert({k, std::move(c)});
+}
+
 
 //x is in lower 32 bits, z is in upper 32 bits
 int64_t Terrain::getHashKey(int x, int z){
@@ -116,14 +126,38 @@ BlockType Terrain::getBlockAt(int x, int y, int z) const
     //    locate which chunk it is in
     //    check if the coordinate belong to the chunk
 
-    for(auto entry : chunkMap){
-        int64_t key = entry.first;
-        glm::vec2 xzPos = getCoordFromKey(key);
-        if(x>=xzPos.x && x<xzPos.x+16 && z>=xzPos.y && z<xzPos.y+16){
-            return entry.second.getBlockAt(x - xzPos.x, y, z - xzPos.y);
-        }
-    }
-    return EMPTY;
+//    for(auto& entry : chunkMap){
+//        int64_t key = entry.first;
+//        Chunk* c = entry.second.get();
+//        glm::vec2 xzPos = getCoordFromKey(key);
+//        int newx = x - xzPos.x;
+//        int newz = z - xzPos.y;
+//        if(x>=xzPos.x && x<xzPos.x+16 && z>=xzPos.y && z<xzPos.y+16){
+//            int idx = 16 * 256 * newx + 16 * y + newz;
+//            BlockType t = c->m_blocks[idx];
+//            return c->m_blocks[idx];
+//        }
+//        return EMPTY;
+//    }
+}
+
+BlockType& Terrain::getBlockAt(int x, int y, int z)
+{
+    //    locate which chunk it is in
+    //    check if the coordinate belong to the chunk
+
+//    for(auto& entry : chunkMap){
+//        int64_t key = entry.first.get();
+//        Chunk* c = entry.second;
+//        glm::vec2 xzPos = getCoordFromKey(key);
+//        int newx = x - xzPos.x;
+//        int newz = z - xzPos.y;
+//        if(x>=xzPos.x && x<xzPos.x+16 && z>=xzPos.y && z<xzPos.y+16){
+//            int idx = 16 * 256 * newx + 16 * y + newz;
+//            BlockType t = c->m_blocks[idx];
+//            return c->m_blocks[idx];
+//        }
+//    }
 }
 
 void Terrain::setBlockAt(int x, int y, int z, BlockType t)
@@ -131,14 +165,19 @@ void Terrain::setBlockAt(int x, int y, int z, BlockType t)
     //locate which chunk it is in
     //check if the coordinate belong to the chunk
 
-    for(auto entry : chunkMap){
-        int64_t key = entry.first;
-        glm::vec2 xzPos = getCoordFromKey(key);
-        if(x>=xzPos.x && x<xzPos.x+16 && z>=xzPos.y && z<xzPos.y+16){
-            entry.second.setBlockAt(x - xzPos.x, y, z - xzPos.y, t);
-            break;
-        }
-    }
+//    for(auto& entry : chunkMap){
+//        Chunk* c = entry.second.get();
+//        int64_t key = entry.first;
+//        glm::vec2 xzPos = getCoordFromKey(key);
+//        int newx = x - xzPos.x;
+//        int newz = z - xzPos.y;
+//        if(x>=xzPos.x && x<xzPos.x+16 && z>=xzPos.y && z<xzPos.y+16){
+//            int idx = 16 * 256 * newx + 16 * y + newz;
+//            c->m_blocks[idx] = t;
+//            BlockType t1 = c->m_blocks[0];
+//            break;
+//        }
+//    }
 }
 
 void Terrain::CreateTestScene()
@@ -181,4 +220,11 @@ void Terrain::CreateTestScene()
     {
         setBlockAt(32,y,32,GRASS);
     }
+}
+
+Terrain::~Terrain(){
+    //    for(auto entry : chunkMap){
+    //        delete entry.second;
+    //    }
+
 }
