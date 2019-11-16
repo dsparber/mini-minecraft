@@ -30,9 +30,9 @@ MyGL::~MyGL()
     //mp_chunk->destroy();
     for(auto entry : mp_terrain->chunkMap){
         entry.second->destroy();
+        delete entry.second;
+        entry.second = nullptr;
     }
-
-
 }
 
 
@@ -81,9 +81,10 @@ void MyGL::initializeGL()
     mp_geomCube->create();
     //mp_chunk->create();
     mp_terrain->CreateTestScene();
-    for(auto& entry : mp_terrain->chunkMap){
-        entry.second->create();
-    }
+
+//    for(auto& entry : mp_terrain->chunkMap){
+//        entry.second->create();
+//    }
 
     // We have to have a VAO bound in OpenGL 3.2 Core. But if we're not
     // using multiple VAOs, we can just bind one once.
@@ -91,7 +92,6 @@ void MyGL::initializeGL()
     glBindVertexArray(vao);
 
     printGLErrorLog();
-    std::cout<<"--end of create test scene error"<<std::endl;
 }
 
 void MyGL::resizeGL(int w, int h)
@@ -141,9 +141,7 @@ void MyGL::GLDrawScene()
         Chunk* c = entry.second;
         mp_progLambert->setModelMatrix(glm::translate(glm::mat4(), glm::vec3(c->pos)));
         c->create();
-        //mp_progLambert->setModelMatrix(glm::mat4());
         mp_progLambert->draw(*c);
-
     }
 
 }
