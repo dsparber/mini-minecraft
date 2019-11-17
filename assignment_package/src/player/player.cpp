@@ -132,6 +132,11 @@ void Player::physicsUpdate(float dt) {
     // Position update
     position += ds;
 
+    // Tell terrain that player moved
+    if (glm::length(ds) > eps) {
+        terrain->checkAndCreate(position);
+    }
+
     // Update camera
     cameraUpdate();
 }

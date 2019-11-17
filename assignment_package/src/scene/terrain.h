@@ -24,7 +24,7 @@ public:
     OpenGLContext* context;
 
     void setMap();
-    void CreateTestScene();
+    void create();
 
     BlockType getBlockOrEmpty(int x, int y, int z) const;
 
@@ -39,7 +39,12 @@ public:
     glm::vec3 rayMarch(glm::vec3 eye, glm::vec3 look);
     void generateTerrain(glm::vec3 currPos);
                                                           // given type.
-    void addChunk(glm::vec4 pos);
+    Chunk* addChunk(glm::vec4 pos);
+
+    Chunk* getChunk(int x, int z) const;
+
+    void checkAndCreate(glm::vec3);
+
     int64_t getHashKey(int x, int z) const;
     glm::vec2 getCoordFromKey(int64_t key) const;
 };

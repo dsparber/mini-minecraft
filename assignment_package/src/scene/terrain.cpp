@@ -20,91 +20,14 @@ Terrain::Terrain (OpenGLContext* context) : context(context), dimensions(64, 256
 }
 
 void Terrain::setMap(){
-    Chunk* c1 = new Chunk(context, glm::vec4(0,0,0,0));
-    Chunk* c2 = new Chunk(context, glm::vec4(16,0,0,0));
-    Chunk* c3 = new Chunk(context, glm::vec4(16,0,16,0));
-    Chunk* c4 = new Chunk(context, glm::vec4(0,0,16,0));
-
-    Chunk* c5 = new Chunk(context, glm::vec4(32,0,0,0));
-    Chunk* c6 = new Chunk(context, glm::vec4(48,0,0,0));
-    Chunk* c7 = new Chunk(context, glm::vec4(48,0,16,0));
-    Chunk* c8 = new Chunk(context, glm::vec4(32,0,16,0));
-
-    Chunk* c9 = new Chunk(context, glm::vec4(32,0,32,0));
-    Chunk* c10 = new Chunk(context, glm::vec4(48,0,32,0));
-    Chunk* c11 = new Chunk(context, glm::vec4(48,0,48,0));
-    Chunk* c12 = new Chunk(context, glm::vec4(32,0,48,0));
-
-    Chunk* c13 = new Chunk(context, glm::vec4(0,0,32,0));
-    Chunk* c14 = new Chunk(context, glm::vec4(16,0,32,0));
-    Chunk* c15 = new Chunk(context, glm::vec4(16,0,48,0));
-    Chunk* c16 = new Chunk(context, glm::vec4(0,0,48,0));
-
-    c1->right = c2;
-    c1->back = c4;
-    c2->left = c1;
-    c2->back = c3;
-    c2->right = c5;
-    c3->front = c2;
-    c3->left = c4;
-    c4->front = c1;
-    c4->right = c3;
-    //keys
-    int64_t k1 = Terrain::getHashKey(0, 0);
-    int64_t k2 = Terrain::getHashKey(16, 0);
-    int64_t k3 = Terrain::getHashKey(16, 16);
-    int64_t k4 = Terrain::getHashKey(0, 16);
-
-    int64_t k5 = Terrain::getHashKey(32, 0);
-    int64_t k6 = Terrain::getHashKey(48, 0);
-    int64_t k7 = Terrain::getHashKey(48, 16);
-    int64_t k8 = Terrain::getHashKey(32, 16);
-
-    int64_t k9 = Terrain::getHashKey(32, 32);
-    int64_t k10 = Terrain::getHashKey(48, 32);
-    int64_t k11 = Terrain::getHashKey(48, 48);
-    int64_t k12 = Terrain::getHashKey(32, 48);
-
-    int64_t k13 = Terrain::getHashKey(0, 32);
-    int64_t k14 = Terrain::getHashKey(16, 32);
-    int64_t k15 = Terrain::getHashKey(16, 48);
-    int64_t k16 = Terrain::getHashKey(0, 48);
-
-    chunkMap.insert(std::make_pair(k1, c1));
-    chunkMap.insert(std::make_pair(k2, c2));
-    chunkMap.insert(std::make_pair(k3, c3));
-    chunkMap.insert(std::make_pair(k4, c4));
-
-    chunkMap.insert(std::make_pair(k5, c5));
-    chunkMap.insert(std::make_pair(k6, c6));
-    chunkMap.insert(std::make_pair(k7, c7));
-    chunkMap.insert(std::make_pair(k8, c8));
-
-    chunkMap.insert(std::make_pair(k9, c9));
-    chunkMap.insert(std::make_pair(k10, c10));
-    chunkMap.insert(std::make_pair(k11, c11));
-    chunkMap.insert(std::make_pair(k12, c12));
-
-    chunkMap.insert(std::make_pair(k13, c13));
-    chunkMap.insert(std::make_pair(k14, c14));
-    chunkMap.insert(std::make_pair(k15, c15));
-    chunkMap.insert(std::make_pair(k16, c16));
-
-    //    //CreateTestScene();
-    //    Chunk* c = new Chunk(context, glm::vec4(0,0,0,0));
-    //    int64_t k1 = Terrain::getHashKey(0, 0);
-    //    chunkMap.insert({k1, c});
-    //    setBlockAt(0,0,0,STONE);
-    //    //getBlockAt(0,0,0) = STONE;
-    //    //Chunk c1 = chunkMap[(int64_t)0];
-    //    //BlockType test = c1.m_blocks[0];
-    //    BlockType t = getBlockAt(0,0,0);
+    generateTerrain(glm::vec3(0, 0, 0));
 }
 
-void Terrain::addChunk(glm::vec4 pos){
+Chunk* Terrain::addChunk(glm::vec4 pos){
     Chunk* c = new Chunk(context, pos);
     int64_t k = Terrain::getHashKey(pos.x, pos.z);
-    chunkMap.insert({k, c});
+    chunkMap[k] = c;
+    return c;
 }
 
 
@@ -171,6 +94,22 @@ BlockType& Terrain::getBlockAt(int x, int y, int z)
     return chunk->getBlockAt(blockX, y, blockZ);
 }
 
+Chunk* Terrain::getChunk(int x, int z) const {
+    // Get coordinates aligned to chunk
+    int chunkX = (x / 16) * 16;
+    int chunkZ = (z / 16) * 16;
+
+    // Get key for chunk map
+    int64_t chunkKey = Terrain::getHashKey(chunkX, chunkZ);
+
+    if (chunkMap.find(chunkKey) == chunkMap.end()) {
+        return nullptr;
+    }
+
+    // Get chunk
+    return chunkMap.at(chunkKey);
+}
+
 void Terrain::setBlockAt(int x, int y, int z, BlockType t)
 {
     // Get coordinates aligned to chunk
@@ -227,11 +166,8 @@ float fbm(float x, float z) {
     return total;
 }
 
-void Terrain::CreateTestScene()
+void Terrain::create()
 {
-    // Amelia has a Chunk::getBlockAt(x, y, z) in Chunk class
-    // loop through every chunk
-    // for each chunk go through every block and get its WORLD (x,z) coord
     for(auto entry : chunkMap){
         Chunk* c = entry.second;
         int64_t key = entry.first;
@@ -243,7 +179,6 @@ void Terrain::CreateTestScene()
             {
                 for(int y = 0; y < 256; ++y)
                 {
-                    // Amelia will have a map going from chunk to world
                     int newX = chunkPos.x + x;
                     int newY = y;
                     int newZ = chunkPos[1] + z;
@@ -266,6 +201,7 @@ void Terrain::CreateTestScene()
                 }
             }
         }
+        c->create();
     }
 }
 
@@ -300,37 +236,57 @@ glm::vec3 Terrain::rayMarch(glm::vec3 eye, glm::vec3 look)
     return currPos;
 }
 
+void Terrain::checkAndCreate(glm::vec3 playerPosition) {
 
-// Generating new terrain
-// How/when/where to check characters position to call this function
-// need consistent checking, checking in every direction, put it in the game loop (paintGL)
-    // every time timer ticks, check what area of world the character is in, if that location is close to the edge of that part of the world,
-    // then check if the blocks on the edge have neighbors, if not generate new terrain
-    // add new chunks to map of chunks
-// get current coordinates from camera, check if camera's (x,z) is in the map or use getBlockAt to see if a block exists there (could create a
-//      block type called NO_BLOCK (different than empty)
+    for (int i = 0; i < 8; i++) {
 
-// Need a function from Amelia to generate a new chunk, each time the player is
-//      within ___ of the edge, generate a new chunk
-void Terrain::generateTerrain(glm::vec3 currPos) {
-    // get current chunk position
-    // position of new chunk =
-//void createChunk(position of this chunk);
+        glm::vec3 delta = glm::mat3(glm::rotate(glm::mat4(), i * glm::pi<float>() / 4, glm::vec3(0, 0, 1))) * glm::vec3(16, 0, 0);
+
+        glm::vec3 testPos = playerPosition + delta;
+
+        Chunk* testChunk = getChunk(testPos.x, testPos.z);
+
+        if (testChunk == nullptr) {
+            generateTerrain(testPos);
+
+        }
+    }
 }
 
-//    // Add "walls" for collision testing
-//    for(int x = 0; x < 64; ++x)
-//    {
-//        m_blocks[x][129][0] = GRASS;
-//        m_blocks[x][130][0] = GRASS;
-//        m_blocks[x][129][63] = GRASS;
-//        m_blocks[0][130][x] = GRASS;
-//    }
-//    for(int y = 129; y < 140; ++y)
-//    {
-//        m_blocks[32][y][32] = GRASS;
-//    }
+void Terrain::generateTerrain(glm::vec3 currPos) {
 
+    // Align coordinates
+    glm::ivec3 requestedPos = (glm::ivec3) currPos;
+    requestedPos = (requestedPos / 64) * 64;
+
+    for (int i = 0; i < 64; i += 16)
+    {
+        for (int j = 0; j < 64; j += 16)
+        {
+            int x = requestedPos.x + i;
+            int z = requestedPos.z + j;
+            addChunk(glm::vec4(x, 0, z, 1.f));
+        }
+    }
+
+    for (int i = 0; i < 64; i += 16)
+    {
+        for (int j = 0; j < 64; j += 16)
+        {
+            int x = requestedPos.x + i;
+            int z = requestedPos.z + j;
+
+            Chunk* c = getChunk(x, z);
+
+            c->left = getChunk(x - 16, z);
+            c->right = getChunk(x + 16, z);
+            c->front = getChunk(x, z - 16);
+            c->back = getChunk(x, z + 16);
+        }
+    }
+
+    create();
+}
 
 Terrain::~Terrain(){
 

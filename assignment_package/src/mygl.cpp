@@ -89,7 +89,6 @@ void MyGL::initializeGL()
     //Create the instance of Cube
     mp_geomCube->create();
     //mp_chunk->create();
-    mp_terrain->CreateTestScene();
 
 //    for(auto& entry : mp_terrain->chunkMap){
 //        entry.second->create();
@@ -101,6 +100,8 @@ void MyGL::initializeGL()
     glBindVertexArray(vao);
 
     printGLErrorLog();
+
+    mp_terrain->create();
 }
 
 void MyGL::resizeGL(int w, int h)
@@ -165,7 +166,6 @@ void MyGL::GLDrawScene()
     for(auto& entry : mp_terrain->chunkMap){
         Chunk* c = entry.second;
         mp_progLambert->setModelMatrix(glm::translate(glm::mat4(), glm::vec3(c->pos)));
-        c->create();
         mp_progLambert->draw(*c);
     }
 
