@@ -225,79 +225,47 @@ float fbm(float x, float z) {
     return total;
 }
 
-// Base code implementation
 void Terrain::CreateTestScene()
 {
-    setBlockAt(0,0,0,STONE);
-    // Create the basic terrain floor
-    for(int x = 0; x < 64; ++x)
-    {
-        for(int z = 0; z < 64; ++z)
+    // Amelia has a Chunk::getBlockAt(x, y, z) in Chunk class
+    // loop through every chunk
+    // for each chunk go through every block and get its WORLD (x,z) coord
+    for(auto entry : chunkMap){
+        Chunk* c = entry.second;
+        int64_t key = entry.first;
+        glm::vec2 chunkPos = getCoordFromKey(key);
+
+        for(int x = 0; x < 16; ++x)
         {
-            for(int y = 127; y < 256; ++y)
+            for(int z = 0; z < 16; ++z)
             {
-                if(y <= 128)
+                for(int y = 0; y < 256; ++y)
                 {
-                        m_blocks[x][y][z] = STONE;
-                }
-                else
-                {
-                    // Terrain generation
-                    // multiple by 32 and add 128
-                    float rawFBM = fbm(x / 64.f, z / 64.f);
-                    float fbmVal = 85.f * powf(rawFBM, 4.f);
-                    int intFBM = 128 + (int) fbmVal;
+                    // Amelia will have a map going from chunk to world
+                    int newX = chunkPos.x + x;
+                    int newY = y;
+                    int newZ = chunkPos[1] + z;
 
-                    for (int i = 129; i < intFBM; i++) {
-                        m_blocks[x][i][z] = DIRT;
+                    if(y <= 128) {
+                        setBlockAt(newX, newY, newZ, STONE);
                     }
+                    else
+                    {
+                        float rawFBM = fbm(newX / 64.f, newZ / 64.f);
+                        float fbmVal = 85.f * powf(rawFBM, 4.f);
+                        int intFBM = 128 + (int) fbmVal;
 
-                    m_blocks[x][intFBM][z] = GRASS;
+                        for (int i = 129; i < intFBM; i++) {
+                            setBlockAt(newX, intFBM, newZ, DIRT);
+                        }
+
+                        setBlockAt(newX, intFBM, newZ, GRASS);
+                    }
                 }
             }
         }
     }
 }
-
-//// New implementation with chunking
-//void Terrain::CreateTestScene()
-//{
-//    // Amelia has a Chunk::getBlockAt(x, y, z) in Chunk class
-//    // loop through every chunk
-//    // for each chunk go through every block and get its WORLD (x,z) coord
-//    for(/* each chunk c*/)
-//    {
-//        for(int x = 0; x < 16; ++x)
-//        {
-//            for(int z = 0; z < 16; ++z)
-//            {
-//                for(int y = 0; y < 256; ++y)
-//                {
-//                    // Amelia will have a map going from chunk to world
-//                    int newX = /*change to world*/;
-//                    int newY = /*change to world*/;
-//                    int newZ = /*change to world*/;
-
-//                    if(y <= 128) {
-//                        c.setBlockAt(newX, newY, newZ, STONE);
-//                    }
-//                    else
-//                    {
-//                        float rawFBM = fbm(newX / 64.f, newZ / 64.f);
-//                        float fbmVal = 85.f * powf(rawFBM, 4.f);
-//                        int intFBM = 128 + (int) fbmVal;
-
-//                        for (int i = 129; i < intFBM; i++) {
-//                            c.setBlockAt(newX, intFBM, newZ, DIRT);
-//                        }
-
-//                        c.setBlockAt(newX, intFBM, newZ, GRASS);
-//                    }
-//                }
-//            }
-//        }
-//    }
-//}
 
 void Terrain::addBlock(glm::vec3 eye, glm::vec3 look)
 {
@@ -328,8 +296,8 @@ glm::vec3 Terrain::rayMarch(glm::vec3 eye, glm::vec3 look)
         }
     }
     return currPos;
-    }
 }
+
 
 // Generating new terrain
 // How/when/where to check characters position to call this function
@@ -360,6 +328,7 @@ void Terrain::generateTerrain(glm::vec3 currPos) {
 //    {
 //        m_blocks[32][y][32] = GRASS;
 //    }
+
 
 Terrain::~Terrain(){
 

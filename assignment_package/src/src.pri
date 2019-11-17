@@ -14,7 +14,7 @@ SOURCES += \
     $$PWD/scene/transform.cpp \
     $$PWD/openglcontext.cpp \
     $$PWD/scene/terrain.cpp \
-    $$PWD/scene/chunk.cpp
+    $$PWD/scene/chunk.cpp \
     $$PWD/scene/worldaxes.cpp \
     $$PWD/player/player.cpp
 
@@ -34,5 +34,5 @@ HEADERS += \
     $$PWD/scene/worldaxes.h \
     $$PWD/smartpointerhelp.h \
     $$PWD/scene/chunk.h \
-    $$PWD/scene/blocktype.h
+    $$PWD/scene/blocktype.h \
     $$PWD/player/player.h

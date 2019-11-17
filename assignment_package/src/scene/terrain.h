@@ -26,8 +26,6 @@ public:
     void setMap();
     void CreateTestScene();
 
-    glm::ivec3 dimensions;
-
     BlockType getBlockOrEmpty(int x, int y, int z) const;
 
     BlockType& getBlockAt(int x, int y, int z) ;
