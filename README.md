@@ -4,7 +4,9 @@ Amelia Peng, Daniel Sparber, Veronica Bristol
 
 ## Milestone 1
 
-**Video:** *TODO*
+### Videos
+
+- [Game Engine Update Function and Player Physics](https://youtu.be/PDtSNNaBpVM)
 
 ### Procedural Terrain
 
@@ -12,9 +14,9 @@ Implemented by: **Veronica**
 
 #### Implementation
 
-- *Initial Terrain Generation:* To implement the terrain using fractal brownian motion, I used the fbm functions given in lecture notes. I manipulated the output of the fbm function by raising it to the 4th power and multiplying by 85. This gave me some nice mountains with a maximum height of 85. I then added 128 to my value to move the terrain above the 128 blocks of stone. To align my code with chunking, I then rewrote the for loops in CreateTestScene (which we have renamed to create()) to loop through each chunk in the chunk map and then loop through each block within each chunk. 
-- *Delete & Add Block:* To implement delete and add block I used ray-marching to find the closest block to delete or add next to. At first I struggled with this section because I didn't understand the difference between ray-marching and ray cube intersection, but once I understood the difference between the two methods and how to implement each ray-marching was easy to implement. Ultimately, I chose to use ray-marching instead of ray cube intersection because I understand the concept better. I still don't fully understand ray cube intersection, so I thought it would be better to implement the method that I had a complete understanding of rather than use the given raycube intersection code that I don't understand. I also added a new BlockType called LAVA in order to test my add block function. I set the maxLength for adding and deleting blocks to be 8, so that you must be within 8 blocks to add or delete a block. 
-- *Generating New Terrain:* To implement new terrain generation I created a new function that is called from the player class and consistently checks in every direction (8 directions) if there is terrain in that direction. If terrain does not exist in a direction then I generate new terrain. Each time new terrain is generated, I create 16 new chunks who's positions align with the initial terrain. Initially I had trouble understanding this section conceptually and visualizing how I would make the terrain continuous, but after help in office hours and talking to other students I got a better understanding. Unfortunately, the terrain generation relies on chunking, so I'm unable to display it in my video since our chunking does not completely work.
+**TODO:** briefly describe how you implemented your chosen features. 
+Discuss any difficulties you encountered when coding the project, and explain the approach you 
+took to implementing each feature
 
 
 
