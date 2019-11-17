@@ -15,7 +15,7 @@ MyGL::MyGL(QWidget *parent)
       mp_progFlat(mkU<ShaderProgram>(this)),
       mp_camera(mkU<Camera>()),
       mp_player(mkU<Player>()),
-      mp_terrain(mkU<Terrain>()),
+      mp_terrain(mkU<Terrain>(this)),
       lastUpdate(0)
 {
     // Connect the timer to a function so that when the timer ticks the function is executed
@@ -36,6 +36,12 @@ MyGL::~MyGL()
     makeCurrent();
     glDeleteVertexArrays(1, &vao);
     mp_geomCube->destroy();
+    //mp_chunk->destroy();
+    for(auto entry : mp_terrain->chunkMap){
+        entry.second->destroy();
+        delete entry.second;
+        entry.second = nullptr;
+    }
 }
 
 
@@ -68,9 +74,7 @@ void MyGL::initializeGL()
     // Create a Vertex Attribute Object
     glGenVertexArrays(1, &vao);
 
-    //Create the instance of Cube
-    mp_geomCube->create();
-    mp_worldAxes->create();
+
 
     // Create and set up the diffuse shader
     mp_progLambert->create(":/glsl/lambert.vert.glsl", ":/glsl/lambert.frag.glsl");
@@ -82,12 +86,21 @@ void MyGL::initializeGL()
     // This makes your geometry render green.
     mp_progLambert->setGeometryColor(glm::vec4(0,1,0,1));
 
+    //Create the instance of Cube
+    mp_geomCube->create();
+    //mp_chunk->create();
+    mp_terrain->CreateTestScene();
+
+//    for(auto& entry : mp_terrain->chunkMap){
+//        entry.second->create();
+//    }
+
     // We have to have a VAO bound in OpenGL 3.2 Core. But if we're not
     // using multiple VAOs, we can just bind one once.
-//    vao.bind();
+    //    vao.bind();
     glBindVertexArray(vao);
 
-    mp_terrain->CreateTestScene();
+    printGLErrorLog();
 }
 
 void MyGL::resizeGL(int w, int h)
@@ -95,7 +108,7 @@ void MyGL::resizeGL(int w, int h)
     //This code sets the concatenated view and perspective projection matrices used for
     //our scene's camera view.
     *mp_camera = Camera(w, h, glm::vec3(mp_terrain->dimensions.x, mp_terrain->dimensions.y * 0.75, mp_terrain->dimensions.z),
-                       glm::vec3(mp_terrain->dimensions.x / 2, mp_terrain->dimensions.y / 2, mp_terrain->dimensions.z / 2), glm::vec3(0,1,0));
+                        glm::vec3(mp_terrain->dimensions.x / 2, mp_terrain->dimensions.y / 2, mp_terrain->dimensions.z / 2), glm::vec3(0,1,0));
     glm::mat4 viewproj = mp_camera->getViewProj();
 
     MoveMouseToCenter();
@@ -103,7 +116,6 @@ void MyGL::resizeGL(int w, int h)
 
     mp_progLambert->setViewProjMatrix(viewproj);
     mp_progFlat->setViewProjMatrix(viewproj);
-
     printGLErrorLog();
 }
 
@@ -143,54 +155,22 @@ void MyGL::paintGL()
 
     GLDrawScene();
 
-    glDisable(GL_DEPTH_TEST);
-    mp_progFlat->setModelMatrix(glm::mat4());
-    mp_progFlat->draw(*mp_worldAxes);
-    glEnable(GL_DEPTH_TEST);
-
-    //if () {
-      //  mp_terrain->generateTerrain(mp_camera.look);
-    //}
-    // every time timer ticks, check what area of world the character is in, if that location is close to the edge of that part of the world,
-    // then check if the blocks on the edge have neighbors, if not generate new terrain
-    // add new chunks to map of chunks
 }
 
 void MyGL::GLDrawScene()
 {
-    for(int x = 0; x < mp_terrain->dimensions.x; ++x)
-    {
-        for(int y = 0; y < mp_terrain->dimensions.y; ++y)
-        {
-            for(int z = 0; z < mp_terrain->dimensions.z; ++z)
-            {
-                BlockType t;
-                if((t = mp_terrain->m_blocks[x][y][z]) != EMPTY)
-                {
-                    switch(t)
-                    {
-                    case DIRT:
-                        mp_progLambert->setGeometryColor(glm::vec4(121.f, 85.f, 58.f, 255.f) / 255.f);
-                        break;
-                    case GRASS:
-                        mp_progLambert->setGeometryColor(glm::vec4(95.f, 159.f, 53.f, 255.f) / 255.f);
-                        break;
-                    case STONE:
-                        mp_progLambert->setGeometryColor(glm::vec4(0.5f));
-                        break;
-                    case LAVA:
-                        mp_progLambert->setGeometryColor(glm::vec4(1.f, 0.f, 0.f, 0.f));
-                    default:
-                        // Other types are as of yet not defined
-                        break;
-                    }
-                    mp_progLambert->setModelMatrix(glm::translate(glm::mat4(), glm::vec3(x, y, z)));
-                    mp_progLambert->draw(*mp_geomCube);
-                }
-            }
-        }
+    //mp_progLambert->setModelMatrix(glm::translate(glm::mat4(), glm::vec3(mp_chunk->pos)));
+    //mp_progLambert->draw(*mp_chunk);
+
+    for(auto& entry : mp_terrain->chunkMap){
+        Chunk* c = entry.second;
+        mp_progLambert->setModelMatrix(glm::translate(glm::mat4(), glm::vec3(c->pos)));
+        c->create();
+        mp_progLambert->draw(*c);
     }
+
 }
+
 
 
 void MyGL::keyPressEvent(QKeyEvent *e)
@@ -210,12 +190,11 @@ void MyGL::mouseMoveEvent(QMouseEvent *e) {
 
 void MyGL::mousePressEvent(QMouseEvent *e) {
     mp_player->handleMouseEvent(e);
-}
 
-void MyGL::mousePressEvent(QMouseEvent *e) {
     if (e->buttons() == Qt::RightButton) {
         mp_terrain->addBlock(mp_camera->eye, mp_camera->look);
     } else if (e->buttons() == Qt::LeftButton) {
         mp_terrain->removeBlock(mp_camera->eye, mp_camera->look);
     }
 }
+

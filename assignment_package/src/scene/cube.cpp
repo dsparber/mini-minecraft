@@ -30,7 +30,7 @@ void createCubeVertexPositions(glm::vec4 (&cub_vert_pos)[CUB_VERT_COUNT])
     cub_vert_pos[idx++] = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
     //LR
     cub_vert_pos[idx++] = glm::vec4(1.0f, 0.0f, 1.0f, 1.0f);
-    //LL
+    //LLs
     cub_vert_pos[idx++] = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
     //UL
     cub_vert_pos[idx++] = glm::vec4(0.0f, 1.0f, 1.0f, 1.0f);
@@ -140,9 +140,17 @@ void Cube::create()
     createCubeVertexNormals(sph_vert_nor);
     createCubeIndices(sph_idx);
 
+    std::vector <glm::vec4> all;
+
 
     for(int i = 0; i < CUB_VERT_COUNT; i++){
         cub_vert_col[i] = glm::vec4(0.2f, 1.0f, 0.6f, 1);
+    }
+
+    for(int i = 0; i < CUB_VERT_COUNT; i++){
+        all.push_back(sph_vert_pos[i]);
+        all.push_back(sph_vert_nor[i]);
+        all.push_back(cub_vert_col[i]);
     }
 
     count = CUB_IDX_COUNT;
@@ -158,15 +166,18 @@ void Cube::create()
 
     // The next few sets of function calls are basically the same as above, except bufPos and bufNor are
     // array buffers rather than element array buffers, as they store vertex attributes like position.
-    generatePos();
-    context->glBindBuffer(GL_ARRAY_BUFFER, bufPos);
-    context->glBufferData(GL_ARRAY_BUFFER, CUB_VERT_COUNT * sizeof(glm::vec4), sph_vert_pos, GL_STATIC_DRAW);
+    //    generatePos();
+    //    context->glBindBuffer(GL_ARRAY_BUFFER, bufPos);
+    //    context->glBufferData(GL_ARRAY_BUFFER, CUB_VERT_COUNT * sizeof(glm::vec4), sph_vert_pos, GL_STATIC_DRAW);
 
-    generateNor();
-    context->glBindBuffer(GL_ARRAY_BUFFER, bufNor);
-    context->glBufferData(GL_ARRAY_BUFFER, CUB_VERT_COUNT * sizeof(glm::vec4), sph_vert_nor, GL_STATIC_DRAW);
+    //    generateNor();
+    //    context->glBindBuffer(GL_ARRAY_BUFFER, bufNor);
+    //    context->glBufferData(GL_ARRAY_BUFFER, CUB_VERT_COUNT * sizeof(glm::vec4), sph_vert_nor, GL_STATIC_DRAW);
 
-    generateCol();
-    context->glBindBuffer(GL_ARRAY_BUFFER, bufCol);
-    context->glBufferData(GL_ARRAY_BUFFER, CUB_VERT_COUNT * sizeof(glm::vec4), cub_vert_col, GL_STATIC_DRAW);
+    //    generateCol();
+    //    context->glBindBuffer(GL_ARRAY_BUFFER, bufCol);
+    //    context->glBufferData(GL_ARRAY_BUFFER, CUB_VERT_COUNT * sizeof(glm::vec4), cub_vert_col, GL_STATIC_DRAW);
+    generateAll();
+    context->glBindBuffer(GL_ARRAY_BUFFER, bufAll);
+    context->glBufferData(GL_ARRAY_BUFFER, all.size() * sizeof(glm::vec4), all.data(), GL_STATIC_DRAW);
 }

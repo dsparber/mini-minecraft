@@ -30,6 +30,7 @@ private:
     uPtr<Player> mp_player;
     uPtr<Camera> mp_camera;
     uPtr<Terrain> mp_terrain;
+    //uPtr<Chunk> mp_chunk;
 
     long lastUpdate; // Save when the timer update was last called
 

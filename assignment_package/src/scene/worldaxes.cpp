@@ -11,17 +11,19 @@ void WorldAxes::create()
                         glm::vec4(0,1,0,1), glm::vec4(0,1,0,1),
                         glm::vec4(0,0,1,1), glm::vec4(0,0,1,1)};
 
+    glm::vec4 all[12];
+    for(int i = 0; i < 6; i+=2){
+        all[i]=pos[i];
+        all[i+1]=col[i];
+    }
     count = 6;
 
     generateIdx();
     context->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufIdx);
     context->glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(GLuint), idx, GL_STATIC_DRAW);
-    generatePos();
-    context->glBindBuffer(GL_ARRAY_BUFFER, bufPos);
-    context->glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(glm::vec4), pos, GL_STATIC_DRAW);
-    generateCol();
-    context->glBindBuffer(GL_ARRAY_BUFFER, bufCol);
-    context->glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(glm::vec4), col, GL_STATIC_DRAW);
+    generateAll();
+    context->glBindBuffer(GL_ARRAY_BUFFER, bufAll);
+    context->glBufferData(GL_ARRAY_BUFFER, 12 * sizeof(glm::vec4), all, GL_STATIC_DRAW);
 }
 
 GLenum WorldAxes::drawMode()

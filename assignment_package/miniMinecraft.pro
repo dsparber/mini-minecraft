@@ -4,6 +4,7 @@ TARGET = MiniMinecraft
 TEMPLATE = app
 CONFIG += console
 CONFIG += c++1z
+CONFIG +=c++11
 win32 {
     LIBS += -lopengl32
     LIBS += -lglut32
