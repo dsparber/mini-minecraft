@@ -43,9 +43,9 @@ std::vector<glm::vec4> nors =
     //in order of front, right, back, left, bottom, top
     glm::vec4(0,0,1,1),
     glm::vec4(1,0,0,1),
-    glm::vec4(0,0,-1,1),//-
-    glm::vec4(-1,0,0,1),//-
-    glm::vec4(0,-1,0,1),//-
+    glm::vec4(0,0,-1,1),
+    glm::vec4(-1,0,0,1),
+    glm::vec4(0,-1,0,1),
     glm::vec4(0,1,0,1)
 };
 
@@ -64,14 +64,12 @@ Chunk::Chunk(OpenGLContext* context) : Drawable(context), mp_context(context), p
     front(nullptr), back(nullptr), m_blocks()
 {
     std::fill(this->m_blocks.begin(), this->m_blocks.end(), EMPTY);
-    //tempTest();
 }
 
 Chunk::Chunk(OpenGLContext* context, glm::vec4 pos): Drawable(context), mp_context(context), pos(pos), left(nullptr), right(nullptr),
     front(nullptr), back(nullptr), m_blocks()
 {
     std::fill(this->m_blocks.begin(), this->m_blocks.end(), EMPTY);
-    //tempTest();
 }
 
 Chunk::Chunk(OpenGLContext* context, const Chunk& c): Drawable(context), mp_context(context), pos(c.pos), left(c.left), right(c.right),
@@ -83,11 +81,6 @@ Chunk::Chunk(OpenGLContext* context, const Chunk& c): Drawable(context), mp_cont
 
 
 void Chunk::tempTest(){
-    //    setBlockAt(0,0,0,STONE);
-    //    setBlockAt(1,0,1,GRASS);
-    //    setBlockAt(1,0,0,STONE);
-    //    setBlockAt(1,0,1,STONE);
-
     for(int x = 0; x < 16; ++x)
     {
         for(int z = 0; z < 16; ++z)
@@ -133,10 +126,7 @@ BlockType Chunk::getBlockAt(int x, int y, int z) const
         return EMPTY;
     }
     int idx = 16 * 256 * x + 16 * y + z;
-    //if(idx < 65536 && idx >= 0){
-        return m_blocks[idx];
-    //
-    return EMPTY;
+    return m_blocks[idx];
 }
 
 BlockType& Chunk::getBlockAt(int x, int y, int z)
@@ -146,9 +136,7 @@ BlockType& Chunk::getBlockAt(int x, int y, int z)
 
     }
     int idx = 16 * 256 * x + 16 * y + z;
-    //if(idx <= 65536 && idx >= 0){
-        return m_blocks[idx];
-    //}
+    return m_blocks[idx];
 }
 
 void Chunk::setBlockAt(int x, int y, int z, BlockType t)
@@ -161,7 +149,6 @@ void Chunk::setBlockAt(int x, int y, int z, BlockType t)
 
 //only create vertex data for block faces that lie on the boundary between an EMPTY block and a filled block.
 void Chunk::create(){
-    //std::cout<<"a chunk is created!"<<std::endl;
     //handle setting up the VBOs for any arbitrary mesh
     std::vector<GLuint> idx;
     std::vector<glm::vec4> all; //all attributes organized as vertex position, normal, and color
@@ -173,7 +160,6 @@ void Chunk::create(){
             for(int z = 0; z < 16; z++){
 
                 BlockType b = getBlockAt(x,y,z);
-                //std::cout<<"blockType: " <<b<<"at"<<x<<y<<z<<std::endl;
 
                 if(b != EMPTY){
                     //check all 6 sides

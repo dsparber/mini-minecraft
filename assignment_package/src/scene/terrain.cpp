@@ -37,8 +37,6 @@ int64_t Terrain::getHashKey(int x, int z) const {
     int64_t nz = (int64_t)z;
     nz = nz << 32;
     nx = nx & 0x00000000ffffffff;
-    //std::cout<<"getHashKey:"<<std::endl;
-    //std::cout<<"key:"<<(int64_t)(nx | nz)<<" x:"<<x<<" z:"<<z<<std::endl;
     return nx | nz;
 }
 
@@ -49,8 +47,6 @@ glm::vec2 Terrain::getCoordFromKey(int64_t key) const{
         x = 0xffffffff00000000 | x;
     }
     int64_t z = key>>32;
-    //std::cout<<"getCoordFromKey:"<<std::endl;
-    //std::cout<<"key:"<<key<<" x:"<<x<<" z:"<<z<<std::endl;
     return(glm::vec2(x, z));
 }
 

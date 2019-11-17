@@ -1,0 +1,31 @@
+Final Project Milestone 1 Help Log:
+
+Wednesday:
+Q: Getting FBM to have good peeks
+A: Don’t need to alter the actual FBM function but try changing the height of the max peek and 
+
+Q: How is chunking more efficient when I still have 4 for loops?
+A: It’s not, it’s more efficient when rendering not when writing out the actual code
+
+Q: Generating new terrain, need to match height? If so how?
+Can I automatically have new terrain become a new biome?
+A: FBM is a continuous function so adding new terrain should start at x and z values where the previous terrain left off
+
+
+Thursday:
+Q: Is it ok to have a setBlockAt function in both the chunk class and the terrain class?
+A: Yes, just need to make sure they are "synced" i.e. chunk's function should call the terrain's function
+
+Q: Ray march set up—using vec3’s and for loop to go through each direction, need to find smallest tnear out of closest blocks…but how am I getting the closest books to test against them? Is that where setting min & max comes in?
+A: Code I had was not for ray-marching but for ray cube intersection. I was confused and thinking that they're the same thing. I re-implemented the function with ray-marching and got it to work.
+
+https://doc.qt.io/qt-5/qwidget.html#mousePressEvent
+
+
+Saturday:
+Q: Getting ray marching to work — delete block. How to set max length and how to get rid of crashing
+A: Needed to multiple my step by look vector and set my origin position to be the camera’s eye
+
+
+Resources:
+GitHub Resource: https://innerjoiner.com/guide/git-team-workflow-cheatsheet/
