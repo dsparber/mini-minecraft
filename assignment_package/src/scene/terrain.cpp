@@ -109,7 +109,7 @@ void Terrain::addChunk(glm::vec4 pos){
 
 
 //x is in lower 32 bits, z is in upper 32 bits
-int64_t Terrain::getHashKey(int x, int z){
+int64_t Terrain::getHashKey(int x, int z) const {
     int64_t nx = (int64_t)x;
     int64_t nz = (int64_t)z;
     nz = nz << 32;
@@ -133,60 +133,62 @@ glm::vec2 Terrain::getCoordFromKey(int64_t key) const{
 
 BlockType Terrain::getBlockAt(int x, int y, int z) const
 {
-    //    locate which chunk it is in
-    //    check if the coordinate belong to the chunk
+    // Get coordinates aligned to chunk
+    int chunkX = (x / 16) * 16;
+    int chunkZ = (z / 16) * 16;
 
-    for(auto entry : chunkMap){
-        int64_t key = entry.first;
-        Chunk* c = entry.second;
-        glm::vec2 xzPos = getCoordFromKey(key);
-        int newx = x - xzPos.x;
-        int newz = z - xzPos.y;
-        if(x>=xzPos.x && x<xzPos.x+16 && z>=xzPos.y && z<xzPos.y+16){
-            int idx = 16 * 256 * newx + 16 * y + newz;
-            BlockType t = c->m_blocks[idx];
-            return c->m_blocks[idx];
-        }
-        return EMPTY;
-    }
+    // Get local block coordinates
+    int blockX = x - chunkX;
+    int blockZ = z - chunkZ;
+
+    // Get key for chunk map
+    int64_t chunkKey = Terrain::getHashKey(chunkX, chunkZ);
+
+    // Get chunk
+    Chunk* chunk = chunkMap.at(chunkKey);
+
+    // Get block of chunk
+    return chunk->getBlockAt(blockX, y, blockZ);
 }
 
 BlockType& Terrain::getBlockAt(int x, int y, int z)
 {
-    //    locate which chunk it is in
-    //    check if the coordinate belong to the chunk
-    for(auto entry : chunkMap){
-        int64_t key = entry.first;
-        Chunk* c = entry.second;
-        glm::vec2 xzPos = getCoordFromKey(key);
-        int newx = x - xzPos.x;
-        int newz = z - xzPos.y;
-        if(x>=xzPos.x && x<xzPos.x+16 && z>=xzPos.y && z<xzPos.y+16){
-            int idx = 16 * 256 * newx + 16 * y + newz;
-            BlockType t = c->m_blocks[idx];
-            return c->m_blocks[idx];
-        }
-    }
+    // Get coordinates aligned to chunk
+    int chunkX = (x / 16) * 16;
+    int chunkZ = (z / 16) * 16;
+
+    // Get local block coordinates
+    int blockX = x - chunkX;
+    int blockZ = z - chunkZ;
+
+    // Get key for chunk map
+    int64_t chunkKey = Terrain::getHashKey(chunkX, chunkZ);
+
+    // Get chunk reference
+    Chunk* chunk = chunkMap[chunkKey];
+
+    // Get block of chunk
+    return chunk->getBlockAt(blockX, y, blockZ);
 }
 
 void Terrain::setBlockAt(int x, int y, int z, BlockType t)
 {
-    //locate which chunk it is in
-    //check if the coordinate belong to the chunk
+    // Get coordinates aligned to chunk
+    int chunkX = (x / 16) * 16;
+    int chunkZ = (z / 16) * 16;
 
-    for(auto entry : chunkMap){
-        Chunk* c = entry.second;
-        int64_t key = entry.first;
-        glm::vec2 xzPos = getCoordFromKey(key);
-        int newx = x - xzPos.x;
-        int newz = z - xzPos.y;
-        if(x>=xzPos.x && x<xzPos.x+16 && z>=xzPos.y && z<xzPos.y+16){
-            int idx = 16 * 256 * newx + 16 * y + newz;
-            c->m_blocks[idx] = t;
-            BlockType t1 = c->m_blocks[0];
-            break;
-        }
-    }
+    // Get local block coordinates
+    int blockX = x - chunkX;
+    int blockZ = z - chunkZ;
+
+    // Get key for chunk map
+    int64_t chunkKey = Terrain::getHashKey(chunkX, chunkZ);
+
+    // Get chunk reference
+    Chunk* chunk = chunkMap[chunkKey];
+
+    // Set block
+    chunk->setBlockAt(blockX, y, blockZ, t);
 }
 
 float rand(glm::vec2 n) {
@@ -256,7 +258,7 @@ void Terrain::CreateTestScene()
                         int intFBM = 128 + (int) fbmVal;
 
                         for (int i = 129; i < intFBM; i++) {
-                            setBlockAt(newX, intFBM, newZ, DIRT);
+                            setBlockAt(newX, i, newZ, DIRT);
                         }
 
                         setBlockAt(newX, intFBM, newZ, GRASS);

@@ -40,6 +40,6 @@ public:
     void generateTerrain(glm::vec3 currPos);
                                                           // given type.
     void addChunk(glm::vec4 pos);
-    int64_t getHashKey(int x, int z);
+    int64_t getHashKey(int x, int z) const;
     glm::vec2 getCoordFromKey(int64_t key) const;
 };
