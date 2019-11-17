@@ -6,6 +6,15 @@
 Terrain::Terrain() : dimensions(64, 256, 64)
 {}
 
+BlockType Terrain::getBlockOrEmpty(int x, int y, int z) const {
+    if (x < 0 || x >= dimensions.x ||
+            y < 0 || y >= dimensions.y ||
+            z < 0 || z >= dimensions.z) {
+        return EMPTY;
+    }
+    return getBlockAt(x, y, z);
+}
+
 BlockType Terrain::getBlockAt(int x, int y, int z) const
 {
     // TODO: Make this work with your new block storage!
