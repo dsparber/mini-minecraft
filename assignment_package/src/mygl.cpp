@@ -163,7 +163,7 @@ void MyGL::GLDrawScene()
 
     for(auto& entry : mp_terrain->chunkMap){
         Chunk* c = entry.second;
-        c->create();
+        //c->create();
         mp_progLambert->setModelMatrix(glm::translate(glm::mat4(), glm::vec3(c->pos)));
         mp_progLambert->draw(*c);
     }

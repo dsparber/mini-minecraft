@@ -28,11 +28,15 @@ Implemented by: **Veronica**
 Implemented by: **Amelia**
 
 #### Implementation
+- *Chunk class* Added a chunk class so the terrain could store chunks instead of 3D array of BlockTypes to make rendering more efficient. Uses vectors of global variables to be the offset to handle chunk's creation and neighbor checking, only draws the face if the chunk doesn't have a neighbor or the neighboring block has EMPTY as blocktype.  
 
-**TODO:** briefly describe how you implemented your chosen features. 
-Discuss any difficulties you encountered when coding the project, and explain the approach you 
-took to implementing each feature
+- *Chunk Map* create a map of (x,z) coordinate to Chunk in terrain.cpp to store chunk's wold position to chunk. Implemented hash functions using bit logic to convert (x,z) coordinate to 64bit integer keys.   
 
+- *interleaving vbos* modified the Drawable class and shaderProgram::draw in order to use a single interleaved vertex buffer object to store the position, normal, and color data of an object.
+
+#### Difficulties
+- there were a lot of repeating code when implementing create() in Chunk class. Declaring global vectors of position offsets and looping the face helped simplified the code.
+- After a block is set to a blocktype, it results to be EMPTY when calling getBlockAt function. I switch from storing the physical block in the map to using pointer. 
 
 
 ### Game Engine Update Function and Player Physics
