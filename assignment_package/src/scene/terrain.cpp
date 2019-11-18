@@ -196,6 +196,10 @@ void Terrain::create()
                         }
 
                         setBlockAt(newX, intFBM, newZ, GRASS);
+
+                        for (int i = intFBM + 1; i < 140; i++) {
+                            setBlockAt(newX, i, newZ, WATER);
+                        }
                     }
                 }
             }

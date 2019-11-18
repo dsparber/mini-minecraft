@@ -235,10 +235,12 @@ void Chunk::drawFace(glm::vec4 pos, std::vector<GLuint>& idx, std::vector<glm::v
             case LAVA:
                 all.push_back(glm::vec4(1, 0, 0, 0));
                 break;
+            case WATER:
+                all.push_back(glm::vec4(.2, .5, 1, 0));
+                break;
             default:
                 // Other types are as of yet not define
                 all.push_back(glm::vec4(0));
-
                 break;
             }
         }

@@ -4,7 +4,7 @@
 
 enum BlockType: unsigned char
 {
-    EMPTY, GRASS, DIRT, STONE, LAVA
+    EMPTY, GRASS, DIRT, STONE, LAVA, WATER
 };
 
 #endif // BLOCKTYPE_H
