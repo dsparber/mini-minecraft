@@ -210,12 +210,14 @@ void Terrain::addBlock(glm::vec3 eye, glm::vec3 look)
     glm::vec3 addPos = rayMarch(eye, look) - 0.75f * look;
     glm::vec3 coords(glm::floor(addPos));
     setBlockAt(coords.x, coords.y, coords.z, LAVA);
+    updateScene();
 }
 
 void Terrain::removeBlock(glm::vec3 eye, glm::vec3 look)
 {
     glm::vec3 coords(glm::floor(rayMarch(eye, look)));
     setBlockAt(coords.x, coords.y, coords.z, EMPTY);
+    updateScene();
 }
 
 glm::vec3 Terrain::rayMarch(glm::vec3 eye, glm::vec3 look)

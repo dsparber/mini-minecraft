@@ -56,6 +56,9 @@ private:
     /// track the change in the cursor's X and Y coordinate
     glm::vec2 mouseDelta;
 
+    /// Calculate mouse delta based on last position
+    glm::vec2 lastMousePos;
+
     /// Modiefies camera attributes based on on position / orientation
     void cameraUpdate();
 

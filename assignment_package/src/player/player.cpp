@@ -11,6 +11,7 @@ Player::Player() :
     requestedTheta(0),
     requestedPhi(0),
     mouseDelta(0, 0),
+    lastMousePos(-1, -1),
     forwardPressed(false),
     backwardPressed(false),
     leftPressed(false),
@@ -337,7 +338,20 @@ void Player::handleMouseEvent(QMouseEvent* e) {
     // Compute distance to center of mygl
     float x0 = camera->width / 2.f;
     float y0 = camera->height / 2.f;
-    mouseDelta = glm::vec2(e->x() - x0, e->y() - y0);
+    glm::vec2 mousePos(e->x(), e->y());
+    glm::vec2 center(x0, y0);
+    // Last position not initialised
+    if (lastMousePos.x == -1) {
+        lastMousePos = mousePos;
+    }
+
+    if (mousePos != center) {
+        mouseDelta = mousePos - lastMousePos;
+    } else {
+        mouseDelta = glm::vec2(0);
+    }
+
+    lastMousePos = mousePos;
 }
 
 void Player::setCamera(Camera* c) {
