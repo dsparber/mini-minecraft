@@ -26,7 +26,7 @@ void Terrain::setMap(){
 Chunk* Terrain::addChunk(glm::vec4 pos){
     Chunk* c = new Chunk(context, pos);
     int64_t k = Terrain::getHashKey(pos.x, pos.z);
-    chunkMap[k] = c;
+    chunkMap.insert({k, c});
     return c;
 }
 
@@ -118,12 +118,13 @@ void Terrain::setBlockAt(int x, int y, int z, BlockType t)
 
     // Get key for chunk map
     int64_t chunkKey = Terrain::getHashKey(chunkX, chunkZ);
+    if(chunkMap.count(chunkKey) > 0){
+        // Get chunk reference
+        Chunk* chunk = chunkMap[chunkKey];
 
-    // Get chunk reference
-    Chunk* chunk = chunkMap[chunkKey];
-
-    // Set block
-    chunk->setBlockAt(blockX, y, blockZ, t);
+        // Set block
+        chunk->setBlockAt(blockX, y, blockZ, t);
+    }
 }
 
 float rand(glm::vec2 n) {
@@ -197,7 +198,7 @@ void Terrain::create()
                 }
             }
         }
-        c->create();
+        //c->create();
     }
 }
 

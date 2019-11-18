@@ -88,11 +88,6 @@ void MyGL::initializeGL()
 
     //Create the instance of Cube
     mp_geomCube->create();
-    //mp_chunk->create();
-
-//    for(auto& entry : mp_terrain->chunkMap){
-//        entry.second->create();
-//    }
 
     // We have to have a VAO bound in OpenGL 3.2 Core. But if we're not
     // using multiple VAOs, we can just bind one once.
@@ -102,6 +97,9 @@ void MyGL::initializeGL()
     printGLErrorLog();
 
     mp_terrain->create();
+    for(auto& entry : mp_terrain->chunkMap){
+        entry.second->create();
+    }
 }
 
 void MyGL::resizeGL(int w, int h)
@@ -165,6 +163,7 @@ void MyGL::GLDrawScene()
 
     for(auto& entry : mp_terrain->chunkMap){
         Chunk* c = entry.second;
+        c->create();
         mp_progLambert->setModelMatrix(glm::translate(glm::mat4(), glm::vec3(c->pos)));
         mp_progLambert->draw(*c);
     }

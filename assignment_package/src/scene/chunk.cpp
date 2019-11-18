@@ -245,7 +245,7 @@ void Chunk::drawOutFace(glm::vec4 pos, std::vector<GLuint>& idx, std::vector<glm
     glm::vec4 adjPos;
     if(faceNum == 0){
         adjC = front;
-        adjPos = glm::vec4(pos.x, pos.y, 16, 1);
+        adjPos = glm::vec4(pos.x, pos.y, 15, 1);
     } else if(faceNum == 1){
         adjC = right;
         adjPos = glm::vec4(0, pos.y, pos.z, 1);
@@ -254,7 +254,7 @@ void Chunk::drawOutFace(glm::vec4 pos, std::vector<GLuint>& idx, std::vector<glm
         adjPos = glm::vec4(pos.x, pos.y, 0, 1);
     } else if(faceNum == 3){
         adjC = left;
-        adjPos = glm::vec4(16.f, pos.y, pos.z, 1);
+        adjPos = glm::vec4(15, pos.y, pos.z, 1);
     }
 
     if(adjC == nullptr || adjC->getBlockAt(adjPos.x, adjPos.y, adjPos.z) == EMPTY){
