@@ -7,6 +7,7 @@ Amelia Peng, Daniel Sparber, Veronica Bristol
 ### Videos
 
 - [Game Engine Update Function and Player Physics](https://youtu.be/PDtSNNaBpVM)
+- [Terrain](https://youtu.be/z__P_hIH8nM)
 
 ### Procedural Terrain
 
