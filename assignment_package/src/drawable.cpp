@@ -58,7 +58,7 @@ bool Drawable::bindIdx()
 bool Drawable::bindAll()
 {
     if(allBound) {
-        context->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufAll);
+        context->glBindBuffer(GL_ARRAY_BUFFER, bufAll);
     }
     return allBound;
 }

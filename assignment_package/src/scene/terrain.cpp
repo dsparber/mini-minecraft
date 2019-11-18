@@ -6,17 +6,15 @@
 
 
 BlockType Terrain::getBlockOrEmpty(int x, int y, int z) const {
-    if (x < 0 || x >= dimensions.x ||
-            y < 0 || y >= dimensions.y ||
-            z < 0 || z >= dimensions.z) {
+
+    if (getChunk(x, z) == nullptr || y < 0 || y >= dimensions.y) {
         return EMPTY;
     }
     return getBlockAt(x, y, z);
 }
 
-Terrain::Terrain (OpenGLContext* context) : context(context), dimensions(64, 256, 64),chunkMap()
+Terrain::Terrain (OpenGLContext* context) : context(context), dimensions(64, 256, 64), chunkMap()
 {
-    setMap();
 }
 
 void Terrain::setMap(){
@@ -165,6 +163,10 @@ float fbm(float x, float z) {
 
 void Terrain::create()
 {
+    if (chunkMap.size() == 0) {
+        setMap();
+    }
+
     for(auto entry : chunkMap){
         Chunk* c = entry.second;
         int64_t key = entry.first;
@@ -198,7 +200,8 @@ void Terrain::create()
                 }
             }
         }
-        //c->create();
+        c->destroy();
+        c->create();
     }
 }
 
@@ -245,7 +248,7 @@ void Terrain::checkAndCreate(glm::vec3 playerPosition) {
 
         if (testChunk == nullptr) {
             generateTerrain(testPos);
-
+            create();
         }
     }
 }
@@ -281,8 +284,6 @@ void Terrain::generateTerrain(glm::vec3 currPos) {
             c->back = getChunk(x, z + 16);
         }
     }
-
-    create();
 }
 
 Terrain::~Terrain(){

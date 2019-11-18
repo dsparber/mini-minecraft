@@ -89,18 +89,14 @@ void MyGL::initializeGL()
     //Create the instance of Cube
     mp_geomCube->create();
 
+    mp_terrain->create();
+
     // We have to have a VAO bound in OpenGL 3.2 Core. But if we're not
     // using multiple VAOs, we can just bind one once.
     //    vao.bind();
     glBindVertexArray(vao);
 
     printGLErrorLog();
-
-    mp_terrain->create();
-    for(auto& entry : mp_terrain->chunkMap){
-        entry.second->create();
-    }
-    mp_terrain->updateScene();
 }
 
 void MyGL::resizeGL(int w, int h)
