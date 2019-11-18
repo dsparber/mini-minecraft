@@ -45,6 +45,8 @@ public:
 
     void checkAndCreate(glm::vec3);
 
+    void updateScene();
+
     int64_t getHashKey(int x, int z) const;
     glm::vec2 getCoordFromKey(int64_t key) const;
 };

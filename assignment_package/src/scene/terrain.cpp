@@ -290,3 +290,12 @@ Terrain::~Terrain(){
     chunkMap = std::unordered_map<int64_t, Chunk*>();
 
 }
+
+void Terrain::updateScene(){
+    for(auto entry: chunkMap){
+        Chunk* c = chunkMap[entry.first];
+        c->destroy();
+        c->create();
+    }
+
+}

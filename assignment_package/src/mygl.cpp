@@ -100,6 +100,7 @@ void MyGL::initializeGL()
     for(auto& entry : mp_terrain->chunkMap){
         entry.second->create();
     }
+    mp_terrain->updateScene();
 }
 
 void MyGL::resizeGL(int w, int h)
