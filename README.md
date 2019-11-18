@@ -8,6 +8,7 @@ Amelia Peng, Daniel Sparber, Veronica Bristol
 
 - [Game Engine Update Function and Player Physics](https://youtu.be/PDtSNNaBpVM)
 - [Terrain](https://youtu.be/z__P_hIH8nM)
+- [Chunking and Merged demo](https://vimeo.com/373853823)
 
 ### Procedural Terrain
 
@@ -28,16 +29,17 @@ Implemented by: **Veronica**
 Implemented by: **Amelia**
 
 #### Implementation
-- *Chunk class* Added a chunk class so the terrain could store chunks instead of 3D array of BlockTypes to make rendering more efficient. Uses vectors of global variables to be the offset to handle chunk's creation and neighbor checking, only draws the face if the chunk doesn't have a neighbor or the neighboring block has EMPTY as blocktype.  
+- *Chunk class*: Added a chunk class so the terrain could store chunks instead of 3D array of BlockTypes to make rendering more efficient. Uses vectors of global variables to be the offset to handle chunk's creation and neighbor checking, only draws the face if the chunk doesn't have a neighbor or the neighboring block has EMPTY as blocktype.  
 
-- *Chunk Map* create a map of (x,z) coordinate to Chunk in terrain.cpp to store chunk's wold position to chunk. Implemented hash functions using bit logic to convert (x,z) coordinate to 64bit integer keys.   
+- *Chunk Map*: create a map of (x,z) coordinate to Chunk in terrain.cpp to store chunk's wold position to chunk. Implemented hash functions using bit logic to convert (x,z) coordinate to 64bit integer keys.   
 
-- *interleaving vbos* modified the Drawable class and shaderProgram::draw in order to use a single interleaved vertex buffer object to store the position, normal, and color data of an object.
+- *interleaving VBOs*: modified the Drawable class and shaderProgram::draw in order to use a single interleaved vertex buffer object to store the position, normal, and color data of an object.
 
 #### Difficulties
 - there were a lot of repeating code when implementing create() in Chunk class. Declaring global vectors of position offsets and looping the face helped simplified the code.
 - After a block is set to a blocktype, it results to be EMPTY when calling getBlockAt function. I switch from storing the physical block in the map to using pointer. 
-
+- different behavior when calling create() in initialize GL and paintGL. If create() is only called in initialize GL, part of the terrain won't be drawed correctly, but calling create() in paintGL each time would be too inefficient. 
+- After merging, the trackpad on my computer is very hard to make the "player" view the direction desired.
 
 ### Game Engine Update Function and Player Physics
 
