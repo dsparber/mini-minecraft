@@ -78,47 +78,6 @@ Chunk::Chunk(OpenGLContext* context, const Chunk& c): Drawable(context), mp_cont
     std::fill(this->m_blocks.begin(), this->m_blocks.end(), EMPTY);
 }
 
-
-
-void Chunk::tempTest(){
-    for(int x = 0; x < 16; ++x)
-    {
-        for(int z = 0; z < 16; ++z)
-        {
-            for(int y = 127; y < 256; ++y)
-            {
-                if(y <= 128)
-                {
-                    if((x + z) % 2 == 0)
-                    {
-                        setBlockAt(x,y,z,STONE);
-                    }
-                    else
-                    {
-                        setBlockAt(x,y,z,DIRT);
-                    }
-                }
-                else
-                {
-                    setBlockAt(x,y,z,EMPTY);
-                }
-            }
-        }
-    }
-    // Add "walls" for collision testing
-    for(int x = 0; x < 16; ++x)
-    {
-        setBlockAt(x,129,0,GRASS);
-        setBlockAt(x,130,0,GRASS);
-        setBlockAt(x,129,63,GRASS);
-        setBlockAt(0,130,x,GRASS);
-    }
-    for(int y = 129; y < 140; ++y)
-    {
-        setBlockAt(32,y,32,GRASS);
-    }
-}
-
 BlockType Chunk::getBlockAt(int x, int y, int z) const
 {
     if(x < 0 || y < 0 || z < 0
@@ -233,10 +192,10 @@ void Chunk::drawFace(glm::vec4 pos, std::vector<GLuint>& idx, std::vector<glm::v
                 all.push_back(glm::vec4(0.5f));
                 break;
             case LAVA:
-                all.push_back(glm::vec4(1, 0, 0, 0));
+                all.push_back(glm::vec4(1, 0, 0, 0.5));
                 break;
             case WATER:
-                all.push_back(glm::vec4(.2, .5, 1, 0));
+                all.push_back(glm::vec4(.2, .5, 1, 0.5));
                 break;
             default:
                 // Other types are as of yet not define

@@ -25,7 +25,6 @@ public:
     BlockType getBlockAt(int x, int y, int z) const;
     BlockType& getBlockAt(int x, int y, int z);
     void setBlockAt(int x, int y, int z, BlockType t);
-    void tempTest();
 
 
     glm::vec4 pos;
