@@ -15,6 +15,10 @@ void Terrain::initialize(){
             initializeChunk(i * 16, j * 16);
         }
     }
+
+    for(Chunk* c : getChunksToDraw()){
+        c->create();
+    }
 }
 
 BlockType Terrain::getBlockOrEmpty(int x, int y, int z) const {
@@ -71,22 +75,20 @@ void Terrain::initializeChunk(int chunkX, int chunkZ) {
     // Link neighbors
     c->left = getChunk(chunkX - 16, chunkZ);
     if (c->left != nullptr) {
-        c->right = c;
+        c->left->right = c;
     }
     c->right = getChunk(chunkX + 16, chunkZ);
     if (c->right != nullptr) {
-        c->left = c;
+        c->right->left = c;
     }
     c->front = getChunk(chunkX, chunkZ - 16);
     if (c->front != nullptr) {
-        c->back = c;
+        c->front->back = c;
     }
     c->back = getChunk(chunkX, chunkZ + 16);
     if (c->back != nullptr) {
-        c->front = c;
+        c->back->front = c;
     }
-
-    c->create();
 
     chunkMap[key] = c;
     chunksToDraw.push_back(c);

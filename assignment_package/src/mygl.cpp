@@ -82,7 +82,7 @@ void MyGL::initializeGL()
     mp_progLambert->setGeometryColor(glm::vec4(0,1,0,1));
 
     //Create the instance of Cube
-    mp_geomCube->create();
+    //mp_geomCube->create();
 
     // Initializes the terrain
     mp_terrain->initialize();

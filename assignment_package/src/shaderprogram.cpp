@@ -164,9 +164,6 @@ void ShaderProgram::draw(Drawable &d)
         context->glEnableVertexAttribArray(attrCol);
         context->glVertexAttribPointer(attrCol, 4, GL_FLOAT, false, 3 * sizeof(glm::vec4),  (void*)(2*sizeof(glm::vec4)));
   }
-    //std::cout<<"bind attributes error:"<<std::endl;
-    //context->printGLErrorLog();
-
 
     // Bind the index buffer and then draw shapes from it.
     // This invokes the shader program, which accesses the vertex buffers.

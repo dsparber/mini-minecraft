@@ -90,10 +90,6 @@ BlockType Chunk::getBlockAt(int x, int y, int z) const
 
 BlockType& Chunk::getBlockAt(int x, int y, int z)
 {
-    if(x < 0 || y < 0 || z < 0
-            || x >= 16 || y >= 256 || z >= 16) {
-
-    }
     int idx = 16 * 256 * x + 16 * y + z;
     return m_blocks[idx];
 }
@@ -226,6 +222,6 @@ void Chunk::drawOutFace(glm::vec4 pos, std::vector<GLuint>& idx, std::vector<glm
     if(adjC == nullptr || adjC->getBlockAt(adjPos.x, adjPos.y, adjPos.z) == EMPTY){
         //draw the current face
         drawFace(pos, idx, all, faceNum);
-    }
 
+    }
 }
