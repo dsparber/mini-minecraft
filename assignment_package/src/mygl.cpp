@@ -36,12 +36,6 @@ MyGL::~MyGL()
     makeCurrent();
     glDeleteVertexArrays(1, &vao);
     mp_geomCube->destroy();
-    //mp_chunk->destroy();
-    for(auto entry : mp_terrain->chunkMap){
-        entry.second->destroy();
-        delete entry.second;
-        entry.second = nullptr;
-    }
 }
 
 
@@ -75,7 +69,6 @@ void MyGL::initializeGL()
     glGenVertexArrays(1, &vao);
 
 
-
     // Create and set up the diffuse shader
     mp_progLambert->create(":/glsl/lambert.vert.glsl", ":/glsl/lambert.frag.glsl");
     // Create and set up the flat lighting shader
@@ -89,7 +82,8 @@ void MyGL::initializeGL()
     //Create the instance of Cube
     mp_geomCube->create();
 
-    mp_terrain->create();
+    // Initializes the terrain
+    mp_terrain->initialize();
 
     // We have to have a VAO bound in OpenGL 3.2 Core. But if we're not
     // using multiple VAOs, we can just bind one once.
@@ -101,10 +95,8 @@ void MyGL::initializeGL()
 
 void MyGL::resizeGL(int w, int h)
 {
-    //This code sets the concatenated view and perspective projection matrices used for
-    //our scene's camera view.
-    *mp_camera = Camera(w, h, glm::vec3(mp_terrain->dimensions.x, mp_terrain->dimensions.y * 0.75, mp_terrain->dimensions.z),
-                        glm::vec3(mp_terrain->dimensions.x / 2, mp_terrain->dimensions.y / 2, mp_terrain->dimensions.z / 2), glm::vec3(0,1,0));
+    mp_camera->width = w;
+    mp_camera->height = h;
     glm::mat4 viewproj = mp_camera->getViewProj();
 
     MoveMouseToCenter();
@@ -155,16 +147,10 @@ void MyGL::paintGL()
 
 void MyGL::GLDrawScene()
 {
-    //mp_progLambert->setModelMatrix(glm::translate(glm::mat4(), glm::vec3(mp_chunk->pos)));
-    //mp_progLambert->draw(*mp_chunk);
-
-    for(auto& entry : mp_terrain->chunkMap){
-        Chunk* c = entry.second;
-        //c->create();
+    for(Chunk* c : mp_terrain->getChunksToDraw()){
         mp_progLambert->setModelMatrix(glm::translate(glm::mat4(), glm::vec3(c->pos)));
         mp_progLambert->draw(*c);
     }
-
 }
 
 

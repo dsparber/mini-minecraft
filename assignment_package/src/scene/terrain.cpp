@@ -3,29 +3,93 @@
 
 #include <scene/cube.h>
 #include <iostream>
+#include "fbm.h"
 
+
+Terrain::Terrain (OpenGLContext* context) : context(context), chunkMap(), chunksToDraw()
+{ }
+
+void Terrain::initialize(){
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            initializeChunk(i * 16, j * 16);
+        }
+    }
+}
 
 BlockType Terrain::getBlockOrEmpty(int x, int y, int z) const {
 
-    if (getChunk(x, z) == nullptr || y < 0 || y >= dimensions.y) {
+    if (getChunk(x, z) == nullptr || y < 0 || y >= 256) {
         return EMPTY;
     }
     return getBlockAt(x, y, z);
 }
 
-Terrain::Terrain (OpenGLContext* context) : context(context), dimensions(64, 256, 64), chunkMap()
-{
-}
+void Terrain::initializeChunk(int chunkX, int chunkZ) {
 
-void Terrain::setMap(){
-    generateTerrain(glm::vec3(0, 0, 0));
-}
+    // Ensure alignment to 16
+    chunkX = (chunkX / 16) * 16;
+    chunkZ = (chunkZ / 16) * 16;
 
-Chunk* Terrain::addChunk(glm::vec4 pos){
-    Chunk* c = new Chunk(context, pos);
-    int64_t k = Terrain::getHashKey(pos.x, pos.z);
-    chunkMap.insert({k, c});
-    return c;
+    Chunk* c = new Chunk(context, glm::vec4(chunkX, 0, chunkZ, 0));
+    int64_t key = getHashKey(chunkX, chunkZ);
+
+    // Generate blocks
+    for(int x = 0; x < 16; ++x)
+    {
+        for(int z = 0; z < 16; ++z)
+        {
+            for(int y = 0; y < 256; ++y)
+            {
+                int fbmX = chunkX + x;
+                int fbmZ = chunkZ + z;
+
+                if(y <= 128) {
+                    c->setBlockAt(x, y, z, STONE);
+                }
+                else
+                {
+                    float rawFBM = fbm(fbmX / 64.f, fbmZ / 64.f);
+                    float fbmVal = 32.f * powf(rawFBM, 4.f);
+                    int intFBM = 128 + (int) fbmVal;
+
+                    for (int i = 129; i < intFBM; i++) {
+                        c->setBlockAt(x, i, z, DIRT);
+                    }
+
+                    c->setBlockAt(x, intFBM, z, GRASS);
+
+
+                    for (int i = intFBM + 1; i < 134; i++) {
+                        c->setBlockAt(x, i, z, WATER);
+                    }
+                }
+            }
+        }
+    }
+
+    // Link neighbors
+    c->left = getChunk(chunkX - 16, chunkZ);
+    if (c->left != nullptr) {
+        c->right = c;
+    }
+    c->right = getChunk(chunkX + 16, chunkZ);
+    if (c->right != nullptr) {
+        c->left = c;
+    }
+    c->front = getChunk(chunkX, chunkZ - 16);
+    if (c->front != nullptr) {
+        c->back = c;
+    }
+    c->back = getChunk(chunkX, chunkZ + 16);
+    if (c->back != nullptr) {
+        c->front = c;
+    }
+
+    c->create();
+
+    chunkMap[key] = c;
+    chunksToDraw.push_back(c);
 }
 
 
@@ -130,106 +194,24 @@ void Terrain::setBlockAt(int x, int y, int z, BlockType t)
     }
 }
 
-float rand(glm::vec2 n) {
-    return (glm::fract(sin(glm::dot(n, glm::vec2(12.9898, 4.1414))) * 43758.5453));
-}
-
-
-float interpNoise2D(float x, float y) {
-    float intX = glm::floor(x);
-    float fractX = glm::fract(x);
-    float intY = floor(y);
-    float fractY = glm::fract(y);
-
-    float v1 = rand(glm::vec2(intX, intY));
-    float v2 = rand(glm::vec2(intX + 1, intY));
-    float v3 = rand(glm::vec2(intX, intY + 1));
-    float v4 = rand(glm::vec2(intX + 1, intY + 1));
-
-    float i1 = glm::mix(v1, v2, fractX);
-    float i2 = glm::mix(v3, v4, fractX);
-    return glm::mix(i1, i2, fractY);
-}
-
-float fbm(float x, float z) {
-    float total = 0;
-    float persistence = 0.5f;
-    int octaves = 8;
-
-    for(int i = 1; i <= octaves; i++) {
-        float freq = pow(2.f, i);
-        float amp = pow(persistence, i);
-
-        total += interpNoise2D(x * freq,
-                               z * freq) * amp;
-    }
-    return total;
-}
-
-void Terrain::create()
-{
-    if (chunkMap.size() == 0) {
-        setMap();
-    }
-
-    for(auto entry : chunkMap){
-        Chunk* c = entry.second;
-        int64_t key = entry.first;
-        glm::vec2 chunkPos = getCoordFromKey(key);
-
-        for(int x = 0; x < 16; ++x)
-        {
-            for(int z = 0; z < 16; ++z)
-            {
-                for(int y = 0; y < 256; ++y)
-                {
-                    int newX = chunkPos.x + x;
-                    int newY = y;
-                    int newZ = chunkPos[1] + z;
-
-                    if(y <= 128) {
-                        setBlockAt(newX, newY, newZ, STONE);
-                    }
-                    else
-                    {
-
-                        float rawFBM = fbm(newX / 64.f, newZ / 64.f);
-                        float fbmVal = 32.f * powf(rawFBM, 4.f);
-                        int intFBM = 128 + (int) fbmVal;
-
-                        for (int i = 129; i < intFBM; i++) {
-                            setBlockAt(newX, i, newZ, DIRT);
-                        }
-
-                        setBlockAt(newX, intFBM, newZ, GRASS);
-
-
-                        for (int i = intFBM + 1; i < 134; i++) {
-                            setBlockAt(newX, i, newZ, WATER);
-                        }
-
-                    }
-                }
-            }
-        }
-        c->destroy();
-        c->create();
-    }
-}
-
 void Terrain::addBlock(glm::vec3 eye, glm::vec3 look)
 {
     glm::vec3 addPos = rayMarch(eye, look) - 0.75f * look;
     glm::vec3 coords(glm::floor(addPos));
     setBlockAt(coords.x, coords.y, coords.z, LAVA);
-    updateScene();
+    Chunk* c = getChunk((int)coords.x, (int)coords.z);
+    c->destroy();
+    c->create();
 }
 
 void Terrain::removeBlock(glm::vec3 eye, glm::vec3 look)
 {
     glm::vec3 coords(glm::floor(rayMarch(eye, look)));
     setBlockAt(coords.x, coords.y, coords.z, EMPTY);
-    updateScene();
+    Chunk* c = getChunk((int)coords.x, (int) coords.z);
+    c->destroy();
+    c->create();
+    // TODO update neighbor if block deleted at border
 }
 
 glm::vec3 Terrain::rayMarch(glm::vec3 eye, glm::vec3 look)
@@ -250,7 +232,7 @@ glm::vec3 Terrain::rayMarch(glm::vec3 eye, glm::vec3 look)
     return currPos;
 }
 
-void Terrain::checkAndCreate(glm::vec3 playerPosition) {
+void Terrain::playerMoved(glm::vec3 playerPosition) {
 
     for (int i = 0; i < 8; i++) {
 
@@ -261,56 +243,20 @@ void Terrain::checkAndCreate(glm::vec3 playerPosition) {
         Chunk* testChunk = getChunk(testPos.x, testPos.z);
 
         if (testChunk == nullptr) {
-            generateTerrain(testPos);
-            create();
+            initializeChunk(testPos.x, testPos.z);
         }
     }
 }
 
-void Terrain::generateTerrain(glm::vec3 currPos) {
-
-    // Align coordinates
-    glm::ivec3 requestedPos = (glm::ivec3) currPos;
-    requestedPos = (requestedPos / 64) * 64;
-
-    for (int i = 0; i < 64; i += 16)
-    {
-        for (int j = 0; j < 64; j += 16)
-        {
-            int x = requestedPos.x + i;
-            int z = requestedPos.z + j;
-            addChunk(glm::vec4(x, 0, z, 1.f));
-        }
-    }
-
-    for (int i = 0; i < 64; i += 16)
-    {
-        for (int j = 0; j < 64; j += 16)
-        {
-            int x = requestedPos.x + i;
-            int z = requestedPos.z + j;
-
-            Chunk* c = getChunk(x, z);
-
-            c->left = getChunk(x - 16, z);
-            c->right = getChunk(x + 16, z);
-            c->front = getChunk(x, z - 16);
-            c->back = getChunk(x, z + 16);
-        }
-    }
+std::vector<Chunk*> Terrain::getChunksToDraw() const {
+    return chunksToDraw;
 }
 
 Terrain::~Terrain(){
-
-    chunkMap = std::unordered_map<int64_t, Chunk*>();
-
-}
-
-void Terrain::updateScene(){
-    for(auto entry: chunkMap){
-        Chunk* c = chunkMap[entry.first];
-        c->destroy();
-        c->create();
+    for(auto entry : chunkMap){
+        entry.second->destroy();
+        delete entry.second;
+        entry.second = nullptr;
     }
-
+    chunkMap = std::unordered_map<int64_t, Chunk*>();
 }

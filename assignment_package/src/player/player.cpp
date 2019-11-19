@@ -77,6 +77,7 @@ void Player::physicsUpdate(float dt) {
     if (flightMode) {
         velocity = requestedDirection * flightVelocity;
         position += velocity * dt; // Position update
+        terrain->playerMoved(position); // Tell terrain that player moved
         cameraUpdate(); // Update camera
         return;
     }
@@ -131,11 +132,12 @@ void Player::physicsUpdate(float dt) {
     }
 
     // Position update
-    position += ds;
+    position += ds; 
+
 
     // Tell terrain that player moved
     if (glm::length(ds) > eps) {
-        //terrain->checkAndCreate(position);
+        terrain->playerMoved(position);
     }
 
     // Update camera

@@ -13,17 +13,15 @@ Camera::Camera():
 }
 
 Camera::Camera(unsigned int w, unsigned int h):
-    Camera(w, h, glm::vec3(0,0,10), glm::vec3(0,0,0), glm::vec3(0,1,0))
+    Camera(w, h, glm::vec3(0,1,0))
 {}
 
-Camera::Camera(unsigned int w, unsigned int h, const glm::vec3 &e, const glm::vec3 &r, const glm::vec3 &worldUp):
+Camera::Camera(unsigned int w, unsigned int h, const glm::vec3 &worldUp):
     fovy(45),
     width(w),
     height(h),
     near_clip(0.1f),
     far_clip(1000),
-    eye(e),
-    ref(r),
     theta(0),
     phi(0),
     world_up(worldUp)

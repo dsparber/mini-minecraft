@@ -9,7 +9,7 @@ class Camera
 public:
     Camera();
     Camera(unsigned int w, unsigned int h);
-    Camera(unsigned int w, unsigned int h, const glm::vec3 &e, const glm::vec3 &r, const glm::vec3 &worldUp);
+    Camera(unsigned int w, unsigned int h, const glm::vec3 &worldUp);
     Camera(const Camera &c);
 
     float fovy;
