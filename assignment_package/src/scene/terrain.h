@@ -29,6 +29,7 @@ public:
     BlockType getBlockOrEmpty(int x, int y, int z) const;
 
     BlockType& getBlockAt(int x, int y, int z) ;
+    BlockType getBlockAt(glm::vec3) const;
     BlockType getBlockAt(int x, int y, int z) const;   // Given a world-space coordinate (which may have negative
                                                            // values) return the block stored at that point in space.
     void setBlockAt(int x, int y, int z, BlockType t); // Given a world-space coordinate (which may have negative

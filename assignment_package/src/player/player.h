@@ -68,11 +68,17 @@ private:
     /// Computes the distance to the next collision along travel vector
     float getCollisionDistance(glm::vec3);
 
-    /// Retunrs the edges of the players bounding box relative to the position
+    /// Returns the vertices of the players bounding box relative to the position
     std::vector<glm::vec3> getBoundingBox();
+
+    /// Returns the bottom of the players bounding box relative to the position
+    std::vector<glm::vec3> getBoundingBoxBottom();
 
     /// Used for caching of bounding box
     std::vector<glm::vec3> boundingBox;
+
+    /// Used for caching of bounding box bottom
+    std::vector<glm::vec3> boundingBoxBottom;
 
 public:
     void handleKeyEvent(QKeyEvent*);

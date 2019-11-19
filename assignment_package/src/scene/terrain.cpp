@@ -48,6 +48,11 @@ glm::vec2 Terrain::getCoordFromKey(int64_t key) const{
     return(glm::vec2(x, z));
 }
 
+BlockType Terrain::getBlockAt(glm::vec3 pos) const
+{
+    return getBlockAt((int)pos.x, (int)pos.y, (int)pos.z);
+}
+
 BlockType Terrain::getBlockAt(int x, int y, int z) const
 {
     // Get coordinates aligned to chunk
@@ -187,8 +192,9 @@ void Terrain::create()
                     }
                     else
                     {
+
                         float rawFBM = fbm(newX / 64.f, newZ / 64.f);
-                        float fbmVal = 85.f * powf(rawFBM, 4.f);
+                        float fbmVal = 32.f * powf(rawFBM, 4.f);
                         int intFBM = 128 + (int) fbmVal;
 
                         for (int i = 129; i < intFBM; i++) {
@@ -197,9 +203,11 @@ void Terrain::create()
 
                         setBlockAt(newX, intFBM, newZ, GRASS);
 
-                        for (int i = intFBM + 1; i < 140; i++) {
+
+                        for (int i = intFBM + 1; i < 134; i++) {
                             setBlockAt(newX, i, newZ, WATER);
                         }
+
                     }
                 }
             }

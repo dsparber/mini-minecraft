@@ -135,7 +135,7 @@ void Player::physicsUpdate(float dt) {
 
     // Tell terrain that player moved
     if (glm::length(ds) > eps) {
-        terrain->checkAndCreate(position);
+        //terrain->checkAndCreate(position);
     }
 
     // Update camera
@@ -148,16 +148,16 @@ float Player::getCollisionDistance(glm::vec3 ds) {
     float tMax = glm::length(ds);
     float tMin = tMax;
 
+    // Max == 0 -> return
+    if (tMax == 0) {
+        return 0;
+    }
+
     // Get signs
     glm::vec3 s = glm::sign(ds);
 
     // Unit direction
     glm::vec3 u = glm::normalize(ds);
-
-    // Max == 0 -> return
-    if (tMax <= eps) {
-        return 0;
-    }
 
     for (glm::vec3 offset : getBoundingBox()) {
 
@@ -181,6 +181,11 @@ float Player::getCollisionDistance(glm::vec3 ds) {
 
             // For every coordinate i in [x,y,z]
             for (int i = 0; i < 3; i++) {
+
+                // i component of vector is zero -> no i intersection
+                if (u[i] == 0) {
+                    continue;
+                }
 
                 float pi = cube[i] + s[i]; // position_[x/y/z] of intersection
                 float di = glm::abs(p[i] - pi); // distance in i direction
@@ -220,17 +225,14 @@ float Player::getCollisionDistance(glm::vec3 ds) {
             p = intersection;
 
             // If solid block -> break loop
-            if (terrain->getBlockOrEmpty(block.x, block.y, block.z) != EMPTY) {
+            BlockType type = terrain->getBlockOrEmpty(block.x, block.y, block.z);
+            if (isSolid(type)) {
                 tMin = glm::min(tMin, t);
                 break;
             }
 
             firstIteration = false;
         }
-    }
-
-    if (tMin < eps) {
-        return 0;
     }
     return tMin;
 }
@@ -243,16 +245,16 @@ bool Player::isGrounded() {
         return false;
     }
 
-
     // Check if any of the corners of the bounding box is on a block
-    for (glm::vec3 offset : getBoundingBox()) {
+    for (glm::vec3 offset : getBoundingBoxBottom()) {
         glm::vec3 pos = position + offset;
         int x = (int) pos.x;
         int z = (int) pos.z;
         int y = glm::round(pos.y);
 
-        // If currently on non empty block
-        if (terrain->getBlockOrEmpty(x, y - 1, z) != EMPTY) {
+        // If currently on solid block
+        BlockType type = terrain->getBlockOrEmpty(x, y - 1, z);
+        if (isSolid(type)) {
             return true;
         }
     }
@@ -292,6 +294,19 @@ std::vector<glm::vec3> Player::getBoundingBox() {
 
     boundingBox = box;
     return boundingBox;
+}
+
+std::vector<glm::vec3> Player::getBoundingBoxBottom() {
+
+    if (boundingBoxBottom.size() != 4) {
+        std::vector<glm::vec3> box;
+        box.push_back(glm::vec3(.5f,  -2.f,  .5f));
+        box.push_back(glm::vec3(.5f,  -2.f, -.5f));
+        box.push_back(glm::vec3(-.5f, -2.f,  .5f));
+        box.push_back(glm::vec3(-.5f, -2.f, -.5f));
+        boundingBoxBottom = box;
+    }
+    return boundingBoxBottom;
 }
 
 void Player::cameraUpdate() {

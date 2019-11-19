@@ -16,7 +16,8 @@ SOURCES += \
     $$PWD/scene/terrain.cpp \
     $$PWD/scene/chunk.cpp \
     $$PWD/scene/worldaxes.cpp \
-    $$PWD/player/player.cpp
+    $$PWD/player/player.cpp \
+    $$PWD/scene/blocktype.cpp
 
 HEADERS += \
     $$PWD/la.h \
