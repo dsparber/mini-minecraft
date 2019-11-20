@@ -147,7 +147,7 @@ void Player::physicsUpdate(float dt) {
 float Player::getCollisionDistance(glm::vec3 ds) {
 
     // Setup
-    float tMax = 10; //glm::length(ds);
+    float tMax = glm::length(ds);
     float tMin = tMax;
 
     // Max == 0 -> return
@@ -238,9 +238,6 @@ float Player::getCollisionDistance(glm::vec3 ds) {
     }
     if (tMin < eps) {
         tMin = 0;
-    }
-    if (tMin != 0) {
-        std::cout << tMin << std::endl;
     }
     return tMin;
 }
