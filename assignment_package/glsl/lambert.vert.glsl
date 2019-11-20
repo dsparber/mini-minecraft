@@ -49,7 +49,7 @@ void main()
 
     vec4 modelposition = u_Model * vs_Pos;   // Temporarily store the transformed vertex positions for use below
 
-    fs_LightVec = (lightDir);  // Compute the direction in which the light source lies
+    fs_LightVec = normalize(vec4(.3, .7, .2, 0));  // Compute the direction in which the light source lies
 
     gl_Position = u_ViewProj * modelposition;// gl_Position is a built-in variable of OpenGL which is
                                              // used to render the final positions of the geometry's vertices

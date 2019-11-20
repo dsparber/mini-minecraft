@@ -61,19 +61,19 @@ std::vector<glm::vec3> offsets =
 };
 
 Chunk::Chunk(OpenGLContext* context) : Drawable(context), mp_context(context), pos(glm::vec4(0,0,0,0)), left(nullptr), right(nullptr),
-    front(nullptr), back(nullptr), m_blocks(), created(false), computed(false), mutex()
+    front(nullptr), back(nullptr), m_blocks(), created(false), mutex()
 {
     std::fill(this->m_blocks.begin(), this->m_blocks.end(), EMPTY);
 }
 
 Chunk::Chunk(OpenGLContext* context, glm::vec4 pos): Drawable(context), mp_context(context), pos(pos), left(nullptr), right(nullptr),
-    front(nullptr), back(nullptr), m_blocks(), created(false), computed(false), mutex()
+    front(nullptr), back(nullptr), m_blocks(), created(false), mutex()
 {
     std::fill(this->m_blocks.begin(), this->m_blocks.end(), EMPTY);
 }
 
 Chunk::Chunk(OpenGLContext* context, const Chunk& c): Drawable(context), mp_context(context), pos(c.pos), left(c.left), right(c.right),
-    front(c.front), back(c.back), m_blocks(c.m_blocks), created(false), computed(false), mutex()
+    front(c.front), back(c.back), m_blocks(c.m_blocks), created(false), mutex()
 {
     std::fill(this->m_blocks.begin(), this->m_blocks.end(), EMPTY);
 }
@@ -145,14 +145,10 @@ void Chunk::setBlockAt(int x, int y, int z, BlockType t)
     if(idx < 65536 && idx >= 0){
         m_blocks[idx] = t;
     }
-    computed = false;
 }
 
 //only create vertex data for block faces that lie on the boundary between an EMPTY block and a filled block.
 void Chunk::compute(){
-    if (computed) {
-        return;
-    }
 
     //handle setting up the VBOs for any arbitrary mesh
     idx = std::vector<GLuint>();
@@ -191,14 +187,10 @@ void Chunk::compute(){
     }
 
     count = idx.size();
-    computed = true;
     created = false;
 }
 
 void Chunk::create() {
-    if (!computed) {
-        compute();
-    }
     if (created) {
         return;
     }
