@@ -10,7 +10,6 @@
 MyGL::MyGL(QWidget *parent)
     : OpenGLContext(parent),
       mp_geomCube(mkU<Cube>(this)),
-      mp_worldAxes(mkU<WorldAxes>(this)),
       mp_progLambert(mkU<ShaderProgram>(this)),
       mp_progFlat(mkU<ShaderProgram>(this)),
       mp_camera(mkU<Camera>()),
@@ -155,7 +154,29 @@ void MyGL::GLDrawScene()
     }
 }
 
+void MyGL::createTexture(const char *texturePath)
+{
+    printGLErrorLog();
 
+    QImage img(texturePath);
+    img.convertToFormat(QImage::Format_ARGB32);
+    img = img.mirrored();
+//    m_textureImage = std::make_shared<QImage>(img);
+//    context->glGenTextures(1, &m_textureHandle);
+    //this->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img.width, img.height, 0, GL_BGRA, GL_UNSIGNED_BYTE, img.bits());
+
+    printGLErrorLog();
+}
+
+void MyGL::setTextureSample(){
+// Set the render settings for the texture we've just created.
+// Essentially zero filtering on the "texture" so it appears exactly as rendered
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+// Clamp the colors at the edge of our texture
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+}
 
 void MyGL::keyPressEvent(QKeyEvent *e)
 {

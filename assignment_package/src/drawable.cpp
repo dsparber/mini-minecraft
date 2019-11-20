@@ -2,8 +2,8 @@
 #include <la.h>
 
 Drawable::Drawable(OpenGLContext* context)
-    : bufIdx(), bufAll(),
-      idxBound(false), allBound(false), context(context)
+    : bufIdx(), bufOp(), bufNonOp(),
+      idxBound(false), opBound(false), nonOpBound(false), context(context)
 {}
 
 Drawable::~Drawable()
@@ -13,7 +13,8 @@ Drawable::~Drawable()
 void Drawable::destroy()
 {
     context->glDeleteBuffers(1, &bufIdx);
-    context->glDeleteBuffers(1, &bufAll);
+    context->glDeleteBuffers(1, &bufOp);
+    context->glDeleteBuffers(1, &bufNonOp);
 }
 
 GLenum Drawable::drawMode()
@@ -40,11 +41,32 @@ void Drawable::generateIdx()
 }
 
 
-void Drawable::generateAll()
+void Drawable::generateOp()
 {
-    allBound = true;
+    opBound = true;
     // Create a VBO on our GPU and store its handle in bufAll
-    context->glGenBuffers(1, &bufAll);
+    context->glGenBuffers(1, &bufOp);
+}
+
+void Drawable::generateNonOp()
+{
+    nonOpBound = true;
+    // Create a VBO on our GPU and store its handle in bufAll
+    context->glGenBuffers(1, &bufNonOp);
+}
+
+void Drawable::generateTexture()
+{
+    context->printGLErrorLog();
+    // Create a VBO on our GPU and store its handle in bufAll
+    context->glGenTextures(1, &textureHandle);
+    context->glActiveTexture(GL_TEXTURE0);
+    context->glBindTexture(GL_TEXTURE_2D, textureHandle);
+    unsigned char* image;// = loadImage();
+//  context->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
+//                          image->width(), image->height(),
+//                          0, GL_BGRA, GL_UNSIGNED_BYTE, image);
+    context->printGLErrorLog();
 }
 
 bool Drawable::bindIdx()
@@ -55,10 +77,18 @@ bool Drawable::bindIdx()
     return idxBound;
 }
 
-bool Drawable::bindAll()
+bool Drawable::bindOp()
 {
-    if(allBound) {
-        context->glBindBuffer(GL_ARRAY_BUFFER, bufAll);
+    if(opBound) {
+        context->glBindBuffer(GL_ARRAY_BUFFER, bufOp);
     }
-    return allBound;
+    return opBound;
+}
+
+bool Drawable::bindNonOp()
+{
+    if(nonOpBound) {
+        context->glBindBuffer(GL_ARRAY_BUFFER, bufNonOp);
+    }
+    return nonOpBound;
 }

@@ -90,6 +90,7 @@ void Terrain::initializeChunk(int chunkX, int chunkZ) {
         c->back->front = c;
     }
 
+    //c->create();
     chunkMap[key] = c;
     chunksToDraw.push_back(c);
 }

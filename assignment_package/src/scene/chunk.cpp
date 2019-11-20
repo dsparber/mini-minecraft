@@ -106,7 +106,9 @@ void Chunk::setBlockAt(int x, int y, int z, BlockType t)
 void Chunk::create(){
     //handle setting up the VBOs for any arbitrary mesh
     std::vector<GLuint> idx;
-    std::vector<glm::vec4> all; //all attributes organized as vertex position, normal, and color
+    std::vector<GLuint> nonOpIdx;
+    std::vector<glm::vec4> op; //opaque attributes organized as vertex position, normal, and color
+    std::vector<glm::vec4> nonOp; //non-opaque attributes organized as vertex position, normal, and color
 
 
     //loop through blocks by iterating through a 3d array that's 16 * 256 * 16
@@ -115,8 +117,8 @@ void Chunk::create(){
             for(int z = 0; z < 16; z++){
 
                 BlockType b = getBlockAt(x,y,z);
-
                 if(b != EMPTY){
+
                     //check all 6 sides
                     for(int i = 0; i < 6; i++){
                         //coordinate of the neighbor
@@ -126,29 +128,42 @@ void Chunk::create(){
                                 nc.x < 16 && nc.y < 256 && nc.z < 16)
                         {
                             BlockType adj = getBlockAt(nc.x, nc.y,nc.z);
-                            if(adj == EMPTY) {
-                                Chunk::drawFace(glm::vec4(x,y,z,1.f), idx, all, i);
+                            if(isSolid(b) && (adj == EMPTY || !isSolid(adj))) {
+                                Chunk::drawFace(glm::vec4(x,y,z,1.f), idx, op, i);
+                                 //printf("solid face drawn!\n");
+                            } else if (isSolid(b)){
+                                Chunk::drawOutFace(glm::vec4(x,y,z,1.f), idx, op, i);
+                               //printf("outface drawn!\n");
+                            } else if (!isSolid(b) && adj == EMPTY){
+                                Chunk::drawFace(glm::vec4(x,y,z,1.f), nonOpIdx, nonOp, i);
+                            } else {
+                                //check adjacent chunks and draw faces if adjacent block is empty
+                                Chunk::drawOutFace(glm::vec4(x,y,z,1.f), nonOpIdx, nonOp, i);
+
                             }
-                        } else {
-                            //check adjacent chunks and draw faces if adjacent block is empty
-                            Chunk::drawOutFace(glm::vec4(x,y,z,1.f), idx, all, i);
                         }
                     }
-                }
 
+                }
             }
         }
+
+        idx.insert(idx.end(), nonOpIdx.begin(), nonOpIdx.end());
+        count = idx.size();
+
+        generateIdx();
+        mp_context->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufIdx);
+        mp_context->glBufferData(GL_ELEMENT_ARRAY_BUFFER, idx.size() * sizeof(GLuint), idx.data(), GL_STATIC_DRAW);
+
+        generateOp();
+        mp_context->glBindBuffer(GL_ARRAY_BUFFER, bufOp);
+        mp_context->glBufferData(GL_ARRAY_BUFFER, op.size() * sizeof(glm::vec4), op.data(), GL_STATIC_DRAW);
+
+//        generateNonOp();
+//        mp_context->glBindBuffer(GL_ARRAY_BUFFER, bufNonOp);
+//        mp_context->glBufferData(GL_ARRAY_BUFFER, nonOp.size() * sizeof(glm::vec4), nonOp.data(), GL_STATIC_DRAW);
+
     }
-
-    count = idx.size();
-
-    generateIdx();
-    mp_context->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufIdx);
-    mp_context->glBufferData(GL_ELEMENT_ARRAY_BUFFER, idx.size() * sizeof(GLuint), idx.data(), GL_STATIC_DRAW);
-
-    generateAll();
-    mp_context->glBindBuffer(GL_ARRAY_BUFFER, bufAll);
-    mp_context->glBufferData(GL_ARRAY_BUFFER, all.size() * sizeof(glm::vec4), all.data(), GL_STATIC_DRAW);
 }
 
 void Chunk::drawFace(glm::vec4 pos, std::vector<GLuint>& idx, std::vector<glm::vec4>& all, int faceNum){

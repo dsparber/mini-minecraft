@@ -9,7 +9,7 @@
 ShaderProgram::ShaderProgram(OpenGLContext *context)
     : vertShader(), fragShader(), prog(),
       attrPos(-1), attrNor(-1), attrCol(-1),
-      unifModel(-1), unifModelInvTr(-1), unifViewProj(-1), unifColor(-1),
+      unifModel(-1), unifModelInvTr(-1), unifViewProj(-1), unifColor(-1),unifSampler(-1),
       context(context)
 {}
 
@@ -69,6 +69,9 @@ void ShaderProgram::create(const char *vertfile, const char *fragfile)
     unifModelInvTr = context->glGetUniformLocation(prog, "u_ModelInvTr");
     unifViewProj   = context->glGetUniformLocation(prog, "u_ViewProj");
     unifColor      = context->glGetUniformLocation(prog, "u_Color");
+
+    unifSampler = context->glGetUniformLocation(prog, "u_RenderedTexture");
+
 }
 
 void ShaderProgram::useMe()
@@ -139,6 +142,13 @@ void ShaderProgram::draw(Drawable &d)
 {
     useMe();
 
+    //context->glUseProgram(shaderProgram);
+
+    if(unifSampler != -1)
+    {
+        context->glUniform1i(unifSampler, 0);
+    }
+
     // Each of the following blocks checks that:
     //   * This shader has this attribute, and
     //   * This Drawable has a vertex buffer for this attribute.
@@ -149,18 +159,18 @@ void ShaderProgram::draw(Drawable &d)
     // meaning that glVertexAttribPointer associates vs_Pos
     // (referred to by attrPos) with that VBO
 
-    if (attrPos != -1 && d.bindAll()) {
+    if (attrPos != -1 && d.bindOp()) {
         context->glEnableVertexAttribArray(attrPos);
         context->glVertexAttribPointer(attrPos, 4, GL_FLOAT, false, 3 * sizeof(glm::vec4),  NULL);
 
     }
 
-    if (attrNor != -1 && d.bindAll()) {
+    if (attrNor != -1 && d.bindOp()) {
         context->glEnableVertexAttribArray(attrNor);
         context->glVertexAttribPointer(attrNor, 4, GL_FLOAT, false, 3 * sizeof(glm::vec4),  (void*)sizeof(glm::vec4));
    }
 
-    if (attrCol != -1 && d.bindAll()) {
+    if (attrCol != -1 && d.bindOp()) {
         context->glEnableVertexAttribArray(attrCol);
         context->glVertexAttribPointer(attrCol, 4, GL_FLOAT, false, 3 * sizeof(glm::vec4),  (void*)(2*sizeof(glm::vec4)));
   }
