@@ -22,7 +22,6 @@ public:
     std::array<BlockType, 65536> m_blocks;
 
     bool created;
-    bool computed;
     QMutex mutex;
 
     //functions NOT used, just for debugging
