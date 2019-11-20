@@ -3,7 +3,7 @@
 
 Player::Player() :
     camera(nullptr),
-    position(32, 160, 32),
+    position(0, 160, 0),
     velocity(0, 0, 0),
     phi(0),
     theta(0),
