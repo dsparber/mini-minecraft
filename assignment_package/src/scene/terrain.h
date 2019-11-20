@@ -1,8 +1,12 @@
 #pragma once
 #include <QList>
+#include <QMutex>
+#include <QThreadPool>
 #include <la.h>
+#include <set>
 #include <unordered_map>
 #include <stdint.h>
+#include "utils.h"
 #include "chunk.h"
 #include "blocktype.h"
 #include <smartpointerhelp.h>
@@ -11,6 +15,9 @@ class Terrain
 {
 
 private:
+    /// Chunks to render in every direction of player
+    static int chunksToRender;
+
     /// A map of chunk's coordinate coded in 64 bits as key to the chunk
     std::unordered_map<int64_t, Chunk*> chunkMap;
 
@@ -18,7 +25,7 @@ private:
     OpenGLContext* context;
 
     /// Chunks that should be drawn
-    std::vector<Chunk*> chunksToDraw;
+    std::set<Chunk*> chunksToDraw;
 
     /// Return the coordinates for the block the player is looking at
     glm::vec3 rayMarch(glm::vec3 eye, glm::vec3 look);
@@ -29,9 +36,26 @@ private:
     /// Returns the chunk at the given coordinates
     Chunk* getChunk(int x, int z) const;
 
-    /// Helper functions for converting x,z to int64
-    int64_t getHashKey(int x, int z) const;
-    glm::vec2 getCoordFromKey(int64_t key) const;
+    /// Multi threading, stores  requested chunks
+    std::set<int64_t> requestedChunks;
+
+    /// Chunks that have been generated but not added to the terrain yet
+    std::vector<Chunk*> createdChunks;
+
+    /// Mutex for accesing vectors and maps
+    QMutex requestedMutex, createdMutex;
+
+    /// Save where the player last stood
+    int64_t lastPlayerChunk;
+
+    /// Insert new chunks into chunkMap
+    void updateChunkMap();
+
+    /// Set to true if required chunks not created yet
+    bool waitingForChunks;
+
+    /// Set to true when new chunks were inserted into the map
+    bool newChunksAvailable;
 
 public:
 
@@ -69,7 +93,7 @@ public:
 
 
     /// Returns all chunks that should be drawn.
-    std::vector<Chunk*> getChunksToDraw() const;
+    std::set<Chunk*> getChunksToDraw() const;
 
 
     /// Callback if player moved. Used to expand terrain

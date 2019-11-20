@@ -148,10 +148,10 @@ void Chunk::setBlockAt(int x, int y, int z, BlockType t)
 }
 
 //only create vertex data for block faces that lie on the boundary between an EMPTY block and a filled block.
-void Chunk::create(){
+void Chunk::compute(){
     //handle setting up the VBOs for any arbitrary mesh
-    std::vector<GLuint> idx;
-    std::vector<glm::vec4> all; //all attributes organized as vertex position, normal, and color
+    idx = std::vector<GLuint>();
+    all = std::vector<glm::vec4>(); //all attributes organized as vertex position, normal, and color
 
 
     //loop through blocks by iterating through a 3d array that's 16 * 256 * 16
@@ -186,6 +186,9 @@ void Chunk::create(){
     }
 
     count = idx.size();
+}
+
+void Chunk::create() {
 
     generateIdx();
     mp_context->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufIdx);
