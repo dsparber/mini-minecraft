@@ -12,7 +12,7 @@ class Player
 {
 private:
     /// Precision for floating point comparison
-    float eps = 0.01;
+    float eps = 0.001;
 
     /// Position of the player in 3D space
     glm::vec3 position;

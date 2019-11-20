@@ -101,8 +101,8 @@ BlockType Terrain::getBlockAt(glm::vec3 pos) const
 BlockType Terrain::getBlockAt(int x, int y, int z) const
 {
     // Get coordinates aligned to chunk
-    int chunkX = (x / 16) * 16;
-    int chunkZ = (z / 16) * 16;
+    int chunkX = glm::floor(x / 16.f) * 16;
+    int chunkZ = glm::floor(z / 16.f) * 16;
 
     // Get local block coordinates
     int blockX = x - chunkX;
@@ -121,8 +121,8 @@ BlockType Terrain::getBlockAt(int x, int y, int z) const
 BlockType& Terrain::getBlockAt(int x, int y, int z)
 {
     // Get coordinates aligned to chunk
-    int chunkX = (x / 16) * 16;
-    int chunkZ = (z / 16) * 16;
+    int chunkX = glm::floor(x / 16.f) * 16;
+    int chunkZ = glm::floor(z / 16.f) * 16;
 
     // Get local block coordinates
     int blockX = x - chunkX;
@@ -140,8 +140,8 @@ BlockType& Terrain::getBlockAt(int x, int y, int z)
 
 Chunk* Terrain::getChunk(int x, int z) const {
     // Get coordinates aligned to chunk
-    int chunkX = (x / 16) * 16;
-    int chunkZ = (z / 16) * 16;
+    int chunkX = glm::floor(x / 16.f) * 16;
+    int chunkZ = glm::floor(z / 16.f) * 16;
 
     // Get key for chunk map
     int64_t chunkKey = getHashKey(chunkX, chunkZ);
@@ -157,8 +157,8 @@ Chunk* Terrain::getChunk(int x, int z) const {
 void Terrain::setBlockAt(int x, int y, int z, BlockType t)
 {
     // Get coordinates aligned to chunk
-    int chunkX = (x / 16) * 16;
-    int chunkZ = (z / 16) * 16;
+    int chunkX = glm::floor(x / 16.f) * 16;
+    int chunkZ = glm::floor(z / 16.f) * 16;
 
     // Get local block coordinates
     int blockX = x - chunkX;
@@ -221,8 +221,8 @@ void Terrain::playerMoved(glm::vec3 playerPosition) {
 
     int x = playerPosition.x;
     int z = playerPosition.z;
-    x = (x / 16) * 16;
-    z = (z / 16) * 16;
+    x = glm::floor(x / 16.f) * 16;
+    z = glm::floor(z / 16.f) * 16;
 
     int64_t playerChunk = getHashKey(x, z);
 

@@ -127,7 +127,7 @@ void Player::physicsUpdate(float dt) {
     // Move at most by collision distance
     if (collisionDistance < travelDistance) {
         // Adjust velocity and recalculate ds
-        velocity = velocity / travelDistance * collisionDistance * .9f;
+        velocity = velocity / travelDistance * collisionDistance * .5f;
         ds = velocity * dt;
     }
 
@@ -147,7 +147,7 @@ void Player::physicsUpdate(float dt) {
 float Player::getCollisionDistance(glm::vec3 ds) {
 
     // Setup
-    float tMax = glm::length(ds);
+    float tMax = 10; //glm::length(ds);
     float tMin = tMax;
 
     // Max == 0 -> return
@@ -177,7 +177,7 @@ float Player::getCollisionDistance(glm::vec3 ds) {
             glm::ivec3 cube = (glm::ivec3) glm::floor(p);
 
             // Get nearest intersection
-            float intersectionDistance = 2;
+            float intersectionDistance = 1000;
             glm::vec3 intersection;
             glm::ivec3 block;
 
@@ -236,16 +236,17 @@ float Player::getCollisionDistance(glm::vec3 ds) {
             firstIteration = false;
         }
     }
+    if (tMin < eps) {
+        tMin = 0;
+    }
+    if (tMin != 0) {
+        std::cout << tMin << std::endl;
+    }
     return tMin;
 }
 
 
 bool Player::isGrounded() {
-
-    // If position.y not an integer -> trivially not grounded
-    if (glm::abs(position.y - glm::round(position.y)) > eps) {
-        return false;
-    }
 
     // Check if any of the corners of the bounding box is on a block
     for (glm::vec3 offset : getBoundingBoxBottom()) {
