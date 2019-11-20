@@ -31,12 +31,12 @@ void CreateChunkRunnable::run() {
             }
 
             for (int i = 128; i < intFBM; i++) {
-                chunk->setBlockAt(x, i, z, DIRT);
+                //chunk->setBlockAt(x, i, z, DIRT);
             }
 
-            chunk->setBlockAt(x, intFBM, z, GRASS);
+            //chunk->setBlockAt(x, intFBM, z, GRASS);
 
-            for (int i = intFBM + 1; i < 132; i++) {
+            for (int i = 128; i < 140; i++) {
                 chunk->setBlockAt(x, i, z, WATER);
             }
         }

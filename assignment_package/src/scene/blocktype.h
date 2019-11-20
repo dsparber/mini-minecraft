@@ -17,4 +17,6 @@ enum BlockType: unsigned char
 
 bool isSolid(BlockType);
 
+bool isLiquid(BlockType);
+
 #endif // BLOCKTYPE_H

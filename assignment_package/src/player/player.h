@@ -65,6 +65,9 @@ private:
     /// Returns if player is currently touching the ground
     bool isGrounded();
 
+    /// Returns if the player is "standing" on a liquid (water or lava)
+    bool isSwimming();
+
     /// Computes the distance to the next collision along travel vector
     float getCollisionDistance(glm::vec3);
 

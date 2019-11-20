@@ -51,6 +51,8 @@ void Player::physicsUpdate(float dt) {
 
     bool flightMode = flyPressed;
     bool grounded = isGrounded();
+    bool swimming = isSwimming();
+    bool airborne = !grounded && !swimming;
 
     float pi_2 = glm::pi<float>() * .5f;
 
@@ -60,11 +62,14 @@ void Player::physicsUpdate(float dt) {
     float mps = m / s; // Velocity unit m/s
     float kph = mps / 3.6f; // Velocity unit km/h
 
-    float g = 9.81 * m / s2; // gravitation
-    float horizontalAcceleration = 5 * m / s2; // Player acceleration, for moving
-    float maxVelocity = 15 * kph; // max. velocity
+    float speedModifier = swimming ? .67 : 1; // Changes acceleration and velocity
+
+    float g = 9.81 * speedModifier * m / s2; // gravitation
+    float defaultAcceleration = 5 * speedModifier * m / s2; // Player acceleration, for moving
+    float maxVelocity = 15 * speedModifier * kph; // max. velocity
     float flightVelocity = 30 * kph; // velocity for flying
     float omega = pi_2 / s; // default angular velocity
+
 
     float jumpHeigth = 2 * m; // Jump h meters into the air
     float jumpTakeofVelocity = glm::sqrt(2 * g * jumpHeigth) * mps; // v = sqrt(mgh) [m/s]
@@ -84,25 +89,28 @@ void Player::physicsUpdate(float dt) {
 
     // Acceleration vector
     glm::vec3 a;
-    if (grounded) {
+    if (airborne) {
+        // Gravity only
+        a = glm::vec3(0, -g, 0);
+    }
+    else if (grounded || swimming) {
         // Stop
-        if (glm::length(requestedDirection) == 0) {
-            a = -horizontalAcceleration * velocity;
+        if (glm::length(requestedDirection) == 0 && grounded) {
+            a = -defaultAcceleration * velocity;
         }
         // Accelerate
         else {
-            glm::vec3 horizontal = glm::vec3(requestedDirection.x, 0, requestedDirection.z);
-            a = horizontal * horizontalAcceleration;
+            // Discard y if standing on ground
+            glm::vec3 requested = glm::vec3(requestedDirection.x, 0, requestedDirection.z);
+            a = requested * defaultAcceleration;
+            if (swimming) {
+                a.y = requestedDirection.y * (defaultAcceleration + g) - g;
+            }
         }
         // Slow down if max velocity violated
         if (glm::length(velocity) > maxVelocity) {
-            a -= velocity * horizontalAcceleration;
+            a -= velocity * defaultAcceleration;
         }
-    }
-    // Airborne
-    else {
-        // Gravity only
-        a = glm::vec3(0, -g, 0);
     }
 
     // Velocity 
@@ -133,7 +141,6 @@ void Player::physicsUpdate(float dt) {
 
     // Position update
     position += ds; 
-
 
     // Tell terrain that player moved
     if (glm::length(ds) > eps) {
@@ -240,6 +247,33 @@ float Player::getCollisionDistance(glm::vec3 ds) {
         tMin = 0;
     }
     return tMin;
+}
+
+
+bool Player::isSwimming() {
+
+    // Standing on ground
+    if (isGrounded()) {
+        return false;
+    }
+
+    // Player is standing on at least one non-empty block
+
+    // Check if any of the corners of the bounding box is on a block
+    for (glm::vec3 offset : getBoundingBoxBottom()) {
+        glm::vec3 pos = position + offset;
+        int x = (int) pos.x;
+        int z = (int) pos.z;
+        int y = glm::round(pos.y);
+
+        // At least one corner in a liquid
+        BlockType type = terrain->getBlockOrEmpty(x, y - 1, z);
+        if (isLiquid(type)) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 

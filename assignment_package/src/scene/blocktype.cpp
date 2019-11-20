@@ -9,3 +9,7 @@ bool isSolid(BlockType type) {
             || type == BEDROCK
             || type == ICE;
 }
+
+bool isLiquid(BlockType type) {
+    return type == WATER || type == LAVA;
+}
