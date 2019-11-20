@@ -42,8 +42,8 @@ private:
     /// Chunks that have been generated but not added to the terrain yet
     std::vector<Chunk*> createdChunks;
 
-    /// Mutex for accesing vectors and maps
-    QMutex requestedMutex, createdMutex;
+    /// Mutex for accesing created chunks
+    QMutex createdMutex;
 
     /// Save where the player last stood
     int64_t lastPlayerChunk;

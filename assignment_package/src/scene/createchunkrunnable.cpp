@@ -1,13 +1,14 @@
 #include "createchunkrunnable.h"
 #include "fbm.h"
+#include <iostream>
 
 CreateChunkRunnable::CreateChunkRunnable(
         Chunk* c,
-        std::vector<Chunk*>* createdChunks,
+        std::vector<Chunk*>* completedChunks,
         QMutex* mutex) :
     chunk(c),
-    createdChunks(createdChunks),
-    createdChunksMutex(mutex)
+    completedChunks(completedChunks),
+    terrainMutex(mutex)
 
 { }
 
@@ -40,10 +41,56 @@ void CreateChunkRunnable::run() {
             }
         }
     }
-    chunk->compute();
 
-    // Push new chunk to createdChunks vector
-    createdChunksMutex->lock();
-    createdChunks->push_back(chunk);
-    createdChunksMutex->unlock();
+    int x = chunk->pos.x;
+    int z = chunk->pos.z;
+    int64_t key = getHashKey(x, z);
+
+    std::vector<Chunk*> computeNeeded;
+    computeNeeded.push_back(chunk);
+
+    // Link neighbors
+    mutex.lock();
+    created[key] = chunk;
+
+    // Left
+    int64_t neighborKey = getHashKey(x - 16, z);
+    if (created.find(neighborKey) != created.end()) {
+        chunk->left = created[neighborKey];
+        chunk->left->right = chunk;
+        computeNeeded.push_back(chunk->left);
+    }
+    // Right
+    neighborKey = getHashKey(x + 16, z);
+    if (created.find(neighborKey) != created.end()) {
+        chunk->right = created[neighborKey];
+        chunk->right->left = chunk;
+        computeNeeded.push_back(chunk->right);
+    }
+    // Front
+    neighborKey = getHashKey(x, z - 16);
+    if (created.find(neighborKey) != created.end()) {
+        chunk->front = created[neighborKey];
+        chunk->front->back = chunk;
+        computeNeeded.push_back(chunk->front);
+    }
+    // Back
+    neighborKey = getHashKey(x, z + 16);
+    if (created.find(neighborKey) != created.end()) {
+        chunk->back = created[neighborKey];
+        chunk->back->front = chunk;
+        computeNeeded.push_back(chunk->back);
+    }
+    mutex.unlock();
+
+    for (Chunk* c : computeNeeded) {
+        c->mutex.lock();
+        c->compute();
+        c->mutex.unlock();
+    }
+
+    // Push new chunk to completedChunks vector
+    terrainMutex->lock();
+    completedChunks->push_back(chunk);
+    terrainMutex->unlock();
 }

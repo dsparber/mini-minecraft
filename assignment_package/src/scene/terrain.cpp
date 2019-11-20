@@ -13,7 +13,6 @@ Terrain::Terrain (OpenGLContext* context) :
     chunksToDraw(),
     requestedChunks(),
     createdChunks(),
-    requestedMutex(),
     lastPlayerChunk(-1),
     waitingForChunks(false),
     newChunksAvailable(false)
@@ -45,28 +44,6 @@ void Terrain::updateChunkMap() {
         chunkMap[key] = chunk;
     }
 
-    // Link neighbors
-    for (Chunk* chunk : createdChunks) {
-        int x = chunk->pos.x;
-        int z = chunk->pos.z;
-        chunk->left = getChunk(x - 16, z);
-        if (chunk->left != nullptr) {
-            chunk->right = chunk;
-        }
-        chunk->right = getChunk(x - 16, z);
-        if (chunk->right != nullptr) {
-            chunk->left = chunk;
-        }
-        chunk->front = getChunk(x, z - 16);
-        if (chunk->front != nullptr) {
-            chunk->back = chunk;
-        }
-        chunk->back = getChunk(z, z + 16);
-        if (chunk->back != nullptr) {
-            chunk->front = chunk;
-        }
-    }
-
     createdChunks.clear();
 
     createdMutex.unlock();
@@ -75,22 +52,18 @@ void Terrain::updateChunkMap() {
 void Terrain::initializeChunk(int chunkX, int chunkZ) {
 
     int64_t key = getHashKey(chunkX, chunkZ);
-    bool alreadyRequested = true;
 
-    // Add key to requested chunks
-    requestedMutex.lock();
-    if (requestedChunks.find(key) == requestedChunks.end()) {
-        requestedChunks.insert(key);
-        alreadyRequested = false;
+    // Already requested
+    if (requestedChunks.find(key) != requestedChunks.end()) {
+        return;
     }
-    requestedMutex.unlock();
 
-    if (!alreadyRequested) {
-        Chunk* c = new Chunk(context, glm::vec4(chunkX, 0, chunkZ, 0));
-        CreateChunkRunnable* create = new CreateChunkRunnable(c, &createdChunks, &createdMutex);
-        create->setAutoDelete(true);
-        QThreadPool::globalInstance()->start(create);
-    }
+    requestedChunks.insert(key);
+
+    Chunk* c = new Chunk(context, glm::vec4(chunkX, 0, chunkZ, 0));
+    CreateChunkRunnable* create = new CreateChunkRunnable(c, &createdChunks, &createdMutex);
+    create->setAutoDelete(true);
+    QThreadPool::globalInstance()->start(create);
 }
 
 BlockType Terrain::getBlockAt(glm::vec3 pos) const
@@ -166,13 +139,23 @@ void Terrain::setBlockAt(int x, int y, int z, BlockType t)
 
     // Get key for chunk map
     int64_t chunkKey = getHashKey(chunkX, chunkZ);
-    if(chunkMap.count(chunkKey) > 0){
-        // Get chunk reference
-        Chunk* chunk = chunkMap[chunkKey];
 
-        // Set block
-        chunk->setBlockAt(blockX, y, blockZ, t);
+    if (chunkMap.find(chunkKey) == chunkMap.end()) {
+        return;
     }
+
+    // Get chunk reference
+    Chunk* chunk = chunkMap[chunkKey];
+
+    // Set block
+    chunk->setBlockAt(blockX, y, blockZ, t);
+
+    // Recreate chunk
+    chunk->destroy();
+    chunk->compute();
+    chunk->create();
+
+    // TODO check neighbors and update
 }
 
 void Terrain::addBlock(glm::vec3 eye, glm::vec3 look)
@@ -180,21 +163,12 @@ void Terrain::addBlock(glm::vec3 eye, glm::vec3 look)
     glm::vec3 addPos = rayMarch(eye, look) - 0.75f * look;
     glm::vec3 coords(glm::floor(addPos));
     setBlockAt(coords.x, coords.y, coords.z, LAVA);
-    Chunk* c = getChunk((int)coords.x, (int)coords.z);
-    c->destroy();
-    c->compute();
-    c->create();
 }
 
 void Terrain::removeBlock(glm::vec3 eye, glm::vec3 look)
 {
     glm::vec3 coords(glm::floor(rayMarch(eye, look)));
     setBlockAt(coords.x, coords.y, coords.z, EMPTY);
-    Chunk* c = getChunk((int)coords.x, (int) coords.z);
-    c->destroy();
-    c->compute();
-    c->create();
-    // TODO update neighbor if block deleted at border
 }
 
 glm::vec3 Terrain::rayMarch(glm::vec3 eye, glm::vec3 look)
@@ -254,12 +228,12 @@ void Terrain::playerMoved(glm::vec3 playerPosition) {
 
             // Add chunk to draw set if not in set
             if (chunksToDraw.find(chunk) == chunksToDraw.end()) {
-                chunk->create();
                 chunksToDraw.insert(chunk);
             } else {
                 // Chunk is also used in future
                 prevChunks.erase(chunk);
             }
+            chunk->create();
         }
     }
     waitingForChunks = !allChunksAvailable;
