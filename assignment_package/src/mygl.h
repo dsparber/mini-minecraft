@@ -12,6 +12,7 @@
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLShaderProgram>
 #include <smartpointerhelp.h>
+#include "texture.h"
 
 
 class MyGL : public OpenGLContext
@@ -39,6 +40,9 @@ private:
                               // from within a mouse move event after reading the mouse movement so that
                               // your mouse stays within the screen bounds and is always read.
 
+    std::shared_ptr<Texture> m_texture;
+    Texture* mp_currentTex;
+
 
 public:
     explicit MyGL(QWidget *parent = 0);
@@ -49,7 +53,7 @@ public:
     void paintGL();
 
     void GLDrawScene();
-    void createTexture(const char *texturePath);
+    void createTextures();
     void setTextureSample();
 
 

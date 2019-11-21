@@ -1,5 +1,5 @@
 #include "blocktype.h"
 
 bool isSolid(BlockType type) {
-    return type == STONE || type == GRASS || type == DIRT || type == LAVA;
+    return type != WATER && type != EMPTY;
 }

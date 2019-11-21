@@ -33,11 +33,23 @@ int Drawable::elemCount()
     return count;
 }
 
+int Drawable::elemNCount()
+{
+    return nCount;
+}
+
 void Drawable::generateIdx()
 {
     idxBound = true;
     // Create a VBO on our GPU and store its handle in bufIdx
     context->glGenBuffers(1, &bufIdx);
+}
+
+void Drawable::generateNIdx()
+{
+    nIdxBound = true;
+    // Create a VBO on our GPU and store its handle in bufIdx
+    context->glGenBuffers(1, &bufNIdx);
 }
 
 
@@ -75,6 +87,14 @@ bool Drawable::bindIdx()
         context->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufIdx);
     }
     return idxBound;
+}
+
+bool Drawable::bindNIdx()
+{
+    if(nIdxBound) {
+        context->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufNIdx);
+    }
+    return nIdxBound;
 }
 
 bool Drawable::bindOp()

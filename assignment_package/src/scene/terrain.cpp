@@ -16,9 +16,6 @@ void Terrain::initialize(){
         }
     }
 
-    for(Chunk* c : getChunksToDraw()){
-        c->create();
-    }
 }
 
 BlockType Terrain::getBlockOrEmpty(int x, int y, int z) const {
@@ -43,54 +40,63 @@ void Terrain::initializeChunk(int chunkX, int chunkZ) {
     {
         for(int z = 0; z < 16; ++z)
         {
-            for(int y = 0; y < 256; ++y)
-            {
-                int fbmX = chunkX + x;
-                int fbmZ = chunkZ + z;
+            int fbmX = chunkX + x;
+            int fbmZ = chunkZ + z;
 
-                if(y <= 128) {
-                    c->setBlockAt(x, y, z, STONE);
+
+                float rawFBM = fbm(fbmX / 64.f, fbmZ / 64.f);
+                float fbmVal = 32.f * powf(rawFBM, 4.f);
+                int intFBM = 128 + (int) fbmVal;
+
+                for (int i = 120; i < 129; i++) {
+                    c->setBlockAt(x, i, z, STONE);
                 }
-                else
-                {
-                    float rawFBM = fbm(fbmX / 64.f, fbmZ / 64.f);
-                    float fbmVal = 32.f * powf(rawFBM, 4.f);
-                    int intFBM = 128 + (int) fbmVal;
 
-                    for (int i = 129; i < intFBM; i++) {
-                        c->setBlockAt(x, i, z, DIRT);
-                    }
-
-                    c->setBlockAt(x, intFBM, z, GRASS);
+                c->setBlockAt(x, 129, z, WATER);
 
 
-                    for (int i = intFBM + 1; i < 134; i++) {
-                        c->setBlockAt(x, i, z, WATER);
-                    }
-                }
-            }
+//                for (int i = 129; i < intFBM; i++) {
+//                    c->setBlockAt(x, i, z, DIRT);
+//                }
+
+//                c->setBlockAt(x, intFBM, z, GRASS);
+
+
+//                for (int i = intFBM + 1; i < 134; i++) {
+//                    c->setBlockAt(x, i, z, WATER);
+//                }
+
         }
+
     }
 
     // Link neighbors
     c->left = getChunk(chunkX - 16, chunkZ);
     if (c->left != nullptr) {
         c->left->right = c;
+        c->left->destroy();
+        c->left->create();
     }
     c->right = getChunk(chunkX + 16, chunkZ);
     if (c->right != nullptr) {
         c->right->left = c;
+        c->right->destroy();
+        c->right->create();
     }
     c->front = getChunk(chunkX, chunkZ - 16);
     if (c->front != nullptr) {
         c->front->back = c;
+        c->front->destroy();
+        c->front->create();
     }
     c->back = getChunk(chunkX, chunkZ + 16);
     if (c->back != nullptr) {
         c->back->front = c;
+        c->back->destroy();
+        c->back->create();
     }
 
-    //c->create();
+    c->create();
     chunkMap[key] = c;
     chunksToDraw.push_back(c);
 }

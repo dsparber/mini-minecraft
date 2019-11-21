@@ -8,8 +8,9 @@
 
 ShaderProgram::ShaderProgram(OpenGLContext *context)
     : vertShader(), fragShader(), prog(),
-      attrPos(-1), attrNor(-1), attrCol(-1),
-      unifModel(-1), unifModelInvTr(-1), unifViewProj(-1), unifColor(-1),unifSampler(-1),
+      attrPos(-1), attrNor(-1), attrUV(-1),//attrCol(-1),
+      unifModel(-1), unifModelInvTr(-1), unifViewProj(-1),
+      unifColor(-1), unifSampler(-1),unifTime(-1),
       context(context)
 {}
 
@@ -63,20 +64,35 @@ void ShaderProgram::create(const char *vertfile, const char *fragfile)
 
     attrPos = context->glGetAttribLocation(prog, "vs_Pos");
     attrNor = context->glGetAttribLocation(prog, "vs_Nor");
-    attrCol = context->glGetAttribLocation(prog, "vs_Col");
+    //attrCol = context->glGetAttribLocation(prog, "vs_Col");
+    attrUV  = context->glGetAttribLocation(prog, "vs_UV");
+
 
     unifModel      = context->glGetUniformLocation(prog, "u_Model");
     unifModelInvTr = context->glGetUniformLocation(prog, "u_ModelInvTr");
     unifViewProj   = context->glGetUniformLocation(prog, "u_ViewProj");
     unifColor      = context->glGetUniformLocation(prog, "u_Color");
 
-    unifSampler = context->glGetUniformLocation(prog, "u_RenderedTexture");
+    unifSampler = context->glGetUniformLocation(prog, "u_Texture");
+    unifTime = context->glGetUniformLocation(prog, "u_Time");
+
+    context->printGLErrorLog();
 
 }
 
 void ShaderProgram::useMe()
 {
     context->glUseProgram(prog);
+}
+
+void ShaderProgram::setTime(int t)
+{
+    useMe();
+
+    if(unifTime != -1)
+    {
+        context->glUniform1i(unifTime, t);
+    }
 }
 
 void ShaderProgram::setModelMatrix(const glm::mat4 &model)
@@ -138,7 +154,7 @@ void ShaderProgram::setGeometryColor(glm::vec4 color)
 }
 
 //This function, as its name implies, uses the passed in GL widget
-void ShaderProgram::draw(Drawable &d)
+void ShaderProgram::draw(Drawable &d, bool solid)
 {
     useMe();
 
@@ -158,11 +174,10 @@ void ShaderProgram::draw(Drawable &d)
     // glBindBuffer on the Drawable's VBO for vertex position,
     // meaning that glVertexAttribPointer associates vs_Pos
     // (referred to by attrPos) with that VBO
-
-    if (attrPos != -1 && d.bindOp()) {
+if(solid){
+    if (attrPos != -1 && d.bindOp() ) {
         context->glEnableVertexAttribArray(attrPos);
         context->glVertexAttribPointer(attrPos, 4, GL_FLOAT, false, 3 * sizeof(glm::vec4),  NULL);
-
     }
 
     if (attrNor != -1 && d.bindOp()) {
@@ -174,16 +189,31 @@ void ShaderProgram::draw(Drawable &d)
         context->glEnableVertexAttribArray(attrCol);
         context->glVertexAttribPointer(attrCol, 4, GL_FLOAT, false, 3 * sizeof(glm::vec4),  (void*)(2*sizeof(glm::vec4)));
   }
+        d.bindIdx();
+        // Bind the index buffer and then draw shapes from it.
+        // This invokes the shader program, which accesses the vertex buffers.
+        context->glDrawElements(d.drawMode(), d.elemCount(), GL_UNSIGNED_INT, 0);
+} else {
+    if (attrPos != -1 && d.bindNonOp() ) {
+        context->glEnableVertexAttribArray(attrPos);
+        context->glVertexAttribPointer(attrPos, 4, GL_FLOAT, false, 3 * sizeof(glm::vec4),  NULL);
+    }
 
-    // Bind the index buffer and then draw shapes from it.
-    // This invokes the shader program, which accesses the vertex buffers.
-    d.bindIdx();
-    context->glDrawElements(d.drawMode(), d.elemCount(), GL_UNSIGNED_INT, 0);
+    if (attrNor != -1 && d.bindNonOp()) {
+        context->glEnableVertexAttribArray(attrNor);
+        context->glVertexAttribPointer(attrNor, 4, GL_FLOAT, false, 3 * sizeof(glm::vec4),  (void*)sizeof(glm::vec4));
+   }
 
+    if (attrCol != -1 && d.bindNonOp()) {
+        context->glEnableVertexAttribArray(attrCol);
+        context->glVertexAttribPointer(attrCol, 4, GL_FLOAT, false, 3 * sizeof(glm::vec4),  (void*)(2*sizeof(glm::vec4)));
+  }
+        d.bindNIdx();
+         context->glDrawElements(d.drawMode(), d.elemNCount(), GL_UNSIGNED_INT, 0);
+}
     if (attrPos != -1) context->glDisableVertexAttribArray(attrPos);
     if (attrNor != -1) context->glDisableVertexAttribArray(attrNor);
     if (attrCol != -1) context->glDisableVertexAttribArray(attrCol);
-    //std::cout<<"shader program draw GL error:"<<std::endl;
     context->printGLErrorLog();
 }
 

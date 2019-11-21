@@ -106,7 +106,7 @@ void Chunk::setBlockAt(int x, int y, int z, BlockType t)
 void Chunk::create(){
     //handle setting up the VBOs for any arbitrary mesh
     std::vector<GLuint> idx;
-    std::vector<GLuint> nonOpIdx;
+    std::vector<GLuint> nIdx;
     std::vector<glm::vec4> op; //opaque attributes organized as vertex position, normal, and color
     std::vector<glm::vec4> nonOp; //non-opaque attributes organized as vertex position, normal, and color
 
@@ -129,20 +129,20 @@ void Chunk::create(){
                                 nc.x < 16 && nc.y < 256 && nc.z < 16)
                         {
                             BlockType adj = getBlockAt(nc.x, nc.y,nc.z);
-                            if(isSolid(b) && (adj == EMPTY || !isSolid(adj))) {
+                            if(isSolid(b) && (!isSolid(adj))) {
                                 Chunk::drawFace(glm::vec4(x,y,z,1.f), idx, op, i, siOp);
                                 //printf("solid face drawn!\n");
                             } else if (!isSolid(b) && adj == EMPTY){
-                                Chunk::drawFace(glm::vec4(x,y,z,1.f), nonOpIdx, nonOp, i, siNonOp);
+                                Chunk::drawFace(glm::vec4(x,y,z,1.f), nIdx, nonOp, i, siNonOp);
                                 //printf("opaque face drawn!\n");
                             }
                         } else {
                             if (isSolid(b)){
-                                Chunk::drawOutFace(glm::vec4(x,y,z,1.f), idx, op, i, siOp);
+                                Chunk::drawOutFace(glm::vec4(x,y,z,1.f), idx, op, i, siOp, true);
                                 //printf("outface drawn!\n");
                             } else {
                                 //check adjacent chunks and draw faces if adjacent block is empty
-                                Chunk::drawOutFace(glm::vec4(x,y,z,1.f), nonOpIdx, nonOp, i, siNonOp);
+                                Chunk::drawOutFace(glm::vec4(x,y,z,1.f), nIdx, nonOp, i, siNonOp, false);
                             }
                         }
                     }
@@ -152,12 +152,16 @@ void Chunk::create(){
         }
     }
 
-    idx.insert(idx.end(), nonOpIdx.begin(), nonOpIdx.end());
     count = idx.size();
+    nCount = nIdx.size();
 
     generateIdx();
     mp_context->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufIdx);
     mp_context->glBufferData(GL_ELEMENT_ARRAY_BUFFER, idx.size() * sizeof(GLuint), idx.data(), GL_STATIC_DRAW);
+
+    generateNIdx();
+    mp_context->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufNIdx);
+    mp_context->glBufferData(GL_ELEMENT_ARRAY_BUFFER, nIdx.size() * sizeof(GLuint), nIdx.data(), GL_STATIC_DRAW);
 
     generateOp();
     mp_context->glBindBuffer(GL_ARRAY_BUFFER, bufOp);
@@ -204,7 +208,7 @@ void Chunk::drawFace(glm::vec4 pos, std::vector<GLuint>& idx, std::vector<glm::v
                 all.push_back(glm::vec4(95.f, 159.f, 53.f, 255.f) / 255.f);
                 break;
             case STONE:
-                all.push_back(glm::vec4(0.5f));
+                all.push_back(glm::vec4(0.5f, 0.5f, 0.5f, 1.f));
                 break;
             case LAVA:
                 all.push_back(glm::vec4(1, 0, 0, 0.5));
@@ -221,7 +225,7 @@ void Chunk::drawFace(glm::vec4 pos, std::vector<GLuint>& idx, std::vector<glm::v
     }
 }
 
-void Chunk::drawOutFace(glm::vec4 pos, std::vector<GLuint>& idx, std::vector<glm::vec4>& all, int faceNum, int& si){
+void Chunk::drawOutFace(glm::vec4 pos, std::vector<GLuint>& idx, std::vector<glm::vec4>& all, int faceNum, int& si, bool solid){
     Chunk* adjC = nullptr;
     glm::vec4 adjPos;
     if(faceNum == 0){
@@ -238,7 +242,8 @@ void Chunk::drawOutFace(glm::vec4 pos, std::vector<GLuint>& idx, std::vector<glm
         adjPos = glm::vec4(15, pos.y, pos.z, 1);
     }
 
-    if(adjC == nullptr || adjC->getBlockAt(adjPos.x, adjPos.y, adjPos.z) == EMPTY){
+    BlockType adj = (adjC == nullptr) ? EMPTY : adjC->getBlockAt(adjPos.x, adjPos.y, adjPos.z);
+    if((solid && !isSolid(adj)) || (!solid && (isSolid(adj) || adj == EMPTY))){
         //draw the current face
         drawFace(pos, idx, all, faceNum, si);
 

@@ -6,7 +6,6 @@
 #include <QKeyEvent>
 #include <QDateTime>
 
-
 MyGL::MyGL(QWidget *parent)
     : OpenGLContext(parent),
       mp_geomCube(mkU<Cube>(this)),
@@ -15,6 +14,7 @@ MyGL::MyGL(QWidget *parent)
       mp_camera(mkU<Camera>()),
       mp_player(mkU<Player>()),
       mp_terrain(mkU<Terrain>(this)),
+      m_texture(std::make_shared<Texture>(this)), mp_currentTex(nullptr),
       lastUpdate(0)
 {
     // Connect the timer to a function so that when the timer ticks the function is executed
@@ -148,34 +148,22 @@ void MyGL::paintGL()
 
 void MyGL::GLDrawScene()
 {
+
+    // Opaque
     for(Chunk* c : mp_terrain->getChunksToDraw()){
         mp_progLambert->setModelMatrix(glm::translate(glm::mat4(), glm::vec3(c->pos)));
-        mp_progLambert->draw(*c);
+        mp_progLambert->draw(*c, true);
+    }
+    //Transparent
+    for(Chunk* c : mp_terrain->getChunksToDraw()){
+        mp_progLambert->setModelMatrix(glm::translate(glm::mat4(), glm::vec3(c->pos)));
+        mp_progLambert->draw(*c, false);
     }
 }
 
-void MyGL::createTexture(const char *texturePath)
+void MyGL::createTextures()
 {
-    printGLErrorLog();
-
-    QImage img(texturePath);
-    img.convertToFormat(QImage::Format_ARGB32);
-    img = img.mirrored();
-//    m_textureImage = std::make_shared<QImage>(img);
-//    context->glGenTextures(1, &m_textureHandle);
-    //this->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img.width, img.height, 0, GL_BGRA, GL_UNSIGNED_BYTE, img.bits());
-
-    printGLErrorLog();
-}
-
-void MyGL::setTextureSample(){
-// Set the render settings for the texture we've just created.
-// Essentially zero filtering on the "texture" so it appears exactly as rendered
-glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-// Clamp the colors at the edge of our texture
-glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    m_texture->create(":/textures/minecraft_textures_all/minecraft_textures_all.png");
 }
 
 void MyGL::keyPressEvent(QKeyEvent *e)
