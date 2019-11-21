@@ -103,6 +103,9 @@ public:
     /// dependent variables according to the change in time
     void physicsUpdate(float);
 
+    /// Called to determine what postprocess shader should be used
+    BlockType getBlockAtEye() const;
+
     Player();
 };
 

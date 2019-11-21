@@ -5,7 +5,6 @@ SOURCES += \
     $$PWD/main.cpp \
     $$PWD/mainwindow.cpp \
     $$PWD/mygl.cpp \
-    $$PWD/shaderprogram.cpp \
     $$PWD/utils.cpp \
     $$PWD/drawable.cpp \
     $$PWD/camera.cpp \
@@ -19,13 +18,15 @@ SOURCES += \
     $$PWD/player/player.cpp \
     $$PWD/scene/blocktype.cpp \
     $$PWD/scene/fbm.cpp \
-    $$PWD/scene/createchunkrunnable.cpp
+    $$PWD/scene/createchunkrunnable.cpp \
+    $$PWD/scene/quad.cpp \
+    $$PWD/shaderprograms/postprocessshader.cpp \
+    $$PWD/shaderprograms/shaderprogram.cpp
 
 HEADERS += \
     $$PWD/la.h \
     $$PWD/mainwindow.h \
     $$PWD/mygl.h \
-    $$PWD/shaderprogram.h \
     $$PWD/utils.h \
     $$PWD/drawable.h \
     $$PWD/camera.h \
@@ -40,4 +41,7 @@ HEADERS += \
     $$PWD/scene/blocktype.h \
     $$PWD/player/player.h \
     $$PWD/scene/fbm.h \
-    $$PWD/scene/createchunkrunnable.h
+    $$PWD/scene/createchunkrunnable.h \
+    $$PWD/scene/quad.h \
+    $$PWD/shaderprograms/postprocessshader.h \
+    $$PWD/shaderprograms/shaderprogram.h

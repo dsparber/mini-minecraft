@@ -296,6 +296,10 @@ bool Player::isGrounded() {
     return false;
 }
 
+BlockType Player::getBlockAtEye() const {
+    return terrain->getBlockOrEmpty(position);
+}
+
 
 std::vector<glm::vec3> Player::getBoundingBox() {
 

@@ -69,6 +69,9 @@ public:
     /// Returns the block at the given coordinates. Returns EMPTY if out of bounds
     BlockType getBlockOrEmpty(int x, int y, int z) const;
 
+    /// Returns the block at the given coordinates. Returns EMPTY if out of bounds
+    BlockType getBlockOrEmpty(glm::vec3) const;
+
     /// Returns a reference to a block at the given coordinates
     BlockType& getBlockAt(int x, int y, int z) ;
 

@@ -25,6 +25,11 @@ void Terrain::initialize(){
     QThreadPool::globalInstance()->waitForDone();
 }
 
+
+BlockType Terrain::getBlockOrEmpty(glm::vec3 pos) const {
+    return getBlockOrEmpty(pos.x, pos.y, pos.z);
+}
+
 BlockType Terrain::getBlockOrEmpty(int x, int y, int z) const {
 
     if (getChunk(x, z) == nullptr || y < 0 || y >= 256) {
