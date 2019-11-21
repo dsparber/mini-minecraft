@@ -1,7 +1,6 @@
 # Mini Minecraft: ADVenture
 Amelia Peng, Daniel Sparber, Veronica Bristol
 
-
 ## Milestone 1
 
 ### Videos
@@ -73,3 +72,53 @@ For performance reasons, I only test up to the length of the distance vector.
 #### Difficulties
 
 The only challenge was dealing with floating point precission. If the player moves a tiny bit to far, he ends up within a block and gets stuck.
+
+
+## Milestone 2
+
+### Video
+
+### L-System Rivers
+
+Implemented by: **Veronica**
+
+#### Implementation
+
+TODO
+
+
+#### Difficulties
+
+TODO 
+
+
+
+### Texturing and Texture Animation
+
+Implemented by: **Amelia**
+
+#### Implementation
+
+TODO
+
+
+#### Difficulties
+
+TODO 
+
+
+
+
+### Swimming and Multithreaded Terrain Generation
+
+Implemented by: **Daniel**
+
+
+#### Implementation
+
+TODO
+
+
+#### Difficulties
+
+TODO 
