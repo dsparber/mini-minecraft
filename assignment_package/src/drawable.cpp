@@ -75,9 +75,6 @@ void Drawable::generateTexture()
     context->glActiveTexture(GL_TEXTURE0);
     context->glBindTexture(GL_TEXTURE_2D, textureHandle);
     unsigned char* image;// = loadImage();
-//  context->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
-//                          image->width(), image->height(),
-//                          0, GL_BGRA, GL_UNSIGNED_BYTE, image);
     context->printGLErrorLog();
 }
 

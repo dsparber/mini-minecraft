@@ -48,23 +48,23 @@ void Terrain::initializeChunk(int chunkX, int chunkZ) {
                 float fbmVal = 32.f * powf(rawFBM, 4.f);
                 int intFBM = 128 + (int) fbmVal;
 
-                for (int i = 120; i < 129; i++) {
-                    c->setBlockAt(x, i, z, STONE);
+//                for (int i = 120; i < 129; i++) {
+//                    c->setBlockAt(x, i, z, GRASS);
+//                }
+
+               // c->setBlockAt(x, 129, z, WATER);
+
+
+                for (int i = 129; i < intFBM; i++) {
+                    c->setBlockAt(x, i, z, DIRT);
                 }
 
-                c->setBlockAt(x, 129, z, WATER);
+                c->setBlockAt(x, intFBM, z, GRASS);
 
 
-//                for (int i = 129; i < intFBM; i++) {
-//                    c->setBlockAt(x, i, z, DIRT);
-//                }
-
-//                c->setBlockAt(x, intFBM, z, GRASS);
-
-
-//                for (int i = intFBM + 1; i < 134; i++) {
-//                    c->setBlockAt(x, i, z, WATER);
-//                }
+                for (int i = intFBM + 1; i < 134; i++) {
+                    c->setBlockAt(x, i, z, WATER);
+                }
 
         }
 

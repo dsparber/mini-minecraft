@@ -26,10 +26,17 @@ private:
     GLuint vao; // A handle for our vertex array object. This will store the VBOs created in our geometry classes.
                 // Don't worry too much about this. Just know it is necessary in order to render geometry.
 
+    GLuint m_frameBuffer; //handle to drame buffer to perform render pass
+
+    // m_frameBuffers[i] writes to m_renderedTextures[i].
+    GLuint m_renderedTexture; //handles to the textures used by the frame buffers.
+
+    // m_frameBuffers[i] writes to m_depthRenderBuffers[i].
+    GLuint m_depthRenderBuffer; //handles to depth buffers used by our frame buffers.
+
     uPtr<Player> mp_player;
     uPtr<Camera> mp_camera;
     uPtr<Terrain> mp_terrain;
-    //uPtr<Chunk> mp_chunk;
 
     long lastUpdate; // Save when the timer update was last called
 
@@ -55,6 +62,8 @@ public:
     void GLDrawScene();
     void createTextures();
     void setTextureSample();
+    void createRenderBuffers();
+    void performPostprocessRenderPass();
 
 
 protected:

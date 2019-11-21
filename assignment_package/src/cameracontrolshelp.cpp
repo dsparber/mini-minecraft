@@ -12,3 +12,4 @@ CameraControlsHelp::~CameraControlsHelp()
 {
     delete ui;
 }
+

@@ -6,6 +6,9 @@
 #include <QKeyEvent>
 #include <QDateTime>
 
+#define TEXTURE_SLOT_MINECRAFT_BLOCK 2
+#define TEXTURE_SLOT_POST_PROCESS 0
+
 MyGL::MyGL(QWidget *parent)
     : OpenGLContext(parent),
       mp_geomCube(mkU<Cube>(this)),
@@ -85,6 +88,7 @@ void MyGL::initializeGL()
 
     // Initializes the terrain
     mp_terrain->initialize();
+    createTextures();
 
     // We have to have a VAO bound in OpenGL 3.2 Core. But if we're not
     // using multiple VAOs, we can just bind one once.
@@ -139,41 +143,109 @@ void MyGL::paintGL()
     // Clear the screen so that we only see newly drawn images
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+
     mp_progFlat->setViewProjMatrix(mp_camera->getViewProj());
     mp_progLambert->setViewProjMatrix(mp_camera->getViewProj());
 
     GLDrawScene();
-
+//    performPostprocessRenderPass();
 }
 
 void MyGL::GLDrawScene()
 {
+    m_texture->bind(2); // Bind the Minecraft Block texture
 
     // Opaque
     for(Chunk* c : mp_terrain->getChunksToDraw()){
         mp_progLambert->setModelMatrix(glm::translate(glm::mat4(), glm::vec3(c->pos)));
-        mp_progLambert->draw(*c, true);
+        //mp_progLambert->setTexture();
+        mp_progLambert->draw(*c, true, TEXTURE_SLOT_MINECRAFT_BLOCK);
     }
     //Transparent
     for(Chunk* c : mp_terrain->getChunksToDraw()){
         mp_progLambert->setModelMatrix(glm::translate(glm::mat4(), glm::vec3(c->pos)));
-        mp_progLambert->draw(*c, false);
+        //mp_progLambert->setTexture();
+        mp_progLambert->draw(*c, false, TEXTURE_SLOT_MINECRAFT_BLOCK);
     }
 }
 
 void MyGL::createTextures()
 {
-    m_texture->create(":/textures/minecraft_textures_all/minecraft_textures_all.png");
+    m_texture->create(":/textures/minecraft_textures_all.png");
+    m_texture->load(2);
 }
+
+void MyGL::performPostprocessRenderPass()
+{
+    // Render the frame buffer as a texture on a screen-size quad
+
+    // Tell OpenGL to render to the viewport's frame buffer
+    glBindFramebuffer(GL_FRAMEBUFFER, this->defaultFramebufferObject());
+    // Render on the whole framebuffer, complete from the lower left corner to the upper right
+    glViewport(0,0,this->width() * this->devicePixelRatio(), this->height() * this->devicePixelRatio());
+    // Clear the screen
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    // Bind our texture in Texture Unit 0
+    glActiveTexture(GL_TEXTURE0 + TEXTURE_SLOT_POST_PROCESS);
+    glBindTexture(GL_TEXTURE_2D, m_renderedTexture);
+
+
+    //mp_progPostprocessCurrent->draw(m_geomQuad, TEXTURE_SLOT_POST_PROCESS);
+}
+
+void MyGL::createRenderBuffers()
+{
+    // Initialize the frame buffers and render textures
+    glGenFramebuffers(1, &m_frameBuffer);
+    glGenTextures(1, &m_renderedTexture);
+    glGenRenderbuffers(1, &m_depthRenderBuffer);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, m_frameBuffer);
+    // Bind our texture so that all functions that deal with textures will interact with this one
+    glBindTexture(GL_TEXTURE_2D, m_renderedTexture);
+    // Give an empty image to OpenGL ( the last "0" )
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, this->width() * this->devicePixelRatio(), this->height() * this->devicePixelRatio(), 0, GL_RGB, GL_UNSIGNED_BYTE, (void*)0);
+
+    // Set the render settings for the texture we've just created.
+    // Essentially zero filtering on the "texture" so it appears exactly as rendered
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    // Clamp the colors at the edge of our texture
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+    // Initialize our depth buffer
+    glBindRenderbuffer(GL_RENDERBUFFER, m_depthRenderBuffer);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, this->width() * this->devicePixelRatio(), this->height() * this->devicePixelRatio());
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_depthRenderBuffer);
+
+    // Set m_renderedTexture as the color output of our frame buffer
+    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, m_renderedTexture, 0);
+
+    // Sets the color output of the fragment shader to be stored in GL_COLOR_ATTACHMENT0, which we previously set to m_renderedTextures[i]
+    GLenum drawBuffers[1] = {GL_COLOR_ATTACHMENT0};
+    glDrawBuffers(1, drawBuffers); // "1" is the size of drawBuffers
+
+    if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+    {
+        std::cout << "Frame buffer did not initialize correctly..." << std::endl;
+        printGLErrorLog();
+    }
+}
+
+
+
 
 void MyGL::keyPressEvent(QKeyEvent *e)
 {
     mp_player->handleKeyEvent(e);
+    mp_progLambert->updateCameraPos(glm::vec4(mp_camera->eye,1));
 }
 
 void MyGL::keyReleaseEvent(QKeyEvent *e)
 {
     mp_player->handleKeyEvent(e);
+    mp_progLambert->updateCameraPos(glm::vec4(mp_camera->eye,1));
 }
 
 void MyGL::mouseMoveEvent(QMouseEvent *e) {

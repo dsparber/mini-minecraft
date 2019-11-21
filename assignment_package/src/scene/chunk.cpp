@@ -17,20 +17,20 @@ std::vector<glm::vec4> poses =
     glm::vec4(1,0,1,0),
     glm::vec4(1,1,1,0),
     //back
-    glm::vec4(0,1,1,0),
-    glm::vec4(0,0,1,0),
-    glm::vec4(1,0,1,0),
     glm::vec4(1,1,1,0),
-    //left
-    glm::vec4(0,1,0,0),
-    glm::vec4(0,0,0,0),
+    glm::vec4(1,0,1,0),
     glm::vec4(0,0,1,0),
     glm::vec4(0,1,1,0),
-    //bottom
+    //left
+    glm::vec4(0,1,1,0),
     glm::vec4(0,0,1,0),
     glm::vec4(0,0,0,0),
-    glm::vec4(1,0,0,0),
+    glm::vec4(0,1,0,0),
+    //bottom
+    glm::vec4(0,0,0,0),
+    glm::vec4(0,0,1,0),
     glm::vec4(1,0,1,0),
+    glm::vec4(1,0,0,0),
     //top
     glm::vec4(0,1,1,0),
     glm::vec4(0,1,0,0),
@@ -58,6 +58,16 @@ std::vector<glm::vec3> offsets =
     glm::vec3(-1,0,0),
     glm::vec3(0,-1,0),
     glm::vec3(0,1,0)
+};
+
+//a vector of 1 unit offsets in order of : front, right, back, left, bottom, top
+std::vector<glm::vec2> offsetUVs =
+{
+    glm::vec2(0,1),
+    glm::vec2(0,0),
+    glm::vec2(1,0),
+    glm::vec2(1,1)
+
 };
 
 Chunk::Chunk(OpenGLContext* context) : Drawable(context), mp_context(context), pos(glm::vec4(0,0,0,0)), left(nullptr), right(nullptr),
@@ -174,12 +184,12 @@ void Chunk::create(){
 }
 
 void Chunk::drawFace(glm::vec4 pos, std::vector<GLuint>& idx, std::vector<glm::vec4>& all, int faceNum, int& si){
-//    GLuint si; //start index
-//    if(idx.size()==0){
-//        si = 0;
-//    } else {
-//        si = idx[idx.size()-1] + 1;
-//    }
+    //    GLuint si; //start index
+    //    if(idx.size()==0){
+    //        si = 0;
+    //    } else {
+    //        si = idx[idx.size()-1] + 1;
+    //    }
     //push back indices of a face
     idx.push_back(si);
     idx.push_back(si+1);
@@ -195,7 +205,7 @@ void Chunk::drawFace(glm::vec4 pos, std::vector<GLuint>& idx, std::vector<glm::v
         all.push_back(pos+poses[faceNum*4 + i]);
         //normal
         all.push_back(nors[faceNum]);
-        //color
+        //a vec4 of uv(vec2), cosine power(float), animatable(float, 1 is animatable)
         BlockType t = getBlockAt(pos.x,pos.y,pos.z);
         if(t != EMPTY)
         {
@@ -203,21 +213,49 @@ void Chunk::drawFace(glm::vec4 pos, std::vector<GLuint>& idx, std::vector<glm::v
             {
             case DIRT:
                 all.push_back(glm::vec4(121.f, 85.f, 58.f, 255.f) / 255.f);
-                break;
+                all.push_back((glm::vec4((2 + offsetUVs[i].x)/16.f,
+                                         (15 + offsetUVs[i].y)/16.f,
+                                         0.5, 0.f)));
+                        break;
             case GRASS:
                 all.push_back(glm::vec4(95.f, 159.f, 53.f, 255.f) / 255.f);
+
+                if(faceNum == 5){
+                    //push back grass top if its top face
+                all.push_back((glm::vec4((8 + offsetUVs[i].x)/16.f,
+                                         (13 + offsetUVs[i].y)/16.f,
+                                         0.8, 0.f)));
+                } else if (faceNum == 4){
+                    all.push_back((glm::vec4((2 + offsetUVs[i].x)/16.f,
+                                             (15 + offsetUVs[i].y)/16.f,
+                                             0.8, 0.f)));
+                } else {
+                    all.push_back((glm::vec4((3 + offsetUVs[i].x)/16.f,
+                                             (15 + offsetUVs[i].y)/16.f,
+                                             0.8, 0.f)));
+                }
                 break;
             case STONE:
                 all.push_back(glm::vec4(0.5f, 0.5f, 0.5f, 1.f));
+                all.push_back((glm::vec4((1 + offsetUVs[i].x)/16.f,
+                                         (15 + offsetUVs[i].y)/16.f,
+                                         0.5, 0.f)));
                 break;
             case LAVA:
                 all.push_back(glm::vec4(1, 0, 0, 0.5));
+                all.push_back((glm::vec4((15 + offsetUVs[i].x)/16.f,
+                                         (0 + offsetUVs[i].y)/16.f,
+                                         0.5, 0.f)));
                 break;
             case WATER:
-                all.push_back(glm::vec4(.2, .5, 1, 0.5));
+                all.push_back(glm::vec4(.2, .5, 1, 1.f));
+                all.push_back((glm::vec4((15 + offsetUVs[i].x)/16,
+                                         (2 + offsetUVs[i].y)/16,
+                                         0.2f, 0.f)));
                 break;
             default:
                 // Other types are as of yet not define
+                all.push_back(glm::vec4(0));
                 all.push_back(glm::vec4(0));
                 break;
             }

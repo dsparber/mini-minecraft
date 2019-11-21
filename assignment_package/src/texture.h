@@ -5,6 +5,7 @@
 #include <openglcontext.h>
 #include <la.h>
 #include <memory>
+#include <iostream>
 
 class Texture
 {
@@ -15,10 +16,10 @@ public:
     void create(const char *texturePath);
     void load(int texSlot);
     void bind(int texSlot);
-
+    GLuint m_textureHandle;
 private:
     OpenGLContext* context;
-    GLuint m_textureHandle;
+
     std::shared_ptr<QImage> m_textureImage;
 };
 

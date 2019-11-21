@@ -20,6 +20,8 @@ public:
     int attrCol; // A handle for the "in" vec4 representing vertex color in the vertex shader
 
     int attrUV; // A handle for the "in" vec4 representing vertex UV in the vertex shader
+    int attrCos;
+    int attrAnimatale;
 
     int unifModel; // A handle for the "uniform" mat4 representing model matrix in the vertex shader
     int unifModelInvTr; // A handle for the "uniform" mat4 representing inverse transpose of the model matrix in the vertex shader
@@ -27,6 +29,8 @@ public:
     int unifColor; // A handle for the "uniform" vec4 representing color of geometry in the vertex shader
 
     int unifSampler;
+    int unifTime;
+    int unifCamPos;
 public:
     ShaderProgram(OpenGLContext* context);
     // Sets up the requisite GL data and shaders from the given .glsl files
@@ -40,13 +44,16 @@ public:
     // Pass the given color to this shader on the GPU
     void setGeometryColor(glm::vec4 color);
     // Draw the given object to our screen using this ShaderProgram's shaders
-    void draw(Drawable &d, bool solid);
+    void updateCameraPos(const glm::vec4 &camera);
+    void draw(Drawable &d, bool solid, int textureSlot);
     // Utility function used in create()
     char* textFileRead(const char*);
     // Utility function that prints any shader compilation errors to the console
     void printShaderInfoLog(int shader);
     // Utility function that prints any shader linking errors to the console
     void printLinkInfoLog(int prog);
+
+    void setTime(int t);
 
     QString qTextFileRead(const char*);
 
