@@ -122,6 +122,7 @@ Implemented by: **Daniel**
 
 - *Multithreading:* I introduced a variable that determines how many chunks around the player should be drawn. If the player moves, the program checks if all required chunks are available. The required chunks are stored in a vector that the MyGL class uses. The function also creates and destroys chunks depending on whether they are needed. If a required chunk is not available, a new task is submitted to the threadpool to create the missing chunk.
 The task first computes the blocks within the chunk. Then it checks if any neighbors exist and links them. To reduce the workload of the main thread when calling `create()`, the parallel task computes the `idx` and `all` vectors that are later passed to the GPU. If a neighbor needs to be recomputed, the task also calls the `compute` function. To avoid race conditions when computing a chunk, each chunk is locked by a mutex associated with the chunk.
+After a chunk was created it is inserted into a vector which the main thread later reads to insert the chunks into the chunk map. This process is also secured by a mutex.
 
 
 #### Difficulties
