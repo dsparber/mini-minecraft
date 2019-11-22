@@ -18,7 +18,9 @@ SOURCES += \
     $$PWD/scene/worldaxes.cpp \
     $$PWD/player/player.cpp \
     $$PWD/scene/blocktype.cpp \
-    $$PWD/scene/fbm.cpp
+    $$PWD/scene/fbm.cpp \
+    $$PWD/scene/river.cpp \
+    $$PWD/scene/turtle.cpp
 
 HEADERS += \
     $$PWD/la.h \
@@ -38,4 +40,6 @@ HEADERS += \
     $$PWD/scene/chunk.h \
     $$PWD/scene/blocktype.h \
     $$PWD/player/player.h \
-    $$PWD/scene/fbm.h
+    $$PWD/scene/fbm.h \
+    $$PWD/scene/river.h \
+    $$PWD/scene/turtle.h

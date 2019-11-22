@@ -60,9 +60,9 @@ void Terrain::initializeChunk(int chunkX, int chunkZ) {
                     c->setBlockAt(x, intFBM, z, GRASS);
 
 
-                    for (int i = intFBM + 1; i < 134; i++) {
-                        c->setBlockAt(x, i, z, WATER);
-                    }
+//                    for (int i = intFBM + 1; i < 134; i++) {
+//                        c->setBlockAt(x, i, z, WATER);
+//                    }
                 }
             }
         }
