@@ -13,6 +13,7 @@
 
 uniform vec4 u_Color; // The color with which to render this instance of geometry.
 uniform sampler2D u_Texture;
+uniform int u_Time;
 in vec2 fs_UV;
 in float fs_cosPow;
 in float fs_animatable;
@@ -30,10 +31,18 @@ out vec4 out_Col; // This is the final output color that you will see on your
 
 void main()
 {
-    // Material base color (before shading)
+        vec2 newUV;
+        int i = u_Time / 20;
+        //set uv to a loop of offset of texture if animatable
+        if(fs_animatable > 0){
+          newUV = fs_UV + vec2(cos(i)/16,0);
+        } else {
+            newUV = fs_UV;
+        }
+        // Material base color (before shading)
         vec4 H = (fs_LightVec + fs_CameraPos) / 2.f;
         //vec4 diffuseColor = fs_Col;
-        vec4 diffuseColor = texture(u_Texture, fs_UV) ;//+ max(pow(dot(normalize(H), normalize(fs_Nor)), fs_cosPow), 0);
+        vec4 diffuseColor = texture(u_Texture, newUV);// + max(pow(dot(normalize(H), normalize(fs_Nor)), fs_cosPow), 0);
 
         // Calculate the diffuse term for Lambert shading
         float diffuseTerm = dot(normalize(fs_Nor), normalize(fs_LightVec));
@@ -47,7 +56,6 @@ void main()
                                                             //lit by our point light are not completely black.
 
         // Compute final shaded color
-        //out_Col = vec4(fs_UV*16.f,0,1);
         out_Col = vec4(diffuseColor.rgb * lightIntensity, diffuseColor.a);
-//        out_Col = diffuseColor;
+        //out_Col = diffuseColor;
 }

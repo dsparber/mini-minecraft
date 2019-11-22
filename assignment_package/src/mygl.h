@@ -49,6 +49,9 @@ private:
 
     std::shared_ptr<Texture> m_texture;
     Texture* mp_currentTex;
+    int m_time;
+
+
 
 
 public:

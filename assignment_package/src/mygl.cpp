@@ -18,6 +18,7 @@ MyGL::MyGL(QWidget *parent)
       mp_player(mkU<Player>()),
       mp_terrain(mkU<Terrain>(this)),
       m_texture(std::make_shared<Texture>(this)), mp_currentTex(nullptr),
+      m_time(0),
       lastUpdate(0)
 {
     // Connect the timer to a function so that when the timer ticks the function is executed
@@ -146,8 +147,9 @@ void MyGL::paintGL()
 
     mp_progFlat->setViewProjMatrix(mp_camera->getViewProj());
     mp_progLambert->setViewProjMatrix(mp_camera->getViewProj());
-
+    mp_progLambert->setTime(m_time);
     GLDrawScene();
+    m_time++;
 //    performPostprocessRenderPass();
 }
 
