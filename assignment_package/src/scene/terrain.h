@@ -64,7 +64,7 @@ public:
     /// Adds a block at the center of the screen, updates the terrain
     void addBlock(glm::vec3 eye, glm::vec3 look);
 
-    /// Removes a block at the center og the screen, updates the terrain
+    /// Removes a block at the center of the screen, updates the terrain
     void removeBlock(glm::vec3 eye, glm::vec3 look);
 
 
@@ -74,4 +74,11 @@ public:
 
     /// Callback if player moved. Used to expand terrain
     void playerMoved(glm::vec3);
+
+    /// Drawing rules for river generation
+    void moveAndDrawLine();
+    void rotateLeft();
+    void rotateRight();
+    void savePosition();
+    void storePosition();
 };

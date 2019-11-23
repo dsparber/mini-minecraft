@@ -1,49 +1,59 @@
 #include "river.h"
 
 River::River()
-    : stack(), grammar(), draw()
-{}
+    : stack(), expanRules(), drawRules(), t(glm::vec2(0,0), glm::vec2(0,0))
+{
+    expanRules.insert({'X', "F[-X]F[+X[-X][+X]]"});
+    expanRules.insert({'F', "FF"});
+    expanRules.insert({'Y', "G[+Y][-YG[-Y][+Y][-Y]]"});
+    expanRules.insert({'G', "GG"});
+
+//    drawRules.insert('F', &River::moveAndDrawLine);
+//    drawRules.insert({'F', &River::moveAndDrawLine});
+//    drawRules.insert({'F', (River::moveAndDrawLine*) (void)});
+//    drawRules.insert('G', moveAndDrawLine());
+//    drawRules.insert('+', rotateLeft());
+//    drawRules.insert('-', rotateRight());
+//    drawRules.insert('[', savePosition());
+//    drawRules.insert(']', storePosition());
+}
 
 River::~River() {}
 
 void River::createRiver1(int x, int z)
 {
-    int n = 2;
-    float angle = 25.f;
+    t.pos = glm::vec2(x, z);
+    t.look = glm::vec2();
+    QString axiom = "X";
 
-    grammar.insert(QChar('X'), QString("F[-X]F[+X[-X][+X]]"));
-    grammar.insert(QChar('F'), QString("FF"));
-    Turtle t();
+    QString expanded = expandString(2, axiom);
+    drawString(expanded);
 }
 
 void River::createRiver2(int x, int z)
 {
-    int n = 3;
-    float angle = 25.f;
+    t.pos = glm::vec2(x, z);
+    t.look = glm::vec2();
+    QString axiom = "Y";
 
-    grammar.insert(QChar('X'), QString("F[+X][-XF[-X][+X][-X]]"));
-    grammar.insert(QChar('F'), QString("FF"));
-    Turtle t();
+    QString expanded = expandString(3, axiom);
+    drawString(expanded);
 }
 
-void River::moveAndDrawLine()
+QString River::expandString(int numIterations, QString axiom)
 {
-
+    QString result = "";
+    for (QChar c : axiom) {
+        result += expanRules[c];
+    }
+    return result;
 }
 
-void River::rotate()
+void River::drawString(QString s)
 {
-
-}
-
-void River::savePosition()
-{
-
-}
-
-void River::storePosition()
-{
-
+    for (QChar c : s) {
+        drawRules[c];
+    }
 }
 
 // River 1
@@ -61,13 +71,3 @@ void River::storePosition()
 // Axioms: X
 // Rule 1: X = F[+X][-XF[-X][+X][-X]]
 // Rule 2: F = FF
-
-//QStack<Turtle> stack;
-//QHash<QChar, QString> grammar;
-//QHash<QChar, Rule> draw;
-
-// F = draw a line, moving forward
-// - = rotate(30)
-// + = rotate(-30)
-// [ = save position
-// ] = store position
