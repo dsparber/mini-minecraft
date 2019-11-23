@@ -74,11 +74,4 @@ public:
 
     /// Callback if player moved. Used to expand terrain
     void playerMoved(glm::vec3);
-
-    /// Drawing rules for river generation
-    void moveAndDrawLine();
-    void rotateLeft();
-    void rotateRight();
-    void savePosition();
-    void storePosition();
 };

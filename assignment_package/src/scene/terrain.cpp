@@ -260,37 +260,3 @@ Terrain::~Terrain(){
     }
     chunkMap = std::unordered_map<int64_t, Chunk*>();
 }
-
-void River::moveAndDrawLine()
-{
-    // currPos = pos of Turtle
-    // radius = 5 / depth
-    // triple for loop, xyz, check every block,
-            // if block is not water
-                // if block is within radius
-                    // then set block to water
-    // move currPos forward 4 or 5 blocks, start again from this position
-
-    // repeat 2 times to draw a line, line length = 15 blocks?
-
-}
-
-void Terrain::rotateLeft()
-{
-
-}
-
-void Terrain::rotateRight()
-{
-
-}
-
-void Terrain::savePosition()
-{
-
-}
-
-void Terrain::storePosition()
-{
-
-}
