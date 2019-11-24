@@ -26,10 +26,10 @@ public:
 
     void createRiver1(int x, int z);
     void createRiver2(int x, int z);
-    QString expandString(int numIterations, QString s);
+    QString expandString(int numIterations, QString axiomString);
     void drawString(QString s);
     void carveTerrain();
-    void bresenham(int x1, int z1, int x2, int z2);
+    void bresenham(int x1, int z1, int x2, int z2, float radius);
 
     /// Drawing rules for river generation
     void moveAndDrawLine();

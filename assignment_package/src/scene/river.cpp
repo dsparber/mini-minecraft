@@ -23,9 +23,10 @@ void River::createRiver1(int x, int z)
     t.pos = glm::vec2(x, z); // (2, 50)
     t.look = glm::vec2(1.f, 0.f);
     t.depth = 0;
-    QString axiom = "X";
+    QChar axiom = 'X';
+    QString axiomString = expanRules[axiom];
 
-    QString expanded = expandString(2, axiom);
+    QString expanded = expandString(2, axiomString);
     drawString(expanded);
     carveTerrain();
 }
@@ -41,12 +42,12 @@ void River::createRiver2(int x, int z)
     drawString(expanded);
 }
 
-QString River::expandString(int numIterations, QString axiom)
+QString River::expandString(int numIterations, QString axiomString)
 {
     QString result = "";
     for (int i = 0; i < numIterations; i++) {
         t.depth++;
-        for (QChar c : axiom) {
+        for (QChar c : axiomString) {
             result += expanRules[c];
         }
     }
@@ -81,28 +82,30 @@ void River::carveTerrain()
 void River::moveAndDrawLine()
 {
     glm::vec2 currPos = t.pos;
-    t.pos = t.pos + 6.f * t.look;
-    bresenham(currPos.x, currPos.y, t.pos.x, t.pos.y);
+    t.pos = t.pos + 8.f * t.look;
+    float radius = 8.f / t.depth;
+    bresenham(currPos.x, currPos.y, t.pos.x, t.pos.y, radius);
 }
 
-void River::bresenham(int x1, int z1, int x2, int z2)
+void River::bresenham(int x1, int z1, int x2, int z2, float radius)
 {
     int m_new = 2 * (z2 - z1);
     int slope_error_new = m_new - (x2 - x1);
 
+    // Bresenham line formula (draw between 2 points)
     for (int x = x1, z = z1; x <= x2; x++)
     {
-        for (int newX = x - 8.f; newX < x + 8.f; x++) {
-            for (int newZ = z - 8.f; newZ < z + 8.f; z++) {
+        // Loop through each direction to shape bottom of river
+        for (int newX = x - radius; newX < x + radius; x++) {
+            for (int newZ = z - radius; newZ < z + radius; z++) {
                 for (int y = 128; y < 118; y--)
                 {
-                    QColor color = QColor(0, 1, 0);
-
-                    if (terrain->getBlockAt(x, y, z) != WATER)
+                    if (terrain->getBlockAt(x, y, z) != WATER)  // If block is not already water
                     {
                         glm::vec4 center(x, 128, z, 0);
                         glm::vec4 pos2(newX, y, newZ, 0);
-                        if (glm::distance(center, pos2) < 8.f)
+
+                        if (glm::distance(center, pos2) < radius)   // If block is within radius
                         {
                             terrain->setBlockAt(newX, y, newZ, WATER);
                         }
@@ -123,13 +126,13 @@ void River::bresenham(int x1, int z1, int x2, int z2)
 void River::rotateLeft()
 {
     t.angle -= rand() % 40 + 10;
-    t.look = t.look * t.angle;
+    t.look = glm::vec2(t.look.x * cos(t.angle), t.look.y * sin(t.angle));
 }
 
 void River::rotateRight()
 {
     t.angle += rand() % 40 + 10;
-    t.look = t.look * t.angle;
+    t.look = glm::vec2(t.look.x * cos(t.angle), t.look.y * sin(t.angle));
 }
 
 void River::savePosition()
