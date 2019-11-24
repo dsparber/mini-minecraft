@@ -61,19 +61,19 @@ std::vector<glm::vec3> offsets =
 };
 
 Chunk::Chunk(OpenGLContext* context) : Drawable(context), mp_context(context), pos(glm::vec4(0,0,0,0)), left(nullptr), right(nullptr),
-    front(nullptr), back(nullptr), m_blocks()
+    front(nullptr), back(nullptr), m_blocks(), created(false), mutex()
 {
     std::fill(this->m_blocks.begin(), this->m_blocks.end(), EMPTY);
 }
 
 Chunk::Chunk(OpenGLContext* context, glm::vec4 pos): Drawable(context), mp_context(context), pos(pos), left(nullptr), right(nullptr),
-    front(nullptr), back(nullptr), m_blocks()
+    front(nullptr), back(nullptr), m_blocks(), created(false), mutex()
 {
     std::fill(this->m_blocks.begin(), this->m_blocks.end(), EMPTY);
 }
 
 Chunk::Chunk(OpenGLContext* context, const Chunk& c): Drawable(context), mp_context(context), pos(c.pos), left(c.left), right(c.right),
-    front(c.front), back(c.back), m_blocks(c.m_blocks)
+    front(c.front), back(c.back), m_blocks(c.m_blocks), created(false), mutex()
 {
     std::fill(this->m_blocks.begin(), this->m_blocks.end(), EMPTY);
 }
@@ -148,10 +148,11 @@ void Chunk::setBlockAt(int x, int y, int z, BlockType t)
 }
 
 //only create vertex data for block faces that lie on the boundary between an EMPTY block and a filled block.
-void Chunk::create(){
+void Chunk::compute(){
+
     //handle setting up the VBOs for any arbitrary mesh
-    std::vector<GLuint> idx;
-    std::vector<glm::vec4> all; //all attributes organized as vertex position, normal, and color
+    idx = std::vector<GLuint>();
+    all = std::vector<glm::vec4>(); //all attributes organized as vertex position, normal, and color
 
 
     //loop through blocks by iterating through a 3d array that's 16 * 256 * 16
@@ -186,6 +187,13 @@ void Chunk::create(){
     }
 
     count = idx.size();
+    created = false;
+}
+
+void Chunk::create() {
+    if (created) {
+        return;
+    }
 
     generateIdx();
     mp_context->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufIdx);
@@ -194,6 +202,12 @@ void Chunk::create(){
     generateAll();
     mp_context->glBindBuffer(GL_ARRAY_BUFFER, bufAll);
     mp_context->glBufferData(GL_ARRAY_BUFFER, all.size() * sizeof(glm::vec4), all.data(), GL_STATIC_DRAW);
+    created = true;
+}
+
+void Chunk::destroy() {
+    Drawable::destroy();
+    created = false;
 }
 
 void Chunk::drawFace(glm::vec4 pos, std::vector<GLuint>& idx, std::vector<glm::vec4>& all, int faceNum){

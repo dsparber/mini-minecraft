@@ -9,14 +9,20 @@
 
 MyGL::MyGL(QWidget *parent)
     : OpenGLContext(parent),
-      mp_geomCube(mkU<Cube>(this)),
-      mp_worldAxes(mkU<WorldAxes>(this)),
       mp_progLambert(mkU<ShaderProgram>(this)),
       mp_progFlat(mkU<ShaderProgram>(this)),
       mp_camera(mkU<Camera>()),
       mp_player(mkU<Player>()),
       mp_terrain(mkU<Terrain>(this)),
-      lastUpdate(0)
+      lastUpdate(0),
+      mp_time(0),
+      mp_lavaShader(),
+      mp_waterShader(),
+      mp_plainShader(),
+      mp_geomQuad(this),
+      mp_frameBuffer(-1),
+      mp_renderedTexture(-1),
+      mp_depthRenderBuffer(-1)
 {
     // Connect the timer to a function so that when the timer ticks the function is executed
     connect(&timer, SIGNAL(timeout()), this, SLOT(timerUpdate()));
@@ -35,7 +41,7 @@ MyGL::~MyGL()
 {
     makeCurrent();
     glDeleteVertexArrays(1, &vao);
-    mp_geomCube->destroy();
+    mp_geomQuad.destroy();
 }
 
 
@@ -68,19 +74,11 @@ void MyGL::initializeGL()
     // Create a Vertex Attribute Object
     glGenVertexArrays(1, &vao);
 
+    createRenderBuffers();
 
-    // Create and set up the diffuse shader
-    mp_progLambert->create(":/glsl/lambert.vert.glsl", ":/glsl/lambert.frag.glsl");
-    // Create and set up the flat lighting shader
-    mp_progFlat->create(":/glsl/flat.vert.glsl", ":/glsl/flat.frag.glsl");
+    mp_geomQuad.create();
 
-    // Set a color with which to draw geometry since you won't have one
-    // defined until you implement the Node classes.
-    // This makes your geometry render green.
-    mp_progLambert->setGeometryColor(glm::vec4(0,1,0,1));
-
-    //Create the instance of Cube
-    mp_geomCube->create();
+    createShaders();
 
     // Initializes the terrain
     mp_terrain->initialize();
@@ -104,6 +102,10 @@ void MyGL::resizeGL(int w, int h)
 
     mp_progLambert->setViewProjMatrix(viewproj);
     mp_progFlat->setViewProjMatrix(viewproj);
+    mp_plainShader->setDimensions(glm::ivec2(w, h));
+    mp_waterShader->setDimensions(glm::ivec2(w, h));
+    mp_lavaShader->setDimensions(glm::ivec2(w, h));
+
     printGLErrorLog();
 }
 
@@ -143,17 +145,120 @@ void MyGL::paintGL()
 
     GLDrawScene();
 
+    performPostprocessRenderPass();
+
+    mp_waterShader->setTime(mp_time);
+    mp_lavaShader->setTime(mp_time);
+    ++mp_time;
 }
 
 void MyGL::GLDrawScene()
 {
+    // Render the scene to our frame buffer
+
+    // Render to our framebuffer rather than the viewport
+    glBindFramebuffer(GL_FRAMEBUFFER, mp_frameBuffer);
+    // Render on the whole framebuffer, complete from the lower left corner to the upper right
+    glViewport(0,0,this->width() * this->devicePixelRatio(), this->height() * this->devicePixelRatio());
+    // Clear the screen so that we only see newly drawn images
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
     for(Chunk* c : mp_terrain->getChunksToDraw()){
         mp_progLambert->setModelMatrix(glm::translate(glm::mat4(), glm::vec3(c->pos)));
-        mp_progLambert->draw(*c);
+        mp_progLambert->draw(*c, 0);
     }
 }
 
+void MyGL::performPostprocessRenderPass()
+{
+    // Render the frame buffer as a texture on a screen-size quad
 
+    // Tell OpenGL to render to the viewport's frame buffer
+    glBindFramebuffer(GL_FRAMEBUFFER, this->defaultFramebufferObject());
+    // Render on the whole framebuffer, complete from the lower left corner to the upper right
+    glViewport(0,0,this->width() * this->devicePixelRatio(), this->height() * this->devicePixelRatio());
+    // Clear the screen
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    // Bind our texture in Texture Unit 0
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, mp_renderedTexture);
+
+    // Use shader based on block type
+    BlockType blockType = mp_player->getBlockAtEye();
+    if (blockType == WATER) {
+        mp_waterShader->draw(mp_geomQuad, 0);
+    } else if (blockType == LAVA) {
+        mp_lavaShader->draw(mp_geomQuad, 0);
+    } else {
+        mp_plainShader->draw(mp_geomQuad, 0);
+    }
+}
+
+void MyGL::createRenderBuffers()
+{
+    // Initialize the frame buffers and render textures
+    glGenFramebuffers(1, &mp_frameBuffer);
+    glGenTextures(1, &mp_renderedTexture);
+    glGenRenderbuffers(1, &mp_depthRenderBuffer);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, mp_frameBuffer);
+    // Bind our texture so that all functions that deal with textures will interact with this one
+    glBindTexture(GL_TEXTURE_2D, mp_renderedTexture);
+    // Give an empty image to OpenGL ( the last "0" )
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, this->width() * this->devicePixelRatio(), this->height() * this->devicePixelRatio(), 0, GL_RGB, GL_UNSIGNED_BYTE, (void*)0);
+
+    // Set the render settings for the texture we've just created.
+    // Essentially zero filtering on the "texture" so it appears exactly as rendered
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    // Clamp the colors at the edge of our texture
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+    // Initialize our depth buffer
+    glBindRenderbuffer(GL_RENDERBUFFER, mp_depthRenderBuffer);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, this->width() * this->devicePixelRatio(), this->height() * this->devicePixelRatio());
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, mp_depthRenderBuffer);
+
+    // Set m_renderedTexture as the color output of our frame buffer
+    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, mp_renderedTexture, 0);
+
+    // Sets the color output of the fragment shader to be stored in GL_COLOR_ATTACHMENT0, which we previously set to m_renderedTextures[i]
+    GLenum drawBuffers[1] = {GL_COLOR_ATTACHMENT0};
+    glDrawBuffers(1, drawBuffers); // "1" is the size of drawBuffers
+
+    if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+    {
+        std::cout << "Frame buffer did not initialize correctly..." << std::endl;
+        printGLErrorLog();
+    }
+}
+
+void MyGL::createShaders()
+{
+    // Surface shaders
+    // Create and set up the diffuse shader
+    mp_progLambert->create(":/glsl/lambert.vert.glsl", ":/glsl/lambert.frag.glsl");
+    // Create and set up the flat lighting shader
+    mp_progFlat->create(":/glsl/flat.vert.glsl", ":/glsl/flat.frag.glsl");
+
+    // Set a color with which to draw geometry since you won't have one
+    // defined until you implement the Node classes.
+    // This makes your geometry render green.
+    mp_progLambert->setGeometryColor(glm::vec4(0,1,0,1));
+
+
+
+    // Post-process shaders
+    mp_plainShader = mkU<PostProcessShader>(this);
+    mp_plainShader->create(":/glsl/passthrough.vert.glsl", ":/glsl/noOp.frag.glsl");
+
+    mp_lavaShader = mkU<PostProcessShader>(this);
+    mp_lavaShader->create(":/glsl/passthrough.vert.glsl", ":/glsl/lava.frag.glsl");
+
+    mp_waterShader = mkU<PostProcessShader>(this);
+    mp_waterShader->create(":/glsl/passthrough.vert.glsl", ":/glsl/water.frag.glsl");
+}
 
 void MyGL::keyPressEvent(QKeyEvent *e)
 {

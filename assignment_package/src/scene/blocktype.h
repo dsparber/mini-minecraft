@@ -3,9 +3,20 @@
 
 enum BlockType: unsigned char
 {
-    EMPTY, GRASS, DIRT, STONE, WOOD, LEAF, BEDROCK, LAVA, WATER, ICE
+    EMPTY,
+    GRASS,
+    DIRT,
+    STONE,
+    WOOD,
+    LEAF,
+    BEDROCK,
+    LAVA,
+    WATER,
+    ICE
 };
 
 bool isSolid(BlockType);
+
+bool isLiquid(BlockType);
 
 #endif // BLOCKTYPE_H

@@ -12,7 +12,7 @@ class Player
 {
 private:
     /// Precision for floating point comparison
-    float eps = 0.01;
+    float eps = 0.001;
 
     /// Position of the player in 3D space
     glm::vec3 position;
@@ -65,6 +65,9 @@ private:
     /// Returns if player is currently touching the ground
     bool isGrounded();
 
+    /// Returns if the player is "standing" on a liquid (water or lava)
+    bool isSwimming();
+
     /// Computes the distance to the next collision along travel vector
     float getCollisionDistance(glm::vec3);
 
@@ -99,6 +102,9 @@ public:
     /// acceleration, angular velocity, etc.) and updates all
     /// dependent variables according to the change in time
     void physicsUpdate(float);
+
+    /// Called to determine what postprocess shader should be used
+    BlockType getBlockAtEye() const;
 
     Player();
 };

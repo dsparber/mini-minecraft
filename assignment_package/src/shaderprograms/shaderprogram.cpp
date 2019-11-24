@@ -8,7 +8,7 @@
 
 ShaderProgram::ShaderProgram(OpenGLContext *context)
     : vertShader(), fragShader(), prog(),
-      attrPos(-1), attrNor(-1), attrCol(-1),
+      attrPos(-1), attrNor(-1), attrUV(-1),
       unifModel(-1), unifModelInvTr(-1), unifViewProj(-1), unifColor(-1),
       context(context)
 {}
@@ -63,7 +63,7 @@ void ShaderProgram::create(const char *vertfile, const char *fragfile)
 
     attrPos = context->glGetAttribLocation(prog, "vs_Pos");
     attrNor = context->glGetAttribLocation(prog, "vs_Nor");
-    attrCol = context->glGetAttribLocation(prog, "vs_Col");
+    attrUV = context->glGetAttribLocation(prog, "vs_UV");
 
     unifModel      = context->glGetUniformLocation(prog, "u_Model");
     unifModelInvTr = context->glGetUniformLocation(prog, "u_ModelInvTr");
@@ -135,7 +135,7 @@ void ShaderProgram::setGeometryColor(glm::vec4 color)
 }
 
 //This function, as its name implies, uses the passed in GL widget
-void ShaderProgram::draw(Drawable &d)
+void ShaderProgram::draw(Drawable &d, int textureSlot)
 {
     useMe();
 
@@ -160,10 +160,10 @@ void ShaderProgram::draw(Drawable &d)
         context->glVertexAttribPointer(attrNor, 4, GL_FLOAT, false, 3 * sizeof(glm::vec4),  (void*)sizeof(glm::vec4));
    }
 
-    if (attrCol != -1 && d.bindAll()) {
-        context->glEnableVertexAttribArray(attrCol);
-        context->glVertexAttribPointer(attrCol, 4, GL_FLOAT, false, 3 * sizeof(glm::vec4),  (void*)(2*sizeof(glm::vec4)));
-  }
+    if (attrUV != -1 && d.bindAll()) {
+        context->glEnableVertexAttribArray(attrUV);
+        context->glVertexAttribPointer(attrUV, 4, GL_FLOAT, false, 3 * sizeof(glm::vec4),  (void*)(2*sizeof(glm::vec4)));
+    }
     //std::cout<<"bind attributes error:"<<std::endl;
     //context->printGLErrorLog();
 
@@ -175,7 +175,7 @@ void ShaderProgram::draw(Drawable &d)
 
     if (attrPos != -1) context->glDisableVertexAttribArray(attrPos);
     if (attrNor != -1) context->glDisableVertexAttribArray(attrNor);
-    if (attrCol != -1) context->glDisableVertexAttribArray(attrCol);
+    if (attrUV != -1) context->glDisableVertexAttribArray(attrUV);
     //std::cout<<"shader program draw GL error:"<<std::endl;
     context->printGLErrorLog();
 }

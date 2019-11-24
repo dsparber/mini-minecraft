@@ -4,17 +4,30 @@
 #include <scene/cube.h>
 #include <iostream>
 #include "fbm.h"
+#include "createchunkrunnable.h"
 
 
-Terrain::Terrain (OpenGLContext* context) : context(context), chunkMap(), chunksToDraw()
+Terrain::Terrain (OpenGLContext* context) :
+    context(context),
+    chunkMap(),
+    chunksToDraw(),
+    requestedChunks(),
+    createdChunks(),
+    lastPlayerChunk(-1),
+    waitingForChunks(false),
+    newChunksAvailable(false)
 { }
 
+int Terrain::chunksToRender = 3;
+
 void Terrain::initialize(){
-    for (int i = 0; i < 4; ++i) {
-        for (int j = 0; j < 4; ++j) {
-            initializeChunk(i * 16, j * 16);
-        }
-    }
+    playerMoved(glm::vec3(0, 0, 0));
+    QThreadPool::globalInstance()->waitForDone();
+}
+
+
+BlockType Terrain::getBlockOrEmpty(glm::vec3 pos) const {
+    return getBlockOrEmpty(pos.x, pos.y, pos.z);
 }
 
 BlockType Terrain::getBlockOrEmpty(int x, int y, int z) const {
@@ -25,91 +38,37 @@ BlockType Terrain::getBlockOrEmpty(int x, int y, int z) const {
     return getBlockAt(x, y, z);
 }
 
+void Terrain::updateChunkMap() {
+    createdMutex.lock();
+
+    newChunksAvailable = (createdChunks.size() > 0);
+
+    // Insert chunks
+    for (Chunk* chunk : createdChunks) {
+        int64_t key = getHashKey(chunk->pos.x, chunk->pos.z);
+        chunkMap[key] = chunk;
+    }
+
+    createdChunks.clear();
+
+    createdMutex.unlock();
+}
+
 void Terrain::initializeChunk(int chunkX, int chunkZ) {
 
-    // Ensure alignment to 16
-    chunkX = (chunkX / 16) * 16;
-    chunkZ = (chunkZ / 16) * 16;
-
-    Chunk* c = new Chunk(context, glm::vec4(chunkX, 0, chunkZ, 0));
     int64_t key = getHashKey(chunkX, chunkZ);
 
-    // Generate blocks
-    for(int x = 0; x < 16; ++x)
-    {
-        for(int z = 0; z < 16; ++z)
-        {
-            for(int y = 0; y < 256; ++y)
-            {
-                int fbmX = chunkX + x;
-                int fbmZ = chunkZ + z;
-
-                if(y <= 128) {
-                    c->setBlockAt(x, y, z, STONE);
-                }
-                else
-                {
-                    float rawFBM = fbm(fbmX / 64.f, fbmZ / 64.f);
-                    float fbmVal = 32.f * powf(rawFBM, 4.f);
-                    int intFBM = 128 + (int) fbmVal;
-
-                    for (int i = 129; i < intFBM; i++) {
-                        c->setBlockAt(x, i, z, DIRT);
-                    }
-
-                    c->setBlockAt(x, intFBM, z, GRASS);
-
-
-//                    for (int i = intFBM + 1; i < 134; i++) {
-//                        c->setBlockAt(x, i, z, WATER);
-//                    }
-                }
-            }
-        }
+    // Already requested
+    if (requestedChunks.find(key) != requestedChunks.end()) {
+        return;
     }
 
-    // Link neighbors
-    c->left = getChunk(chunkX - 16, chunkZ);
-    if (c->left != nullptr) {
-        c->right = c;
-    }
-    c->right = getChunk(chunkX + 16, chunkZ);
-    if (c->right != nullptr) {
-        c->left = c;
-    }
-    c->front = getChunk(chunkX, chunkZ - 16);
-    if (c->front != nullptr) {
-        c->back = c;
-    }
-    c->back = getChunk(chunkX, chunkZ + 16);
-    if (c->back != nullptr) {
-        c->front = c;
-    }
+    requestedChunks.insert(key);
 
-    c->create();
-
-    chunkMap[key] = c;
-    chunksToDraw.push_back(c);
-}
-
-
-//x is in lower 32 bits, z is in upper 32 bits
-int64_t Terrain::getHashKey(int x, int z) const {
-    int64_t nx = (int64_t)x;
-    int64_t nz = (int64_t)z;
-    nz = nz << 32;
-    nx = nx & 0x00000000ffffffff;
-    return nx | nz;
-}
-
-glm::vec2 Terrain::getCoordFromKey(int64_t key) const{
-    int64_t x = key & 0x00000000ffffffff;
-    //check if x is negative
-    if(x & 2147483648 != 0){
-        x = 0xffffffff00000000 | x;
-    }
-    int64_t z = key>>32;
-    return(glm::vec2(x, z));
+    Chunk* c = new Chunk(context, glm::vec4(chunkX, 0, chunkZ, 0));
+    CreateChunkRunnable* create = new CreateChunkRunnable(c, &createdChunks, &createdMutex);
+    create->setAutoDelete(true);
+    QThreadPool::globalInstance()->start(create);
 }
 
 BlockType Terrain::getBlockAt(glm::vec3 pos) const
@@ -120,15 +79,15 @@ BlockType Terrain::getBlockAt(glm::vec3 pos) const
 BlockType Terrain::getBlockAt(int x, int y, int z) const
 {
     // Get coordinates aligned to chunk
-    int chunkX = (x / 16) * 16;
-    int chunkZ = (z / 16) * 16;
+    int chunkX = glm::floor(x / 16.f) * 16;
+    int chunkZ = glm::floor(z / 16.f) * 16;
 
     // Get local block coordinates
     int blockX = x - chunkX;
     int blockZ = z - chunkZ;
 
     // Get key for chunk map
-    int64_t chunkKey = Terrain::getHashKey(chunkX, chunkZ);
+    int64_t chunkKey = getHashKey(chunkX, chunkZ);
 
     // Get chunk
     Chunk* chunk = chunkMap.at(chunkKey);
@@ -140,15 +99,15 @@ BlockType Terrain::getBlockAt(int x, int y, int z) const
 BlockType& Terrain::getBlockAt(int x, int y, int z)
 {
     // Get coordinates aligned to chunk
-    int chunkX = (x / 16) * 16;
-    int chunkZ = (z / 16) * 16;
+    int chunkX = glm::floor(x / 16.f) * 16;
+    int chunkZ = glm::floor(z / 16.f) * 16;
 
     // Get local block coordinates
     int blockX = x - chunkX;
     int blockZ = z - chunkZ;
 
     // Get key for chunk map
-    int64_t chunkKey = Terrain::getHashKey(chunkX, chunkZ);
+    int64_t chunkKey = getHashKey(chunkX, chunkZ);
 
     // Get chunk reference
     Chunk* chunk = chunkMap[chunkKey];
@@ -159,11 +118,11 @@ BlockType& Terrain::getBlockAt(int x, int y, int z)
 
 Chunk* Terrain::getChunk(int x, int z) const {
     // Get coordinates aligned to chunk
-    int chunkX = (x / 16) * 16;
-    int chunkZ = (z / 16) * 16;
+    int chunkX = glm::floor(x / 16.f) * 16;
+    int chunkZ = glm::floor(z / 16.f) * 16;
 
     // Get key for chunk map
-    int64_t chunkKey = Terrain::getHashKey(chunkX, chunkZ);
+    int64_t chunkKey = getHashKey(chunkX, chunkZ);
 
     if (chunkMap.find(chunkKey) == chunkMap.end()) {
         return nullptr;
@@ -176,22 +135,32 @@ Chunk* Terrain::getChunk(int x, int z) const {
 void Terrain::setBlockAt(int x, int y, int z, BlockType t)
 {
     // Get coordinates aligned to chunk
-    int chunkX = (x / 16) * 16;
-    int chunkZ = (z / 16) * 16;
+    int chunkX = glm::floor(x / 16.f) * 16;
+    int chunkZ = glm::floor(z / 16.f) * 16;
 
     // Get local block coordinates
     int blockX = x - chunkX;
     int blockZ = z - chunkZ;
 
     // Get key for chunk map
-    int64_t chunkKey = Terrain::getHashKey(chunkX, chunkZ);
-    if(chunkMap.count(chunkKey) > 0){
-        // Get chunk reference
-        Chunk* chunk = chunkMap[chunkKey];
+    int64_t chunkKey = getHashKey(chunkX, chunkZ);
 
-        // Set block
-        chunk->setBlockAt(blockX, y, blockZ, t);
+    if (chunkMap.find(chunkKey) == chunkMap.end()) {
+        return;
     }
+
+    // Get chunk reference
+    Chunk* chunk = chunkMap[chunkKey];
+
+    // Set block
+    chunk->setBlockAt(blockX, y, blockZ, t);
+
+    // Recreate chunk
+    chunk->destroy();
+    chunk->compute();
+    chunk->create();
+
+    // TODO check neighbors and update
 }
 
 void Terrain::addBlock(glm::vec3 eye, glm::vec3 look)
@@ -199,19 +168,12 @@ void Terrain::addBlock(glm::vec3 eye, glm::vec3 look)
     glm::vec3 addPos = rayMarch(eye, look) - 0.75f * look;
     glm::vec3 coords(glm::floor(addPos));
     setBlockAt(coords.x, coords.y, coords.z, LAVA);
-    Chunk* c = getChunk((int)coords.x, (int)coords.z);
-    c->destroy();
-    c->create();
 }
 
 void Terrain::removeBlock(glm::vec3 eye, glm::vec3 look)
 {
     glm::vec3 coords(glm::floor(rayMarch(eye, look)));
     setBlockAt(coords.x, coords.y, coords.z, EMPTY);
-    Chunk* c = getChunk((int)coords.x, (int) coords.z);
-    c->destroy();
-    c->create();
-    // TODO update neighbor if block deleted at border
 }
 
 glm::vec3 Terrain::rayMarch(glm::vec3 eye, glm::vec3 look)
@@ -234,21 +196,61 @@ glm::vec3 Terrain::rayMarch(glm::vec3 eye, glm::vec3 look)
 
 void Terrain::playerMoved(glm::vec3 playerPosition) {
 
-    for (int i = 0; i < 8; i++) {
+    updateChunkMap();
 
-        glm::vec3 delta = glm::mat3(glm::rotate(glm::mat4(), i * glm::pi<float>() / 4, glm::vec3(0, 0, 1))) * glm::vec3(16, 0, 0);
+    int x = playerPosition.x;
+    int z = playerPosition.z;
+    x = glm::floor(x / 16.f) * 16;
+    z = glm::floor(z / 16.f) * 16;
 
-        glm::vec3 testPos = playerPosition + delta;
+    int64_t playerChunk = getHashKey(x, z);
 
-        Chunk* testChunk = getChunk(testPos.x, testPos.z);
+    if (playerChunk == lastPlayerChunk && (!waitingForChunks || !newChunksAvailable)) {
+        return;
+    }
 
-        if (testChunk == nullptr) {
-            initializeChunk(testPos.x, testPos.z);
+    // Chunks that were previously drawn
+    std::set<Chunk*> prevChunks;
+    for (Chunk* c : chunksToDraw) {
+        prevChunks.insert(c);
+    }
+
+    // Create chunks around player
+    bool allChunksAvailable = true;
+    for (int i = -chunksToRender; i <= chunksToRender; ++i) {
+        for (int j = -chunksToRender; j <= chunksToRender; ++j) {
+            int chunkX = x + 16 * i;
+            int chunkZ = z + 16 * j;
+
+            Chunk* chunk = getChunk(chunkX, chunkZ);
+
+            // Initialize chunk if not existing
+            if (chunk == nullptr) {
+                initializeChunk(chunkX, chunkZ);
+                allChunksAvailable = false;
+                continue;
+            }
+
+            // Add chunk to draw set if not in set
+            if (chunksToDraw.find(chunk) == chunksToDraw.end()) {
+                chunksToDraw.insert(chunk);
+            } else {
+                // Chunk is also used in future
+                prevChunks.erase(chunk);
+            }
+            chunk->create();
         }
+    }
+    waitingForChunks = !allChunksAvailable;
+
+    // Destroy chunks that are no longer used
+    for (Chunk* c : prevChunks) {
+        chunksToDraw.erase(c);
+        c->destroy();
     }
 }
 
-std::vector<Chunk*> Terrain::getChunksToDraw() const {
+std::set<Chunk*> Terrain::getChunksToDraw() const {
     return chunksToDraw;
 }
 
