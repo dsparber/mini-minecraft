@@ -8,21 +8,20 @@
 #include <QChar>
 #include <QString>
 #include <map>
+#include "terrain.h"
 
 class River
 {
-    typedef void (*Rule)(void);
+    typedef void (River::*Rule)(void);
 
 public:
+    Terrain* terrain;
     QStack<Turtle> stack;
-    //QHash<QChar, QString> expanRules;
-    std::map<QChar, QString> expanRules;
-    //std::map<QChar, ClassName::*)(void)> expanRules;
-    //QHash<QChar, Rule> drawRules;
-    std::map<QChar, Rule> drawRules;
+    QHash<QChar, QString> expanRules;
+    QHash<QChar, Rule> drawRules;
     Turtle t;
 
-    River();
+    River(Terrain* terr);
     ~River();
 
     void createRiver1(int x, int z);
@@ -30,6 +29,7 @@ public:
     QString expandString(int numIterations, QString s);
     void drawString(QString s);
     void carveTerrain();
+    void bresenham(int x1, int z1, int x2, int z2);
 
     /// Drawing rules for river generation
     void moveAndDrawLine();

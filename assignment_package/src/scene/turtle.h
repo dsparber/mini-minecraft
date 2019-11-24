@@ -2,7 +2,6 @@
 #define TURTLE_H
 #include <la.h>
 
-
 class Turtle
 {
 public:
@@ -11,7 +10,9 @@ public:
     float angle;
     int depth;
 
+    Turtle();
     Turtle(glm::vec2 position, glm::vec2 orientation);
+    Turtle(const Turtle &t2); // copy constructor
     ~Turtle();
 };
 
