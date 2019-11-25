@@ -263,6 +263,26 @@ void Chunk::drawFace(glm::vec4 pos, std::vector<GLuint>& idx, std::vector<glm::v
                                          (15 + offsetUVs[i].y)/16.f,
                                          5, 0.f)));
                 break;
+            case ICE:
+                all.push_back(glm::vec4(0.f, 0.f, 0.f, 0.5f));
+                all.push_back((glm::vec4((3 + offsetUVs[i].x)/16.f,
+                                         (11 + offsetUVs[i].y)/16.f,
+                                         5, 0.f)));
+                break;
+
+            case SNOW:
+                all.push_back(glm::vec4(0.f, 0.f, 0.f, 1.f));
+                all.push_back((glm::vec4((2 + offsetUVs[i].x)/16.f,
+                                         (11 + offsetUVs[i].y)/16.f,
+                                         0.3, 0.f)));
+                break;
+            case BEDROCK:
+                all.push_back(glm::vec4(0.5f, 0.5f, 0.5f, 1.f));
+                all.push_back((glm::vec4((2 + offsetUVs[i].x)/16.f,
+                                         (14 + offsetUVs[i].y)/16.f,
+                                         5, 0.f)));
+                break;
+
             case LAVA:
                 all.push_back(glm::vec4(1, 0, 0, 0.5));
                 all.push_back((glm::vec4((14 + offsetUVs[i].x)/16.f,
