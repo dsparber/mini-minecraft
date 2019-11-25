@@ -84,8 +84,8 @@ void MyGL::initializeGL()
     mp_terrain->initialize();
 
     // Create rivers
-    //River* rivers = new River(mp_terrain.get());
-    //rivers->createRiver1(2, 50);
+    River* rivers = new River(mp_terrain.get());
+    rivers->createRiver1(4, 50);
     //rivers->createRiver2(56, 62);
 
     // We have to have a VAO bound in OpenGL 3.2 Core. But if we're not

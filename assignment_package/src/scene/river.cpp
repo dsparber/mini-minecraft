@@ -14,6 +14,8 @@ River::River(Terrain* terr)
 
     drawRules.insert('F', &River::moveAndDrawLine);
     drawRules.insert('G', &River::moveAndDrawLine);
+    drawRules.insert('X', &River::doNothing);
+    drawRules.insert('Y', &River::doNothing);
     drawRules.insert('+', &River::rotateLeft);
     drawRules.insert('-', &River::rotateRight);
     drawRules.insert('[', &River::savePosition);
@@ -25,13 +27,13 @@ River::~River() {}
 
 void River::createRiver1(int x, int z)
 {
-    t.pos = glm::vec2(x, z); // (2, 50)
+    t.pos = glm::vec2(x, z); // (4, 50)
     t.look = glm::vec2(1.f, 0.f);
     t.depth = 0;
     QString axiom = "X";
 
+    std::cout << "create river1" << std::endl;
     QString expanded = expandString(2, axiom);
-    std::cout << "expanded: " << expanded.toStdString() << std::endl;
     drawString(expanded);
 }
 
@@ -42,6 +44,7 @@ void River::createRiver2(int x, int z)
     t.depth = 0;
     QString axiom = "Y";
 
+    std::cout << "create river2" << std::endl;
     QString expanded = expandString(3, axiom);
     drawString(expanded);
 }
@@ -61,6 +64,7 @@ QString River::expandString(int numIterations, QString axiom)
         }
     }
 
+    std::cout << "expanded string: " << expandedString.toStdString() << std::endl;
     return expandedString;
 }
 
@@ -74,8 +78,7 @@ void River::drawString(QString s)
 
 void River::carveTerrain()
 {
-    // carve out surrounding terrain so that it slopes into river
-    glm::vec2 perpend = t.look * glm::rotate(90);
+    glm::vec2 perpend = t.look * glm::mat2(0, 1, -1, 0);
     float y = pow(perpend.x, 3) / 3.0;
 
     bool hit = true;
@@ -91,7 +94,7 @@ void River::carveTerrain()
         {
             hit = false;
         } else {
-            for (int i = glm::floor(currPos.y); i < ; i++) {
+            for (int i = glm::floor(currPos.y); i < 256; i++) {
                 terrain->setBlockAt(glm::floor(currPos.x), i, glm::floor(currPos.z), EMPTY);
             }
         }
@@ -105,37 +108,38 @@ void River::moveAndDrawLine()
     t.pos = t.pos + 5.f * t.look;
     float radius = 5.f / t.depth;
     bresenham(currPos.x, currPos.y, t.pos.x, t.pos.y, radius);
+    //carveTerrain();
 }
 
 void River::bresenham(int x1, int z1, int x2, int z2, float radius)
 {
     int m_new = 2 * (z2 - z1);
     int slope_error_new = m_new - (x2 - x1);
-    std::cout << "test bresenham" << std::endl;
 
     // Bresenham line formula (draw between 2 points)
     for (int x = x1, z = z1; x <= x2; x++)
     {
         // Loop through each direction to shape bottom of river
-        for (int newX = x - radius; newX < x + radius; x++) {
-            for (int newZ = z - radius; newZ < z + radius; z++) {
-                for (int y = 150; y > 160; y--)
-                {
-                    if (terrain->getBlockAt(x, y, z) != WATER)  // If block is not already water
-                    {
-                        std::cout << "test getBlock if state" << std::endl;
-                        glm::vec4 center(x, 128, z, 0);
-                        glm::vec4 pos2(newX, y, newZ, 0);
+//        for (int newX = x - radius; newX < x + radius; newX++) {
+//            for (int newZ = z - radius; newZ < z + radius; newZ++) {
+//                for (int y = 160; y > 150; y--)
+//                {
+//                    if (terrain->getBlockAt(newX, y, newZ) != WATER)  // If block is not already water
+//                    {
+//                        glm::vec4 center(x, 128, z, 0);
+//                        glm::vec4 pos2(newX, y, newZ, 0);
 
-                        if (glm::distance(center, pos2) < radius)   // If block is within radius
-                        {
-                            std::cout << "test setBlock if state" << std::endl;
-                            terrain->setBlockAt(newX, y, newZ, WATER);
-                        }
-                    }
-                }
-            }
-        }
+//                        if (glm::distance(center, pos2) < radius)   // If block is within radius
+//                        {
+//                            terrain->setBlockAt(newX, y, newZ, WATER);
+//                        }
+//                    }
+//                }
+//            }
+//        }
+
+        //std::cout << terrain->getBlockAt(x, 128, z) << std::endl;
+        terrain->setBlockAt(x, 150, z, WATER);
 
         slope_error_new += m_new;
         if (slope_error_new >= 0)
@@ -149,25 +153,29 @@ void River::bresenham(int x1, int z1, int x2, int z2, float radius)
 void River::rotateLeft()
 {
     std::cout << "test rotateLeft" << std::endl;
-    float angle = rand() % 40 + 10;
-    t.look = glm::vec2(t.look.x * cos(angle), t.look.y * sin(angle));
+    float angle = rand() % 60 + 20;
+    float angleRad = angle * M_PI / 180.f;
+    t.look = t.look * glm::mat2(cos(angleRad), -sin(angleRad), sin(angleRad), cos(angleRad));
 }
 
 void River::rotateRight()
 {
     std::cout << "test rotateRight" << std::endl;
-    float angle = -(rand() % 40 + 10);
-    t.look = glm::vec2(t.look.x * cos(angle * M_PI / 180.f), t.look.y * sin(angle * M_PI / 180.f));
+    float angle = -(rand() % 60 + 20);
+    float angleRad = angle * M_PI / 180.f;
+    t.look = t.look * glm::mat2(cos(angleRad), sin(angleRad), -sin(angleRad), cos(angleRad));
 }
 
 void River::savePosition()
 {
-   std::cout << "test savePosition" << std::endl;
+   std::cout << "test savePos" << std::endl;
    stack.push(t);
 }
 
 void River::storePosition()
 {
-    std::cout << "test storePosition" << std::endl;
+    std::cout << "test storePos" << std::endl;
     stack.pop();
 }
+
+void River::doNothing() {}

@@ -37,6 +37,7 @@ public:
     void rotateRight();
     void savePosition();
     void storePosition();
+    void doNothing();
 };
 
 #endif // RIVER_H
