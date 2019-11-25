@@ -36,9 +36,9 @@ void CreateChunkRunnable::run() {
 
             chunk->setBlockAt(x, intFBM, z, GRASS);
 
-            for (int i = 128; i < 132; i++) {
-                chunk->setBlockAt(x, i, z, WATER);
-            }
+            //for (int i = 128; i < 132; i++) {
+              //  chunk->setBlockAt(x, i, z, WATER);
+            //}
         }
     }
 

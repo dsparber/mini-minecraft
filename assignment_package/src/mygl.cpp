@@ -83,6 +83,11 @@ void MyGL::initializeGL()
     // Initializes the terrain
     mp_terrain->initialize();
 
+    // Create rivers
+    //River* rivers = new River(mp_terrain.get());
+    //rivers->createRiver1(2, 50);
+    //rivers->createRiver2(56, 62);
+
     // We have to have a VAO bound in OpenGL 3.2 Core. But if we're not
     // using multiple VAOs, we can just bind one once.
     //    vao.bind();

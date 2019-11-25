@@ -15,6 +15,7 @@
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLShaderProgram>
 #include <smartpointerhelp.h>
+#include <scene/river.h>
 
 
 class MyGL : public OpenGLContext

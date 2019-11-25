@@ -7,6 +7,7 @@
 #include <set>
 #include "chunk.h"
 #include "utils.h"
+#include <unordered_map>
 
 
 class CreateChunkRunnable : public QRunnable

@@ -7,8 +7,8 @@
 #include <QStack>
 #include <QChar>
 #include <QString>
-#include <map>
 #include "terrain.h"
+#include <map>
 
 class River
 {
