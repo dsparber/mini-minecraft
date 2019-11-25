@@ -23,7 +23,7 @@ void CreateChunkRunnable::run() {
             int fbmZ = chunk->pos.z + z;
 
             float rawFBM = fbm(fbmX / 64.f, fbmZ / 64.f);
-            float fbmVal = 32.f * powf(rawFBM, 4.f);
+            float fbmVal = 64.f * powf(rawFBM, 4.f);
             int intFBM = 128 + (int) fbmVal;
 
             for (int i = 128; i < 132; i++) {
@@ -35,10 +35,18 @@ void CreateChunkRunnable::run() {
             }
 
             for (int i = 128; i < intFBM; i++) {
-                chunk->setBlockAt(x, i, z, DIRT);
+                if (intFBM > 150) {
+                    chunk->setBlockAt(x, i, z, ICE);
+                } else {
+                    chunk->setBlockAt(x, i, z, DIRT);
+                }
             }
 
-            chunk->setBlockAt(x, intFBM, z, GRASS);
+            if (intFBM > 150) {
+                chunk->setBlockAt(x, intFBM, z, ICE);
+            } else {
+                chunk->setBlockAt(x, intFBM, z, GRASS);
+            }
         }
     }
 
