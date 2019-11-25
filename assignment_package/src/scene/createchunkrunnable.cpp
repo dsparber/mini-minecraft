@@ -1,18 +1,53 @@
 #include "createchunkrunnable.h"
 #include "fbm.h"
 #include <iostream>
+#include <QThreadPool>
 
-CreateChunkRunnable::CreateChunkRunnable(
-        Chunk* c,
-        std::vector<Chunk*>* completedChunks,
-        QMutex* mutex) :
-    chunk(c),
+CreateChunkRunnable::CreateChunkRunnable(OpenGLContext* context, Chunk* chunk, std::vector<Chunk*>* completedChunks, QMutex* mutex) :
+    context(context),
+    chunk(chunk),
     completedChunks(completedChunks),
     terrainMutex(mutex)
 
 { }
 
+void CreateChunkRunnable::create(
+        OpenGLContext* context, int x, int z, std::vector<Chunk*>* completedChunks, QMutex* terrainMutex) {
+
+    // Create chunk at given position
+    init(context, x, z, completedChunks, terrainMutex);
+
+    // Also create surrounding for neighbor linking
+    init(context, x + 16, z, completedChunks, terrainMutex);
+    init(context, x - 16, z, completedChunks, terrainMutex);
+    init(context, x, z + 16, completedChunks, terrainMutex);
+    init(context, x, z - 16, completedChunks, terrainMutex);
+}
+
+void CreateChunkRunnable::init(
+        OpenGLContext* context, int x, int z, std::vector<Chunk*>* completedChunks, QMutex* terrainMutex) {
+
+    // Create chunk
+    Chunk* chunk = new Chunk(context, glm::vec4(x, 0, z, 0));
+    int64_t key = getHashKey(x, z);
+
+    // Check if already requested
+    mutex.lock();
+    if (created.find(key) != created.end()) {
+        mutex.unlock();
+        return;
+    }
+    created[key] = chunk;
+    mutex.unlock();
+
+    // Start task
+    CreateChunkRunnable* task = new CreateChunkRunnable(context, chunk, completedChunks, terrainMutex);
+    task->setAutoDelete(true);
+    QThreadPool::globalInstance()->start(task);
+}
+
 void CreateChunkRunnable::run() {
+
 
     // Generate blocks
     for(int x = 0; x < 16; ++x)
@@ -54,51 +89,49 @@ void CreateChunkRunnable::run() {
     int z = chunk->pos.z;
     int64_t key = getHashKey(x, z);
 
-    std::vector<Chunk*> computeNeeded;
-    computeNeeded.push_back(chunk);
+    std::vector<Chunk*> modifiedChunks;
+    modifiedChunks.push_back(chunk);
 
     // Link neighbors
     mutex.lock();
-    created[key] = chunk;
 
     // Left
     int64_t neighborKey = getHashKey(x - 16, z);
     if (created.find(neighborKey) != created.end()) {
         chunk->left = created[neighborKey];
         chunk->left->right = chunk;
-        computeNeeded.push_back(chunk->left);
+        modifiedChunks.push_back(chunk->left);
     }
     // Right
     neighborKey = getHashKey(x + 16, z);
     if (created.find(neighborKey) != created.end()) {
         chunk->right = created[neighborKey];
         chunk->right->left = chunk;
-        computeNeeded.push_back(chunk->right);
+        modifiedChunks.push_back(chunk->right);
     }
     // Front
     neighborKey = getHashKey(x, z - 16);
     if (created.find(neighborKey) != created.end()) {
         chunk->front = created[neighborKey];
         chunk->front->back = chunk;
-        computeNeeded.push_back(chunk->front);
+        modifiedChunks.push_back(chunk->front);
     }
     // Back
     neighborKey = getHashKey(x, z + 16);
     if (created.find(neighborKey) != created.end()) {
         chunk->back = created[neighborKey];
         chunk->back->front = chunk;
-        computeNeeded.push_back(chunk->back);
+        modifiedChunks.push_back(chunk->back);
     }
     mutex.unlock();
 
-    for (Chunk* c : computeNeeded) {
-        c->mutex.lock();
-        c->compute();
-        c->mutex.unlock();
+    for (Chunk* c : modifiedChunks) {
+        if (c->left != nullptr && c->right != nullptr && c->back != nullptr && c->front != nullptr) {
+            c->compute();
+            // Push new chunk to completedChunks vector
+            terrainMutex->lock();
+            completedChunks->push_back(c);
+            terrainMutex->unlock();
+        }
     }
-
-    // Push new chunk to completedChunks vector
-    terrainMutex->lock();
-    completedChunks->push_back(chunk);
-    terrainMutex->unlock();
 }

@@ -36,9 +36,6 @@ private:
     /// Returns the chunk at the given coordinates
     Chunk* getChunk(int x, int z) const;
 
-    /// Multi threading, stores  requested chunks
-    std::set<int64_t> requestedChunks;
-
     /// Chunks that have been generated but not added to the terrain yet
     std::vector<Chunk*> createdChunks;
 

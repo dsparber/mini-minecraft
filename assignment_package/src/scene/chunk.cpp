@@ -164,14 +164,14 @@ void Chunk::compute(){
     }
 
     // Update buffer
-    count = 0;
-    nCount = 0;
+    mutex.lock();
     this->idx = idx;
     this->nIdx = nIdx;
     this->op = op;
     this->nonOp = nonOp;
     count = idx.size();
     nCount = nIdx.size();
+    mutex.unlock();
     created = false;
 }
 
@@ -180,6 +180,7 @@ void Chunk::create() {
         return;
     }
 
+    mutex.lock();
     generateIdx();
     mp_context->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufIdx);
     mp_context->glBufferData(GL_ELEMENT_ARRAY_BUFFER, idx.size() * sizeof(GLuint), idx.data(), GL_STATIC_DRAW);
@@ -195,6 +196,7 @@ void Chunk::create() {
     generateNonOp();
     mp_context->glBindBuffer(GL_ARRAY_BUFFER, bufNonOp);
     mp_context->glBufferData(GL_ARRAY_BUFFER, nonOp.size() * sizeof(glm::vec4), nonOp.data(), GL_STATIC_DRAW);
+    mutex.unlock();
 
     created = true;
 }

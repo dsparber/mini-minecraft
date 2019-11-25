@@ -25,7 +25,7 @@ private:
     /// Mutex for the created map
     inline static QMutex requestedMutex = QMutex();
 
-    /// Pointer to new chunk
+    /// Coordinates of new chunk
     Chunk* chunk;
 
     /// Used to pass chunks to terrain on completion
@@ -34,9 +34,14 @@ private:
     /// Mutex to avoid race conditions on modifying collections
     QMutex* terrainMutex;
 
-public:
+    OpenGLContext* context;
 
-    CreateChunkRunnable(Chunk*, std::vector<Chunk*>*, QMutex*);
+    CreateChunkRunnable(OpenGLContext*, Chunk*, std::vector<Chunk*>*, QMutex*);
+
+    static void init(OpenGLContext*, int, int, std::vector<Chunk*>*, QMutex*);
+
+public:
+    static void create(OpenGLContext*, int, int, std::vector<Chunk*>*, QMutex*);
 
     void run();
 };

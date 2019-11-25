@@ -11,7 +11,6 @@ Terrain::Terrain (OpenGLContext* context) :
     context(context),
     chunkMap(),
     chunksToDraw(),
-    requestedChunks(),
     createdChunks(),
     lastPlayerChunk(-1),
     waitingForChunks(false),
@@ -55,20 +54,7 @@ void Terrain::updateChunkMap() {
 }
 
 void Terrain::initializeChunk(int chunkX, int chunkZ) {
-
-    int64_t key = getHashKey(chunkX, chunkZ);
-
-    // Already requested
-    if (requestedChunks.find(key) != requestedChunks.end()) {
-        return;
-    }
-
-    requestedChunks.insert(key);
-
-    Chunk* c = new Chunk(context, glm::vec4(chunkX, 0, chunkZ, 0));
-    CreateChunkRunnable* create = new CreateChunkRunnable(c, &createdChunks, &createdMutex);
-    create->setAutoDelete(true);
-    QThreadPool::globalInstance()->start(create);
+    CreateChunkRunnable::create(context, chunkX, chunkZ, &createdChunks, &createdMutex);
 }
 
 BlockType Terrain::getBlockAt(glm::vec3 pos) const
