@@ -78,7 +78,7 @@ void River::drawString(QString s)
 
 void River::carveTerrain()
 {
-    glm::vec2 perpend = t.look * glm::mat2(0, 1, -1, 0);
+    glm::vec2 perpend(t.look.y, -(t.look.x));
     float y = pow(perpend.x, 3) / 3.0;
 
     bool hit = true;
@@ -94,8 +94,10 @@ void River::carveTerrain()
         {
             hit = false;
         } else {
-            for (int i = glm::floor(currPos.y); i < 256; i++) {
-                terrain->setBlockAt(glm::floor(currPos.x), i, glm::floor(currPos.z), EMPTY);
+            int myY = glm::floor(currPos.y);
+            while (terrain->getBlockAt(glm::floor(currPos.x), myY, glm::floor(currPos.z)) != EMPTY) {
+                terrain->setBlockAt(glm::floor(currPos.x), myY, glm::floor(currPos.z), EMPTY);
+                myY++;
             }
         }
     }
@@ -106,9 +108,8 @@ void River::moveAndDrawLine()
     std::cout << "testmoveAndDrawLine" << std::endl;
     glm::vec2 currPos = t.pos;
     t.pos = t.pos + 5.f * t.look;
-    float radius = 5.f / t.depth;
+    float radius = 10.f / t.depth;
     bresenham(currPos.x, currPos.y, t.pos.x, t.pos.y, radius);
-    //carveTerrain();
 }
 
 void River::bresenham(int x1, int z1, int x2, int z2, float radius)
@@ -120,26 +121,32 @@ void River::bresenham(int x1, int z1, int x2, int z2, float radius)
     for (int x = x1, z = z1; x <= x2; x++)
     {
         // Loop through each direction to shape bottom of river
-//        for (int newX = x - radius; newX < x + radius; newX++) {
-//            for (int newZ = z - radius; newZ < z + radius; newZ++) {
-//                for (int y = 160; y > 150; y--)
-//                {
-//                    if (terrain->getBlockAt(newX, y, newZ) != WATER)  // If block is not already water
-//                    {
-//                        glm::vec4 center(x, 128, z, 0);
-//                        glm::vec4 pos2(newX, y, newZ, 0);
+        for (int i = x - radius; i < x + radius; i++) {
+            for (int j = z - radius; j < z + radius; j++) {
+                for (int y = 128; y > 118; y--)
+                {
+                    glm::vec4 center(x, 128, z, 0);
+                    glm::vec4 pos2(i, y, j, 0);
 
-//                        if (glm::distance(center, pos2) < radius)   // If block is within radius
-//                        {
-//                            terrain->setBlockAt(newX, y, newZ, WATER);
-//                        }
-//                    }
-//                }
-//            }
+                    if (glm::distance(center, pos2) < radius)   // If block is within radius
+                    {
+                        terrain->setBlockAt(i, y, j, WATER);
+                        for (int k = 129; k < 256; k++)
+                        {
+                            terrain->setBlockAt(i, k, j, EMPTY);
+                        }
+                    }
+                }
+            }
+        }
+
+//        carveTerrain();
+//        terrain->setBlockAt(x, 128, z, WATER);
+
+//        for (int i = 129; i < 256; i++)
+//        {
+//            terrain->setBlockAt(x, i, z, EMPTY);
 //        }
-
-        //std::cout << terrain->getBlockAt(x, 128, z) << std::endl;
-        terrain->setBlockAt(x, 150, z, WATER);
 
         slope_error_new += m_new;
         if (slope_error_new >= 0)

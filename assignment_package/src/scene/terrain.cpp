@@ -156,9 +156,10 @@ void Terrain::setBlockAt(int x, int y, int z, BlockType t)
     chunk->setBlockAt(blockX, y, blockZ, t);
 
     // Recreate chunk
+    /*
     chunk->destroy();
     chunk->compute();
-    chunk->create();
+    chunk->create();*/
 
     // TODO check neighbors and update
 }
