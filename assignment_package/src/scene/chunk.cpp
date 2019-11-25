@@ -71,19 +71,19 @@ std::vector<glm::vec2> offsetUVs =
 };
 
 Chunk::Chunk(OpenGLContext* context) : Drawable(context), mp_context(context), pos(glm::vec4(0,0,0,0)), left(nullptr), right(nullptr),
-    front(nullptr), back(nullptr), m_blocks()
+    front(nullptr), back(nullptr), m_blocks(), created(false), mutex()
 {
     std::fill(this->m_blocks.begin(), this->m_blocks.end(), EMPTY);
 }
 
 Chunk::Chunk(OpenGLContext* context, glm::vec4 pos): Drawable(context), mp_context(context), pos(pos), left(nullptr), right(nullptr),
-    front(nullptr), back(nullptr), m_blocks()
+    front(nullptr), back(nullptr), m_blocks(), created(false), mutex()
 {
     std::fill(this->m_blocks.begin(), this->m_blocks.end(), EMPTY);
 }
 
 Chunk::Chunk(OpenGLContext* context, const Chunk& c): Drawable(context), mp_context(context), pos(c.pos), left(c.left), right(c.right),
-    front(c.front), back(c.back), m_blocks(c.m_blocks)
+    front(c.front), back(c.back), m_blocks(c.m_blocks), created(false), mutex()
 {
     std::fill(this->m_blocks.begin(), this->m_blocks.end(), EMPTY);
 }
@@ -113,12 +113,13 @@ void Chunk::setBlockAt(int x, int y, int z, BlockType t)
 }
 
 //only create vertex data for block faces that lie on the boundary between an EMPTY block and a filled block.
-void Chunk::create(){
+void Chunk::compute(){
+
     //handle setting up the VBOs for any arbitrary mesh
-    std::vector<GLuint> idx;
-    std::vector<GLuint> nIdx;
-    std::vector<glm::vec4> op; //opaque attributes organized as vertex position, normal, and color
-    std::vector<glm::vec4> nonOp; //non-opaque attributes organized as vertex position, normal, and color
+    idx = std::vector<GLuint>();
+    nIdx = std::vector<GLuint>();
+    op = std::vector<glm::vec4>(); //opaque attributes organized as vertex position, normal, and color
+    nonOp = std::vector<glm::vec4>(); //non-opaque attributes organized as vertex position, normal, and color
 
     int siOp = 0;
     int siNonOp = 0;
@@ -139,15 +140,15 @@ void Chunk::create(){
                                 nc.x < 16 && nc.y < 256 && nc.z < 16)
                         {
                             BlockType adj = getBlockAt(nc.x, nc.y,nc.z);
-                            if(isSolid(b) && (!isSolid(adj))) {
+                            if(isOpaque(b) && (!isOpaque(adj))) {
                                 Chunk::drawFace(glm::vec4(x,y,z,1.f), idx, op, i, siOp);
                                 //printf("solid face drawn!\n");
-                            } else if (!isSolid(b) && adj == EMPTY){
+                            } else if (!isOpaque(b) && adj == EMPTY){
                                 Chunk::drawFace(glm::vec4(x,y,z,1.f), nIdx, nonOp, i, siNonOp);
                                 //printf("opaque face drawn!\n");
                             }
                         } else {
-                            if (isSolid(b)){
+                            if (isOpaque(b)){
                                 Chunk::drawOutFace(glm::vec4(x,y,z,1.f), idx, op, i, siOp, true);
                                 //printf("outface drawn!\n");
                             } else {
@@ -164,6 +165,13 @@ void Chunk::create(){
 
     count = idx.size();
     nCount = nIdx.size();
+    created = false;
+}
+
+void Chunk::create() {
+    if (created) {
+        return;
+    }
 
     generateIdx();
     mp_context->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufIdx);
@@ -180,6 +188,13 @@ void Chunk::create(){
     generateNonOp();
     mp_context->glBindBuffer(GL_ARRAY_BUFFER, bufNonOp);
     mp_context->glBufferData(GL_ARRAY_BUFFER, nonOp.size() * sizeof(glm::vec4), nonOp.data(), GL_STATIC_DRAW);
+
+    created = true;
+}
+
+void Chunk::destroy() {
+    Drawable::destroy();
+    created = false;
 
 }
 
@@ -281,7 +296,7 @@ void Chunk::drawOutFace(glm::vec4 pos, std::vector<GLuint>& idx, std::vector<glm
     }
 
     BlockType adj = (adjC == nullptr) ? EMPTY : adjC->getBlockAt(adjPos.x, adjPos.y, adjPos.z);
-    if((solid && !isSolid(adj)) || (!solid && (isSolid(adj) || adj == EMPTY))){
+    if((solid && !isOpaque(adj)) || (!solid && (isOpaque(adj) || adj == EMPTY))){
         //draw the current face
         drawFace(pos, idx, all, faceNum, si);
 

@@ -8,7 +8,7 @@
 
 ShaderProgram::ShaderProgram(OpenGLContext *context)
     : vertShader(), fragShader(), prog(),
-      attrPos(-1), attrNor(-1), attrUV(-1), attrCos(-1), attrAnimatale(-1),attrCol(-1),
+      attrPos(-1), attrNor(-1), attrUV(-1), attrCos(-1), attrAnimatale(-1), attrCol(-1),
       unifModel(-1), unifModelInvTr(-1), unifViewProj(-1),
       unifColor(-1), unifSampler(-1),unifTime(-1),unifCamPos(-1),
       context(context)

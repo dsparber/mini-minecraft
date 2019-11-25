@@ -26,9 +26,9 @@ in vec4 vs_Pos;             // The array of vertex positions passed to the shade
 
 in vec4 vs_Nor;             // The array of vertex normals passed to the shader
 
-in vec4 vs_Col;             // The array of vertex colors passed to the shader.
+in vec2 vs_UV;             // The array of vertex colors passed to the shader.
 
-in vec2 vs_UV;
+in vec4 vs_Col;
 
 in float vs_cosPow;
 
@@ -64,7 +64,7 @@ void main()
 
     vec4 modelposition = u_Model * vs_Pos;   // Temporarily store the transformed vertex positions for use below
 
-    fs_LightVec = (lightDir);  // Compute the direction in which the light source lies
+    fs_LightVec = normalize(vec4(.3, .7, .2, 0));  // Compute the direction in which the light source lies
 
     gl_Position = u_ViewProj * modelposition;// gl_Position is a built-in variable of OpenGL which is
                                              // used to render the final positions of the geometry's vertices

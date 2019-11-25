@@ -17,9 +17,9 @@ public:
 
     int attrPos; // A handle for the "in" vec4 representing vertex position in the vertex shader
     int attrNor; // A handle for the "in" vec4 representing vertex normal in the vertex shader
-    int attrCol; // A handle for the "in" vec4 representing vertex color in the vertex shader
+    int attrUV; // A handle for the "in" vec4 representing vertex uv in the vertex shader
+    int attrCol;
 
-    int attrUV; // A handle for the "in" vec4 representing vertex UV in the vertex shader
     int attrCos;
     int attrAnimatale;
 
@@ -34,7 +34,7 @@ public:
 public:
     ShaderProgram(OpenGLContext* context);
     // Sets up the requisite GL data and shaders from the given .glsl files
-    void create(const char *vertfile, const char *fragfile);
+    virtual void create(const char *vertfile, const char *fragfile);
     // Tells our OpenGL context to use this shader to draw things
     void useMe();
     // Pass the given model matrix to this shader on the GPU
@@ -57,7 +57,7 @@ public:
 
     QString qTextFileRead(const char*);
 
-private:
+protected:
     OpenGLContext* context;   // Since Qt's OpenGL support is done through classes like QOpenGLFunctions_3_2_Core,
                             // we need to pass our OpenGL context to the Drawable in order to call GL functions
                             // from within this class.

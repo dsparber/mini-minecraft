@@ -1,7 +1,6 @@
 # Mini Minecraft: ADVenture
 Amelia Peng, Daniel Sparber, Veronica Bristol
 
-
 ## Milestone 1
 
 ### Videos
@@ -73,3 +72,59 @@ For performance reasons, I only test up to the length of the distance vector.
 #### Difficulties
 
 The only challenge was dealing with floating point precission. If the player moves a tiny bit to far, he ends up within a block and gets stuck.
+
+
+## Milestone 2
+
+### Video
+
+### L-System Rivers
+
+Implemented by: **Veronica**
+
+#### Implementation
+
+TODO
+
+
+#### Difficulties
+
+TODO 
+
+
+
+### Texturing and Texture Animation
+
+Implemented by: **Amelia**
+
+#### Implementation
+
+TODO
+
+
+#### Difficulties
+
+TODO 
+
+
+
+
+### Swimming and Multithreaded Terrain Generation
+
+Implemented by: **Daniel**
+
+
+#### Implementation
+
+- *Swimming physics:* If the player is "standing" on water or on lava, the physics function considers this as swimming. I modified the physics such that there is no collision for liquids (water, lava) and the accelerations and max. velocity are scaled down by 2/3.
+
+- *Swimming Overlays:* I reused the HW5 code to enable post shaders. I implemented 3 shaders (no effext, water, lava) to add the desired color overlay.
+
+- *Multithreading:* I introduced a variable that determines how many chunks around the player should be drawn. If the player moves, the program checks if all required chunks are available. The required chunks are stored in a vector that the MyGL class uses. The function also creates and destroys chunks depending on whether they are needed. If a required chunk is not available, a new task is submitted to the threadpool to create the missing chunk.
+The task first computes the blocks within the chunk. Then it checks if any neighbors exist and links them. To reduce the workload of the main thread when calling `create()`, the parallel task computes the `idx` and `all` vectors that are later passed to the GPU. If a neighbor needs to be recomputed, the task also calls the `compute` function. To avoid race conditions when computing a chunk, each chunk is locked by a mutex associated with the chunk.
+After a chunk was created it is inserted into a vector which the main thread later reads to insert the chunks into the chunk map. This process is also secured by a mutex.
+
+
+#### Difficulties
+
+- None

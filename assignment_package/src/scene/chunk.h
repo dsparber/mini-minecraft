@@ -1,5 +1,6 @@
 #pragma once
 #include <QList>
+#include <QMutex>
 #include <la.h>
 #include <drawable.h>
 #include "blocktype.h"
@@ -20,6 +21,8 @@ public:
     //16 * 256 * 16
     std::array<BlockType, 65536> m_blocks;
 
+    bool created;
+    QMutex mutex;
 
     //functions NOT used, just for debugging
     BlockType getBlockAt(int x, int y, int z) const;
@@ -34,10 +37,16 @@ public:
     Chunk* back;
 
 
+    std::vector<GLuint> idx;
+    std::vector<GLuint> nIdx;
+    std::vector<glm::vec4> op;
+    std::vector<glm::vec4> nonOp;
+
+
+    void compute();
     void create();
+
     void drawFace(glm::vec4 pos, std::vector<GLuint>& idx, std::vector<glm::vec4>& all, int faceNum, int &si);
     void drawOutFace(glm::vec4 pos, std::vector<GLuint>& idx, std::vector<glm::vec4>& all, int faceNum, int &si, bool);
-
-
-
+    void destroy();
 };
