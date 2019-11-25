@@ -12,7 +12,8 @@ enum BlockType: unsigned char
     BEDROCK,
     LAVA,
     WATER,
-    ICE
+    ICE,
+    SNOW
 };
 
 bool isSolid(BlockType);
