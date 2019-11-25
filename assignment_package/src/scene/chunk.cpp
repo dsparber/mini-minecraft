@@ -116,10 +116,10 @@ void Chunk::setBlockAt(int x, int y, int z, BlockType t)
 void Chunk::compute(){
 
     //handle setting up the VBOs for any arbitrary mesh
-    idx = std::vector<GLuint>();
-    nIdx = std::vector<GLuint>();
-    op = std::vector<glm::vec4>(); //opaque attributes organized as vertex position, normal, and color
-    nonOp = std::vector<glm::vec4>(); //non-opaque attributes organized as vertex position, normal, and color
+    std::vector<GLuint> idx;
+    std::vector<GLuint> nIdx;
+    std::vector<glm::vec4> op; //opaque attributes organized as vertex position, normal, and color
+    std::vector<glm::vec4> nonOp; //non-opaque attributes organized as vertex position, normal, and color
 
     int siOp = 0;
     int siNonOp = 0;
@@ -163,6 +163,13 @@ void Chunk::compute(){
         }
     }
 
+    // Update buffer
+    count = 0;
+    nCount = 0;
+    this->idx = idx;
+    this->nIdx = nIdx;
+    this->op = op;
+    this->nonOp = nonOp;
     count = idx.size();
     nCount = nIdx.size();
     created = false;
