@@ -5,6 +5,7 @@
 #include <QMutex>
 #include <vector>
 #include <set>
+#include <unordered_map>
 #include "chunk.h"
 #include "utils.h"
 
