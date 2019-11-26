@@ -3,7 +3,7 @@
 River::River(Terrain* terr)
     : terrain(terr), stack(), expanRules(), drawRules(), t()
 {
-    expanRules.insert('X', "F[-X]F[+X[-X]+X]");
+    expanRules.insert('X', "F[-X]F[+X]F[-X]");
     expanRules.insert('F', "FF");
     expanRules.insert('Y', "G[+Y][-YG[-Y][+Y][-Y]]");
     expanRules.insert('G', "GG");
@@ -32,7 +32,6 @@ void River::createRiver1(int x, int z)
     t.depth = 0;
     QString axiom = "X";
 
-    std::cout << "create river1" << std::endl;
     QString expanded = expandString(2, axiom);
     drawString(expanded);
 }
@@ -44,7 +43,6 @@ void River::createRiver2(int x, int z)
     t.depth = 0;
     QString axiom = "Y";
 
-    std::cout << "create river2" << std::endl;
     QString expanded = expandString(3, axiom);
     drawString(expanded);
 }
@@ -64,7 +62,6 @@ QString River::expandString(int numIterations, QString axiom)
         }
     }
 
-    std::cout << "expanded string: " << expandedString.toStdString() << std::endl;
     return expandedString;
 }
 
@@ -76,50 +73,89 @@ void River::drawString(QString s)
     }
 }
 
-void River::carveTerrain()
+void River::carveTerrain(glm::vec2 pos, glm::vec2 lk, float radius)
 {
-    glm::vec2 perpend(t.look.y, -(t.look.x));
-    float y = pow(perpend.x, 3) / 3.0;
-
-    bool hit = true;
-    glm::vec3 look(perpend.x, y, perpend.y);
-    glm::vec3 currPos(t.pos.x, 128, t.pos.y);
-    float step = 0.75;
-
-    while(hit)
-    {
-        currPos = currPos + step * look;
-
-        if(terrain->getBlockAt(glm::floor(currPos.x), glm::floor(currPos.y), glm::floor(currPos.z)) == EMPTY)
-        {
-            hit = false;
-        } else {
-            int myY = glm::floor(currPos.y);
-            while (terrain->getBlockAt(glm::floor(currPos.x), myY, glm::floor(currPos.z)) != EMPTY) {
-                terrain->setBlockAt(glm::floor(currPos.x), myY, glm::floor(currPos.z), EMPTY);
-                myY++;
-            }
+    // Carve right
+    glm::vec3 currPos(glm::floor(pos.x) + radius, 129, pos.y);
+    for (int i = 0; i < 10; i++) {
+        for (int j = currPos.y; j < 256; j++) {
+            terrain->getBlockAt(currPos.x, j, currPos.y);
+            terrain->setBlockAt(currPos.x, j, currPos.y, EMPTY);
         }
+        currPos.x = currPos.x + 1;
+        currPos.y = currPos.y + 1;
     }
+
+
+    // Carve left
+    currPos = glm::vec3(pos.x - radius, 129, pos.y);
+    for (int i = 0; i < 10; i++) {
+        for (int j = currPos.y; j < 256; j++) {
+            terrain->setBlockAt(glm::floor(currPos.x), j, currPos.y, EMPTY);
+        }
+        currPos.x = currPos.x - 1;
+        currPos.y = currPos.y + 1;
+    }
+
+    //glm::vec2 perpend(lk.y, -(lk.x));   // Two diff perpends for each side?
+    //float y = pow(perpend.x, 3) / 3.0;
+    //float y = 129;
+
+    //bool hit = true;
+//    glm::vec3 look(perpend.x, y, perpend.y);
+//    glm::vec3 currPos(pos.x + radius, 128, pos.y + radius);
+//    float step = 0.75;
+
+//    currPos = currPos + step * look;
+//    for (int i = glm::floor(currPos.x); i < 256; i++) {
+//        terrain->setBlockAt(glm::floor(currPos.x), i, glm::floor(currPos.z), EMPTY);
+//    }
+//    y++;
+
+//    while(hit)
+//    {
+//        currPos = currPos + step * look;
+
+//        if(terrain->getBlockAt(glm::floor(currPos.x), glm::floor(currPos.y), glm::floor(currPos.z)) == EMPTY)
+//        {
+//            hit = false;
+//        } else {
+//            for (int i = glm::floor(currPos.x); i < 256; i++) {
+//                terrain->setBlockAt(glm::floor(currPos.x), i, glm::floor(currPos.z), EMPTY);
+//            }
+//        }
+//    }
+
+
+//    currPos = glm::vec3(pos.x - radius, 128, pos.y - radius);
+//    while(hit)
+//    {
+//        currPos = currPos + step * look;
+
+//        if(terrain->getBlockAt(glm::floor(currPos.x), glm::floor(currPos.y), glm::floor(currPos.z)) == EMPTY)
+//        {
+//            hit = false;
+//        } else {
+//            for (int i = glm::floor(currPos.x); i < 256; i++) {
+//                terrain->setBlockAt(glm::floor(currPos.x), i, glm::floor(currPos.z), EMPTY);
+//            }
+//        }
+//    }
 }
 
 void River::moveAndDrawLine()
 {
-    std::cout << "testmoveAndDrawLine" << std::endl;
     glm::vec2 currPos = t.pos;
-    t.pos = t.pos + 5.f * t.look;
-    float radius = 10.f / t.depth;
-    bresenham(currPos.x, currPos.y, t.pos.x, t.pos.y, radius);
-}
+    float radius = 5.f;
+    float step = 1.f;
 
-void River::bresenham(int x1, int z1, int x2, int z2, float radius)
-{
-    int m_new = 2 * (z2 - z1);
-    int slope_error_new = m_new - (x2 - x1);
-
-    // Bresenham line formula (draw between 2 points)
-    for (int x = x1, z = z1; x <= x2; x++)
+    for (int i = 0; i < 15; i++)
     {
+        currPos = currPos + step * t.look;
+
+        int x = glm::floor(currPos.x);
+        int z = glm::floor(currPos.y);
+
         // Loop through each direction to shape bottom of river
         for (int i = x - radius; i < x + radius; i++) {
             for (int j = z - radius; j < z + radius; j++) {
@@ -140,49 +176,34 @@ void River::bresenham(int x1, int z1, int x2, int z2, float radius)
             }
         }
 
-//        carveTerrain();
-//        terrain->setBlockAt(x, 128, z, WATER);
-
-//        for (int i = 129; i < 256; i++)
-//        {
-//            terrain->setBlockAt(x, i, z, EMPTY);
-//        }
-
-        slope_error_new += m_new;
-        if (slope_error_new >= 0)
-        {
-            z++;
-            slope_error_new  -= 2 * (x2 - x1);
-        }
+        carveTerrain(glm::vec2(x, z), t.look, radius);
     }
+
+    t.pos = currPos;
 }
 
 void River::rotateLeft()
 {
-    std::cout << "test rotateLeft" << std::endl;
     float angle = rand() % 60 + 20;
     float angleRad = angle * M_PI / 180.f;
-    t.look = t.look * glm::mat2(cos(angleRad), -sin(angleRad), sin(angleRad), cos(angleRad));
+    t.look = glm::mat2(cos(angleRad), -sin(angleRad), sin(angleRad), cos(angleRad)) * t.look;
 }
 
 void River::rotateRight()
 {
-    std::cout << "test rotateRight" << std::endl;
-    float angle = -(rand() % 60 + 20);
+    float angle = rand() % 60 + 20;
     float angleRad = angle * M_PI / 180.f;
-    t.look = t.look * glm::mat2(cos(angleRad), sin(angleRad), -sin(angleRad), cos(angleRad));
+    t.look = glm::mat2(cos(angleRad), sin(angleRad), -sin(angleRad), cos(angleRad)) * t.look;
 }
 
 void River::savePosition()
 {
-   std::cout << "test savePos" << std::endl;
-   stack.push(t);
+    stack.push(Turtle(t));
 }
 
 void River::storePosition()
 {
-    std::cout << "test storePos" << std::endl;
-    stack.pop();
+    t = stack.pop();
 }
 
 void River::doNothing() {}

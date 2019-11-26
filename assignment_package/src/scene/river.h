@@ -28,8 +28,7 @@ public:
     void createRiver2(int x, int z);
     QString expandString(int numIterations, QString axiomString);
     void drawString(QString s);
-    void carveTerrain();
-    void bresenham(int x1, int z1, int x2, int z2, float radius);
+    void carveTerrain(glm::vec2 pos, glm::vec2 look, float radius);
 
     /// Drawing rules for river generation
     void moveAndDrawLine();
