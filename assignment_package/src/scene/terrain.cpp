@@ -17,13 +17,13 @@ Terrain::Terrain (OpenGLContext* context) :
     newChunksAvailable(false)
 { }
 
-int Terrain::chunksToRender = 10;
+int Terrain::chunksToRender = 6;
 
 void Terrain::initialize(){
     playerMoved(glm::vec3(0, 0, 0));
     QThreadPool::globalInstance()->waitForDone();
+    playerMoved(glm::vec3(0, 0, 0));
 }
-
 
 BlockType Terrain::getBlockOrEmpty(glm::vec3 pos) const {
     return getBlockOrEmpty(pos.x, pos.y, pos.z);
@@ -142,9 +142,10 @@ void Terrain::setBlockAt(int x, int y, int z, BlockType t)
     chunk->setBlockAt(blockX, y, blockZ, t);
 
     // Recreate chunk
+    /*
     chunk->destroy();
     chunk->compute();
-    chunk->create();
+    chunk->create();*/
 
     // TODO check neighbors and update
 }

@@ -88,7 +88,7 @@ public:
     /// Adds a block at the center of the screen, updates the terrain
     void addBlock(glm::vec3 eye, glm::vec3 look);
 
-    /// Removes a block at the center og the screen, updates the terrain
+    /// Removes a block at the center of the screen, updates the terrain
     void removeBlock(glm::vec3 eye, glm::vec3 look);
 
 

@@ -15,6 +15,7 @@
 #include <QOpenGLShaderProgram>
 #include <smartpointerhelp.h>
 #include "texture.h"
+#include <scene/river.h>
 
 
 class MyGL : public OpenGLContext

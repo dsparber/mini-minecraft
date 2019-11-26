@@ -18,6 +18,8 @@ SOURCES += \
     $$PWD/scene/blocktype.cpp \
     $$PWD/scene/fbm.cpp \
     $$PWD/texture.cpp \
+    $$PWD/scene/river.cpp \
+    $$PWD/scene/turtle.cpp \
     $$PWD/scene/createchunkrunnable.cpp \
     $$PWD/scene/quad.cpp \
     $$PWD/shaderprograms/postprocessshader.cpp \
@@ -41,6 +43,8 @@ HEADERS += \
     $$PWD/player/player.h \
     $$PWD/scene/fbm.h \
     $$PWD/texture.h \
+    $$PWD/scene/river.h \
+    $$PWD/scene/turtle.h \
     $$PWD/scene/createchunkrunnable.h \
     $$PWD/scene/quad.h \
     $$PWD/shaderprograms/postprocessshader.h \

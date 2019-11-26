@@ -62,7 +62,7 @@ void CreateChunkRunnable::run() {
             int intFBM = 128 + (int) fbmVal;
 
             for (int i = 128; i < 132; i++) {
-                chunk->setBlockAt(x, i, z, WATER);
+                //chunk->setBlockAt(x, i, z, WATER);
             }
 
 
@@ -77,12 +77,7 @@ void CreateChunkRunnable::run() {
                     chunk->setBlockAt(x, i, z, DIRT);
                 }
             }
-
-            if (intFBM > 150) {
-                chunk->setBlockAt(x, intFBM, z, SNOW);
-            } else {
-                chunk->setBlockAt(x, intFBM, z, GRASS);
-            }
+            chunk->setBlockAt(x, intFBM, z, GRASS);
         }
     }
 
