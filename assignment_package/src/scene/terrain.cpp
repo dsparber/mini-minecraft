@@ -17,7 +17,7 @@ Terrain::Terrain (OpenGLContext* context) :
     newChunksAvailable(false)
 { }
 
-int Terrain::chunksToRender = 5;
+int Terrain::chunksToRender = 10;
 
 void Terrain::initialize(){
     playerMoved(glm::vec3(0, 0, 0));

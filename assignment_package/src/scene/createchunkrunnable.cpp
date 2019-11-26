@@ -97,28 +97,28 @@ void CreateChunkRunnable::run() {
 
     // Left
     int64_t neighborKey = getHashKey(x - 16, z);
-    if (created.find(neighborKey) != created.end()) {
+    if (chunk->left == nullptr && created.find(neighborKey) != created.end()) {
         chunk->left = created[neighborKey];
         chunk->left->right = chunk;
         modifiedChunks.push_back(chunk->left);
     }
     // Right
     neighborKey = getHashKey(x + 16, z);
-    if (created.find(neighborKey) != created.end()) {
+    if (chunk->right == nullptr && created.find(neighborKey) != created.end()) {
         chunk->right = created[neighborKey];
         chunk->right->left = chunk;
         modifiedChunks.push_back(chunk->right);
     }
     // Front
     neighborKey = getHashKey(x, z - 16);
-    if (created.find(neighborKey) != created.end()) {
+    if (chunk->front == nullptr && created.find(neighborKey) != created.end()) {
         chunk->front = created[neighborKey];
         chunk->front->back = chunk;
         modifiedChunks.push_back(chunk->front);
     }
     // Back
     neighborKey = getHashKey(x, z + 16);
-    if (created.find(neighborKey) != created.end()) {
+    if (chunk->back == nullptr && created.find(neighborKey) != created.end()) {
         chunk->back = created[neighborKey];
         chunk->back->front = chunk;
         modifiedChunks.push_back(chunk->back);
