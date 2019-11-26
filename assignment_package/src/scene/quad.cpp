@@ -21,16 +21,17 @@ void Quad::create()
     for (int i = 0; i < 4; i++) {
         all.push_back(vert_pos[i]);
         all.push_back(glm::vec4(0)); // Normal
+        all.push_back(glm::vec4(1, 0, 0, 1)); // Color
         all.push_back(glm::vec4(vert_UV[i], 0, 0));
     }
 
-    count = 6;
+    nCount = 6;
 
     // Create a VBO on our GPU and store its handle in bufIdx
-    generateIdx();
+    generateNIdx();
     // Tell OpenGL that we want to perform subsequent operations on the VBO referred to by bufIdx
     // and that it will be treated as an element array buffer (since it will contain triangle indices)
-    context->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufIdx);
+    context->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufNIdx);
     // Pass the data stored in cyl_idx into the bound buffer, reading a number of bytes equal to
     // CYL_IDX_COUNT multiplied by the size of a GLuint. This data is sent to the GPU to be read by shader programs.
     context->glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(GLuint), idx, GL_STATIC_DRAW);

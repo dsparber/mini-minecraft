@@ -153,7 +153,7 @@ void MyGL::paintGL()
 
     GLDrawScene();
 
-    //performPostprocessRenderPass();
+    performPostprocessRenderPass();
 
     mp_waterShader->setTime(mp_time);
     mp_lavaShader->setTime(mp_time);
@@ -167,14 +167,14 @@ void MyGL::GLDrawScene()
     m_texture->bind(TEXTURE_SLOT_MINECRAFT_BLOCK);
 
     // Render the scene to our frame buffer
-    /*
+
     // Render to our framebuffer rather than the viewport
     glBindFramebuffer(GL_FRAMEBUFFER, mp_frameBuffer);
     // Render on the whole framebuffer, complete from the lower left corner to the upper right
     glViewport(0,0,this->width() * this->devicePixelRatio(), this->height() * this->devicePixelRatio());
     // Clear the screen so that we only see newly drawn images
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    */
+
 
 
     // Opaque
@@ -215,11 +215,11 @@ void MyGL::performPostprocessRenderPass()
     // Use shader based on block type
     BlockType blockType = mp_player->getBlockAtEye();
     if (blockType == WATER) {
-        mp_waterShader->draw(mp_geomQuad, false, 0);
+        mp_waterShader->draw(mp_geomQuad, false, TEXTURE_SLOT_POST_PROCESS);
     } else if (blockType == LAVA) {
-        mp_lavaShader->draw(mp_geomQuad, false, 0);
+        mp_lavaShader->draw(mp_geomQuad, false, TEXTURE_SLOT_POST_PROCESS);
     } else {
-        mp_plainShader->draw(mp_geomQuad, false, 0);
+        mp_plainShader->draw(mp_geomQuad, false, TEXTURE_SLOT_POST_PROCESS);
     }
 }
 

@@ -104,7 +104,7 @@ void Player::physicsUpdate(float dt) {
             glm::vec3 requested = glm::vec3(requestedDirection.x, 0, requestedDirection.z);
             a = requested * defaultAcceleration;
             if (swimming) {
-                a.y = requestedDirection.y * (defaultAcceleration + g) - g;
+                a.y = requestedDirection.y * 2 * g - g;
             }
         }
         // Slow down if max velocity violated
@@ -119,7 +119,7 @@ void Player::physicsUpdate(float dt) {
 
     if (grounded) {
         // Handle jump via velocity instead of acceleration for simplicity
-        if (requestedDirection.y > 0) {
+        if (!swimming && requestedDirection.y > 0) {
             velocity.y = jumpTakeofVelocity;
         }
         // If player on ground, no downwards velocity
@@ -251,23 +251,14 @@ float Player::getCollisionDistance(glm::vec3 ds) {
 
 
 bool Player::isSwimming() {
-
-    // Standing on ground
-    if (isGrounded()) {
-        return false;
-    }
-
-    // Player is standing on at least one non-empty block
-
-    // Check if any of the corners of the bounding box is on a block
     for (glm::vec3 offset : getBoundingBoxBottom()) {
         glm::vec3 pos = position + offset;
         int x = (int) pos.x;
         int z = (int) pos.z;
-        int y = glm::round(pos.y);
+        int y = (int) pos.y;
 
         // At least one corner in a liquid
-        BlockType type = terrain->getBlockOrEmpty(x, y - 1, z);
+        BlockType type = terrain->getBlockOrEmpty(x, y, z);
         if (isLiquid(type)) {
             return true;
         }
@@ -287,8 +278,8 @@ bool Player::isGrounded() {
         int y = glm::round(pos.y);
 
         // If currently on solid block
-        BlockType type = terrain->getBlockOrEmpty(x, y - 1, z);
-        if (isSolid(type)) {
+        BlockType typeUnderneath = terrain->getBlockOrEmpty(x, y - 1, z);
+        if (isSolid(typeUnderneath)) {
             return true;
         }
     }
