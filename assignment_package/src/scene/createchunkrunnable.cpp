@@ -33,11 +33,11 @@ void CreateChunkRunnable::init(
 
     // Check if already requested
     mutex.lock();
-    if (created.find(key) != created.end()) {
+    if (requested.find(key) != requested.end()) {
         mutex.unlock();
         return;
     }
-    created[key] = chunk;
+    requested.insert(key);
     mutex.unlock();
 
     // Start task
@@ -65,6 +65,7 @@ void CreateChunkRunnable::run() {
                 chunk->setBlockAt(x, i, z, WATER);
             }
 
+
             for (int i = 0; i < 128; i++) {
                 chunk->setBlockAt(x, i, z, STONE);
             }
@@ -87,13 +88,13 @@ void CreateChunkRunnable::run() {
 
     int x = chunk->pos.x;
     int z = chunk->pos.z;
-    int64_t key = getHashKey(x, z);
 
     std::vector<Chunk*> modifiedChunks;
     modifiedChunks.push_back(chunk);
 
     // Link neighbors
     mutex.lock();
+    created[getHashKey(x, z)] = chunk;
 
     // Left
     int64_t neighborKey = getHashKey(x - 16, z);

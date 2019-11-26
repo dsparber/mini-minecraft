@@ -307,7 +307,7 @@ void Chunk::drawFace(glm::vec4 pos, std::vector<GLuint>& idx, std::vector<glm::v
     }
 }
 
-void Chunk::drawOutFace(glm::vec4 pos, std::vector<GLuint>& idx, std::vector<glm::vec4>& all, int faceNum, int& si, bool solid){
+void Chunk::drawOutFace(glm::vec4 pos, std::vector<GLuint>& idx, std::vector<glm::vec4>& all, int faceNum, int& si, bool opaque){
     Chunk* adjC = nullptr;
     glm::vec4 adjPos;
     if(faceNum == 0){
@@ -325,9 +325,8 @@ void Chunk::drawOutFace(glm::vec4 pos, std::vector<GLuint>& idx, std::vector<glm
     }
 
     BlockType adj = (adjC == nullptr) ? EMPTY : adjC->getBlockAt(adjPos.x, adjPos.y, adjPos.z);
-    if((solid && !isOpaque(adj)) || (!solid && (isOpaque(adj) || adj == EMPTY))){
+    if((opaque && !isOpaque(adj)) || (!opaque && (isOpaque(adj) || adj == EMPTY))){
         //draw the current face
         drawFace(pos, idx, all, faceNum, si);
-
     }
 }

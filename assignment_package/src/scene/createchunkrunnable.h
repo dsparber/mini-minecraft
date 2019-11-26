@@ -20,7 +20,7 @@ private:
     inline static QMutex mutex = QMutex();
 
     /// Keeps track of what chunks were requested to compute
-    inline static std::set<Chunk*> requested;
+    inline static std::set<int64_t> requested;
 
     /// Mutex for the created map
     inline static QMutex requestedMutex = QMutex();
