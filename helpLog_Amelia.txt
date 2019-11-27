@@ -1,0 +1,13 @@
+hw9 help log
+
+* 2019-11-10 2:00 pm: Helen explained to me what does interleaving VBO mean
+* 2019-11-12 6:45 pm: Looked up header file etiquette at https://www.fi.muni.cz/usr/jkucera/tic/tic0056.html
+* 2019-11-12 5:30 pm: Adam explained how does 64bit conversion work and ways to check adjacent chunking
+* 2019-11-15 6:30 pm: Spencer explained to me how he fixed his chunking bug
+
+* 2019-11-19 1:30 pm: looked up hw4 to see how the texture was done in there
+* 2019-11-20 6:30 pm: Kathryn explained me how two interleaving vbos work
+* 2019-11-21 4:23 pm: Adam helped me make my texture show up by adding the qrc file
+
+ 
+

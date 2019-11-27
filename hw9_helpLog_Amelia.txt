@@ -1,5 +1,0 @@
-hw9 help log
-* 2019-11-10 2:00 pm: Helen explained to me what does interleaving VBO mean
-* 2019-11-12 6:45 pm: Looked up header file etiquette at https://www.fi.muni.cz/usr/jkucera/tic/tic0056.html
-* 2019-11-12 5:30 pm: Adam explained how does 64bit conversion work and ways to check adjacent chunking
-* 2019-11-15 6:30 pm: Spencer explained to me how he fixed his chunking bug 
