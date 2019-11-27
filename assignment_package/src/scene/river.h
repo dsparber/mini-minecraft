@@ -28,12 +28,14 @@ public:
     void createRiver2(int x, int z);
     QString expandString(int numIterations, QString axiomString);
     void drawString(QString s);
-    void carveTerrain(glm::vec2 pos, glm::vec2 look, float radius);
+    void carveTerrain(glm::vec2 pos, float step, float radius);
 
     /// Drawing rules for river generation
     void moveAndDrawLine();
-    void rotateLeft();
-    void rotateRight();
+    void rotateLeft1();
+    void rotateRight1();
+    void rotateLeft2();
+    void rotateRight2();
     void savePosition();
     void storePosition();
     void doNothing();
