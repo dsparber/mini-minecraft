@@ -98,14 +98,23 @@ TODO
 Implemented by: **Amelia**
 
 #### Implementation
+-*load images into OpenGL:* Implemented a texture class that alows texture image of blocktypes to be loaded into our game
 
-TODO
+-*sample textures:* Made use of sampler2D to apply texture colors to a surface in lambert.frag.glsl
+
+-*specular reflection:* Applied a Blinn-Phong specular reflection model in the lamber shader, with a cosine power that varies accross different blocks
+
+-*animatable blocks:* uses a varaible to animate the UVs on LAVA and WATER block.
+
+-*alpha bending:* enables alpha bending for non-opaque blocks
+
+-*vbo alteration:* add more handles in the vbo that supports U coordinates, cosine power, and animateable flag of each block.
 
 
 #### Difficulties
 
-TODO 
-
+- making the textures show up was very challenging since bugs could appear in every stage such as doing the right UV coordinate offset in VBOs, loading texture files the right way, and initializing the textures in the right place. Since the compiler can't tell me which step is wrong, when the texture is not showing up, I have to make use of debugger and print statement to spot the problem stage by stage. 
+-  There are extra triangles showing up for transparent blocks in specific angles, but when I run the debugger with simple test terrains, it shows that the correct number of faces are drawn. It turns out that it's something with the transparency sorting appears to be fine when there are blocks around the boundary of the water. 
 
 
 
