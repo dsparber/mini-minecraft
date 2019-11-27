@@ -45,6 +45,9 @@ private:
     /// Save where the player last stood
     int64_t lastPlayerChunk;
 
+    /// Recreates the chunk and its neighbors if needed
+    void updateChunk(glm::vec3);
+
     /// Insert new chunks into chunkMap
     void updateChunkMap();
 

@@ -54,30 +54,35 @@ void CreateChunkRunnable::run() {
     {
         for(int z = 0; z < 16; ++z)
         {
-            int fbmX = chunk->pos.x + x;
-            int fbmZ = chunk->pos.z + z;
+            int fbmX = chunk->pos.x + x - 40;
+            int fbmZ = chunk->pos.z + z - 120;
 
             float rawFBM = fbm(fbmX / 64.f, fbmZ / 64.f);
-            float fbmVal = 64.f * powf(rawFBM, 4.f);
-            int intFBM = 128 + (int) fbmVal;
-
-            for (int i = 128; i < 132; i++) {
-                //chunk->setBlockAt(x, i, z, WATER);
-            }
-
+            float fbmVal = 80.f * powf(rawFBM, 4.f);
+            int intFBM = 128 + glm::round(fbmVal);
+            int random = rand() % 4;
 
             for (int i = 0; i < 128; i++) {
                 chunk->setBlockAt(x, i, z, STONE);
             }
 
-            for (int i = 128; i < intFBM; i++) {
-                if (intFBM > 150) {
+            for (int i = 128; i <= intFBM; i++) {
+                if (i > 148 + random) {
                     chunk->setBlockAt(x, i, z, SNOW);
+                } else if(i == intFBM){
+                    chunk->setBlockAt(x, intFBM, z, GRASS);
+
                 } else {
                     chunk->setBlockAt(x, i, z, DIRT);
                 }
             }
-            chunk->setBlockAt(x, intFBM, z, GRASS);
+
+            if (intFBM == 128) {
+                fbmVal = 5 * rawFBM;
+                for (int i = 0; i < fbmVal; i++) {
+                    chunk->setBlockAt(x, 128 - i, z, WATER);
+                }
+            }
         }
     }
 

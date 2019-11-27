@@ -22,6 +22,7 @@ Player::Player() :
     flyPressed(false),
     removeBlockPressed(false),
     addBlockPressed(false),
+    speedModifierPressed(false),
     boundingBox()
 { }
 
@@ -63,11 +64,14 @@ void Player::physicsUpdate(float dt) {
     float kph = mps / 3.6f; // Velocity unit km/h
 
     float speedModifier = swimming ? .67 : 1; // Changes acceleration and velocity
+    if (flyPressed && speedModifierPressed) {
+        speedModifier = 10;
+    }
 
     float g = 9.81 * speedModifier * m / s2; // gravitation
     float defaultAcceleration = 5 * speedModifier * m / s2; // Player acceleration, for moving
     float maxVelocity = 15 * speedModifier * kph; // max. velocity
-    float flightVelocity = 30 * kph; // velocity for flying
+    float flightVelocity = 30 * speedModifier * kph; // velocity for flying
     float omega = pi_2 / s; // default angular velocity
 
 
@@ -376,6 +380,7 @@ void Player::handleKeyEvent(QKeyEvent* e) {
     if (e->key() == Qt::Key_Space) {
         jumpPressed = pressed;
     }
+    speedModifierPressed = e->modifiers().testFlag(Qt::ShiftModifier);
 }
 
 void Player::handleMouseEvent(QMouseEvent* e) {
