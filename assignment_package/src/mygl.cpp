@@ -95,9 +95,7 @@ void MyGL::initializeGL()
     rivers->createRiver1(70, 60);
     rivers->createRiver2(46, 60);
     for(Chunk* c : mp_terrain->getChunksToDraw()){
-        c->destroy();
-        c->compute();
-        c->create();
+        c->update();
     }
 
     // We have to have a VAO bound in OpenGL 3.2 Core. But if we're not

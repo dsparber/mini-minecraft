@@ -52,6 +52,7 @@ private:
     bool flyPressed;
     bool removeBlockPressed;
     bool addBlockPressed;
+    bool speedModifierPressed;
 
     /// track the change in the cursor's X and Y coordinate
     glm::vec2 mouseDelta;
