@@ -330,3 +330,9 @@ void Chunk::drawOutFace(glm::vec4 pos, std::vector<GLuint>& idx, std::vector<glm
         drawFace(pos, idx, all, faceNum, si);
     }
 }
+
+void Chunk::update() {
+    destroy();
+    compute();
+    create();
+}

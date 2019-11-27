@@ -17,7 +17,7 @@ Terrain::Terrain (OpenGLContext* context) :
     newChunksAvailable(false)
 { }
 
-int Terrain::chunksToRender = 6;
+int Terrain::chunksToRender = 10;
 
 void Terrain::initialize(){
     playerMoved(glm::vec3(0, 0, 0));
@@ -140,14 +140,6 @@ void Terrain::setBlockAt(int x, int y, int z, BlockType t)
 
     // Set block
     chunk->setBlockAt(blockX, y, blockZ, t);
-
-    // Recreate chunk
-    /*
-    chunk->destroy();
-    chunk->compute();
-    chunk->create();*/
-
-    // TODO check neighbors and update
 }
 
 void Terrain::addBlock(glm::vec3 eye, glm::vec3 look)
@@ -155,12 +147,37 @@ void Terrain::addBlock(glm::vec3 eye, glm::vec3 look)
     glm::vec3 addPos = rayMarch(eye, look) - 0.75f * look;
     glm::vec3 coords(glm::floor(addPos));
     setBlockAt(coords.x, coords.y, coords.z, LAVA);
+    updateChunk(coords);
 }
 
 void Terrain::removeBlock(glm::vec3 eye, glm::vec3 look)
-{
+{    
     glm::vec3 coords(glm::floor(rayMarch(eye, look)));
     setBlockAt(coords.x, coords.y, coords.z, EMPTY);
+    updateChunk(coords);
+}
+
+void Terrain::updateChunk(glm::vec3 coords) {
+    Chunk* chunk = getChunk(coords.x, coords.z);
+
+    chunk->update();
+
+    int blockX = ((int)coords.x) % 16;
+    int blockZ = ((int)coords.z) % 16;
+
+    if (blockX == 0) {
+        chunk->left->update();
+    } else if (blockX == 15) {
+        chunk->right->update();
+    }
+
+    if (blockZ == 0) {
+        chunk->front->update();
+    } else if (blockZ == 15) {
+        chunk->back->update();
+    }
+
+
 }
 
 glm::vec3 Terrain::rayMarch(glm::vec3 eye, glm::vec3 look)
