@@ -7,7 +7,6 @@ class Turtle
 public:
     glm::vec2 pos;
     glm::vec2 look;
-    int depth;
 
     Turtle();
     Turtle(glm::vec2 position, glm::vec2 orientation);

@@ -1,9 +1,9 @@
 #include "river.h"
 
 River::River(Terrain* terr)
-    : terrain(terr), stack(), expanRules(), drawRules(), t()
+    : terrain(terr), stack(), expanRules(), drawRules(), t(), radius(4.f), currRiver(1)
 {
-    expanRules.insert('X', "F[-X]F[-X]F[+X][-X]");
+    expanRules.insert('X', "F[+X]F[-X]F[+X][-X]");
     expanRules.insert('F', "FFF");
     expanRules.insert('Y', "G[<Y][>YG[>Y][<Y][>Y]]");
     expanRules.insert('G', "GG");
@@ -31,9 +31,8 @@ River::~River() {}
 
 void River::createRiver1(int x, int z)
 {
-    t.pos = glm::vec2(x, z); // (4, 50)
-    t.look = glm::vec2(0.f, -1.f);
-    t.depth = 0;
+    t.pos = glm::vec2(x, z);
+    t.look = glm::vec2(1.f, 0.f);
     QString axiom = "X";
 
     QString expanded = expandString(2, axiom);
@@ -42,9 +41,10 @@ void River::createRiver1(int x, int z)
 
 void River::createRiver2(int x, int z)
 {
-    t.pos = glm::vec2(x, z); // (56, 62)
+    t.pos = glm::vec2(x, z);
     t.look = glm::vec2(-1.f, 0.f);
-    t.depth = 0;
+    radius = 4.f;
+    currRiver = 2;
     QString axiom = "Y";
 
     QString expanded = expandString(3, axiom);
@@ -56,8 +56,6 @@ QString River::expandString(int numIterations, QString axiom)
     QString expandedString = axiom;
 
     for (int i = 0; i < numIterations; i++) {
-        t.depth++;
-
         QString copyExpStr = expandedString;
         expandedString = "";
 
@@ -123,7 +121,6 @@ void River::carveTerrain(glm::vec2 pos, float step, float radius)
 void River::moveAndDrawLine()
 {
     glm::vec2 currPos = t.pos;
-    float radius = 4.f;
     float step = 1.f;
 
     for (int i = 0; i < 12; i++)
@@ -161,39 +158,63 @@ void River::moveAndDrawLine()
 
 void River::rotateLeft1()
 {
-    float angle = rand() % 50 + 30;
+    float angle = rand() % 45 + 30;
     float angleRad = angle * M_PI / 180.f;
-    t.look = glm::mat2(cos(angleRad), -sin(angleRad), sin(angleRad), cos(angleRad)) * t.look;
+
+    if ((float) rand() / (RAND_MAX) > 0.4) {
+        t.look = glm::mat2(cos(angleRad), -sin(angleRad), sin(angleRad), cos(angleRad)) * t.look;
+    }
 }
 
 void River::rotateRight1()
 {
-    float angle = rand() % 50 + 30;
+    float angle = rand() % 45 + 30;
     float angleRad = angle * M_PI / 180.f;
-    t.look = glm::mat2(cos(angleRad), sin(angleRad), -sin(angleRad), cos(angleRad)) * t.look;
+
+    if ((float) rand() / (RAND_MAX) > 0.4) {
+        t.look = glm::mat2(cos(angleRad), sin(angleRad), -sin(angleRad), cos(angleRad)) * t.look;
+    }
 }
 
 void River::rotateLeft2()
 {
     float angle = rand() % 70 + 45;
     float angleRad = angle * M_PI / 180.f;
-    t.look = glm::mat2(cos(angleRad), -sin(angleRad), sin(angleRad), cos(angleRad)) * t.look;
+
+    if ((float) rand() / (RAND_MAX) > 0.2) {
+        t.look = glm::mat2(cos(angleRad), -sin(angleRad), sin(angleRad), cos(angleRad)) * t.look;
+    }
 }
 
 void River::rotateRight2()
 {
     float angle = rand() % 70 + 45;
     float angleRad = angle * M_PI / 180.f;
-    t.look = glm::mat2(cos(angleRad), sin(angleRad), -sin(angleRad), cos(angleRad)) * t.look;
+
+    if ((float) rand() / (RAND_MAX) > 0.2) {
+        t.look = glm::mat2(cos(angleRad), sin(angleRad), -sin(angleRad), cos(angleRad)) * t.look;
+    }
 }
 
 void River::savePosition()
 {
+    if (currRiver == 1) {
+        radius = radius - 1.f;
+    } else {
+        radius = radius - 0.5;
+    }
+
     stack.push(Turtle(t));
 }
 
 void River::storePosition()
 {
+    if (currRiver == 1) {
+        radius = radius + 1.f;
+    } else {
+        radius = radius + 0.5;
+    }
+
     t = stack.pop();
 }
 

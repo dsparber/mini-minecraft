@@ -20,6 +20,8 @@ public:
     QHash<QChar, QString> expanRules;
     QHash<QChar, Rule> drawRules;
     Turtle t;
+    float radius;
+    int currRiver;
 
     River(Terrain* terr);
     ~River();

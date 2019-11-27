@@ -92,8 +92,8 @@ void MyGL::initializeGL()
 
     // Create rivers
     River* rivers = new River(mp_terrain.get());
-    rivers->createRiver1(70, 60);
-    rivers->createRiver2(46, 60);
+    rivers->createRiver1(-50, -55);
+    rivers->createRiver2(100, 30);
     for(Chunk* c : mp_terrain->getChunksToDraw()){
         c->destroy();
         c->compute();
