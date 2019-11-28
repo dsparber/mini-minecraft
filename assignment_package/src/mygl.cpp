@@ -5,6 +5,7 @@
 #include <QApplication>
 #include <QKeyEvent>
 #include <QDateTime>
+#include <QThreadPool>
 #include "random-walks/randomwalk.h"
 #include "random-walks/tunnelwalk.h"
 
@@ -93,8 +94,8 @@ void MyGL::initializeGL()
     createTextures();
 
     // TEST ONLY
-    RandomWalk walk(mkS<TunnelWalk>(mp_terrain.get(), glm::vec3(0, 130, 0)));
-    walk.start();
+    RandomWalk::start(mkS<TunnelWalk>(mp_terrain.get(), glm::vec3(0, 130, 0)));
+    QThreadPool::globalInstance()->waitForDone();
 
     // Create rivers
     //River* rivers = new River(mp_terrain.get());

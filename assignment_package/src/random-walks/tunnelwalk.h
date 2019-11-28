@@ -1,12 +1,13 @@
 #ifndef TUNNELWALK_H
 #define TUNNELWALK_H
 #include "randomwalkstate.h"
+#include "randomwalk.h"
 
 class TunnelWalk : public RandomWalkState
 {
 private:
     /// Time to live
-    unsigned int ttl;
+    int ttl;
 
     /// Current direction
     glm::vec3 direction;

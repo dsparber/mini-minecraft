@@ -3,17 +3,18 @@
 
 #include "smartpointerhelp.h"
 #include "randomwalkstate.h"
+#include "QRunnable"
 
 
-class RandomWalk
+class RandomWalk : public QRunnable
 {
 private:
     sPtr<RandomWalkState> currentState;
-
-public:
     RandomWalk(sPtr<RandomWalkState>);
 
-    void start();
+public:
+    static void start(sPtr<RandomWalkState>);
+    void run();
 };
 
 #endif // RANDOMWALK_H

@@ -12,19 +12,22 @@ void TunnelWalk::step() {
     position += direction;
     glm::vec3 random = glm::vec3(-.5f) + glm::vec3(rand() % 100, rand() % 100, rand() % 100) / 100.f;
     direction = direction + .5f * random;
+    direction = glm::normalize(direction);
 
-    // Stay at same height
     if (position.y < 120) {
-        direction.y = 0;
-    }
-    // Go down
-    if (position.y > 120) {
-        //direction.y = 0.05 * (-(rand() % 100) / 100.f);
+        direction.y = -.1f;
     }
 
     direction = glm::normalize(direction);
-
     --ttl;
+
+    // Span new walk at random
+    if ((rand() % 50) == 0) {
+        sPtr<TunnelWalk> sideTunnel = mkS<TunnelWalk>(terrain, position);
+        sideTunnel->direction = glm::vec3(direction.z, 0, -direction.y);
+        sideTunnel->ttl = ttl * (rand() % 100) / 100.f + 50;
+        RandomWalk::start(sideTunnel);
+    }
 }
 
 sPtr<RandomWalkState> TunnelWalk::next() {
