@@ -6,7 +6,22 @@ TunnelWalk::TunnelWalk(Terrain* terrain, glm::vec3 position) : RandomWalkState(t
 {}
 
 void TunnelWalk::step() {
-    carveHalfSphere(terrain, position, 3);
+    // Set blocks
+    float radius = 4;
+    int start = glm::floor(-radius);
+    int end = start * (-1);
+
+    for (int dx = start; dx < end; dx++) {
+        for (int dy = 0; dy < end; dy++) {
+            for (int dz = start; dz < end; dz++) {
+                glm::vec3 delta = glm::vec3(dx, dy, dz);
+                if (glm::length(delta) <= radius)
+                {
+                    terrain->setBlockAt(position + delta, EMPTY);
+                }
+            }
+        }
+    }
 
     // Update state
     position += direction;

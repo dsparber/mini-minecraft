@@ -93,14 +93,13 @@ void MyGL::initializeGL()
     mp_terrain->initialize();
     createTextures();
 
-    // TEST ONLY
-    RandomWalk::start(mkS<TunnelWalk>(mp_terrain.get(), glm::vec3(0, 130, 0)));
+    RandomWalk::start(mkS<TunnelWalk>(mp_terrain.get(), glm::vec3(-17, 130, 10)));
     QThreadPool::globalInstance()->waitForDone();
 
     // Create rivers
-    //River* rivers = new River(mp_terrain.get());
-    //rivers->createRiver1(70, 60);
-    //rivers->createRiver2(46, 60);
+    River* rivers = new River(mp_terrain.get());
+    rivers->createRiver1(70, 60);
+    rivers->createRiver2(46, 60);
     for(Chunk* c : mp_terrain->getChunksToDraw()){
         c->update();
     }

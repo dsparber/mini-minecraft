@@ -47,7 +47,7 @@ public:
     void create();
 
     void drawFace(glm::vec4 pos, std::vector<GLuint>& idx, std::vector<glm::vec4>& all, int faceNum, int &si);
-    void drawOutFace(glm::vec4 pos, std::vector<GLuint>& idx, std::vector<glm::vec4>& all, int faceNum, int &si, bool);
+    void drawOutFace(glm::vec4 pos, std::vector<GLuint>& idx, std::vector<glm::vec4>& all, int faceNum, int &si, BlockType);
     void destroy();
     void update();
 };
