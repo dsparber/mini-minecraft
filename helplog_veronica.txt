@@ -11,7 +11,6 @@ Q: Generating new terrain, need to match height? If so how?
 Can I automatically have new terrain become a new biome?
 A: FBM is a continuous function so adding new terrain should start at x and z values where the previous terrain left off
 
-
 Thursday:
 Q: Is it ok to have a setBlockAt function in both the chunk class and the terrain class?
 A: Yes, just need to make sure they are "synced" i.e. chunk's function should call the terrain's function
@@ -21,11 +20,44 @@ A: Code I had was not for ray-marching but for ray cube intersection. I was conf
 
 https://doc.qt.io/qt-5/qwidget.html#mousePressEvent
 
-
 Saturday:
 Q: Getting ray marching to work — delete block. How to set max length and how to get rid of crashing
 A: Needed to multiple my step by look vector and set my origin position to be the camera’s eye
 
-
 Resources:
 GitHub Resource: https://innerjoiner.com/guide/git-team-workflow-cheatsheet/
+
+
+
+Final Project Milestone 2 Help Log:
+
+Friday:
+Q: Rounding bottom of river
+A: Use radius to loop through every direction of cube. If the given block is within the radius then set it to water
+
+Saturday:
+Q: How to get drawRules map to compile?
+A: Needed to put River:: in front of rule definition and when calling functions
+
+Q: Getting stack to work—>Turtle construction error
+A: Need copy constructor in Turtle class
+
+Q: What does the look vector in Turtle do? Do I need both that and an angle? How do I set look initially? 
+A: Don’t necessarily need both. Look vector gives x and z orientation at the current position. Multiply look by position to get current vector. I can initially set them to whatever I want.
+
+Q: How to test what I have so far? Do I need to merge first? Or do rasterizer thing, if rasterizer pls help me set up rasterizer?
+A: Either one will work, may be easier to merge since rasterizer only tests drawing functions, not carving.
+
+Sunday:
+Q: Carving out terrain, how to get perpendicular vector etc?
+A: A simpler way to get perpendicular is to just rotate by 90 degrees
+
+Q: Getting river to draw — how to call my draw functions, check expand string
+A: Need to have an instance of river (this->*r)();
+
+Tuesday:
+Q: Getting carveTerrain function to work/do anything
+A: Didn’t really get an answer
+
+Resourcs:
+https://www.geeksforgeeks.org/bresenhams-line-generation-algorithm/

@@ -84,12 +84,17 @@ Implemented by: **Veronica**
 
 #### Implementation
 
-TODO
+- *River Creation:* Implemented a Turtle and River class. The Turtle class stores a position and orientation to be used when constructing rivers. The River class has two functions to create two rivers that are placed in the initial terrain (river1 = straight river, river2 = delta river), as well as two maps for string expansion and string drawing. The first map maps chars to strings and the second maps chars to function pointers. I then implemented all of the functions needed to draw my L-System string. My main river body has a large radius, and I then decreased this value by changing the radius when a position was saved and stored. 
+
+- *Random Numbers:* I created different rotation functions for each river so that I could have one river have slightly larger angles than the other. I incorporated randomization to influence path orientation by randomly generating the angle for each rotation within a given range. I incorporated randomization to influence the probability of branch generation by deciding whether or not to rotate based on a random number generation, thus a new branch is not always generated.
+
+- *Terrain Carving:* I implemented terrain carving by looping through each direction for a given position in my river and carving the terrain around the river at that point by gradually increasing the given height.
 
 
 #### Difficulties
 
-TODO 
+- I struggled a lot with getting my initial river to appear. My L-System grammar was correct, but I had a hard time getting my moveAndDrawLine() function to work properly. At first I tried implementing it using Bresenham's line formula, but I ran into a lot of issues with this implementation and switched to a simpler method that mimicked ray-marching.
+- I also struggled with terrain carving at first trying to implement it using the perpendicular and ray-marching; however, when I also simplified my implementation for this function it became much easier to implement and test.
 
 
 
