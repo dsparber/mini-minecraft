@@ -78,6 +78,8 @@ The only challenge was dealing with floating point precission. If the player mov
 
 ### Video
 
+[Milestone 2 Video](https://youtu.be/wEmui2oN0zU)
+
 ### L-System Rivers
 
 Implemented by: **Veronica**
