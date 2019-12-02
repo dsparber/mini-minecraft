@@ -32,8 +32,8 @@ out vec4 out_Col; // This is the final output color that you will see on your
 void main()
 {  
         vec2 newUV;
-        float i = u_Time % 128;
-        float offset = 1.f/128.f;
+        float i = u_Time % 96;
+        float offset = 1.f/96.f;
         //set uv to a loop of offset of texture if animatable
         if(fs_animatable > 0){
           newUV = fs_UV - vec2(1/16, 0) + vec2(i*offset/16.f,0);//vec2(cos(i)/16,0);
