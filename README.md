@@ -79,6 +79,7 @@ The only challenge was dealing with floating point precission. If the player mov
 ### Video
 
 [Milestone 2 Video](https://youtu.be/wEmui2oN0zU)
+[Water and Lava Animation](https://vimeo.com/376899860)
 
 ### L-System Rivers
 
