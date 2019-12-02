@@ -30,15 +30,17 @@ out vec4 out_Col; // This is the final output color that you will see on your
                   // screen for the pixel that is currently being processed.
 
 void main()
-{
+{  
         vec2 newUV;
-        int i = u_Time / 20;
+        float i = u_Time % 128;
+        float offset = 1.f/128.f;
         //set uv to a loop of offset of texture if animatable
         if(fs_animatable > 0){
-          newUV = fs_UV + vec2(cos(i)/16,0);
+          newUV = fs_UV - vec2(1/16, 0) + vec2(i*offset/16.f,0);//vec2(cos(i)/16,0);
         } else {
             newUV = fs_UV;
         }
+
         // Material base color (before shading)
         vec4 H = (fs_LightVec + fs_CameraPos) / 2.f;
         //vec4 diffuseColor = fs_Col;
