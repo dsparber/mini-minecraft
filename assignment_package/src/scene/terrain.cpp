@@ -118,6 +118,10 @@ Chunk* Terrain::getChunk(int x, int z) const {
     return chunkMap.at(chunkKey);
 }
 
+void Terrain::setBlockAt(glm::vec3 pos, BlockType type) {
+    setBlockAt(glm::round(pos.x), glm::round(pos.y), glm::round(pos.z), type);
+}
+
 void Terrain::setBlockAt(int x, int y, int z, BlockType t)
 {
     // Get coordinates aligned to chunk

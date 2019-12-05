@@ -86,7 +86,7 @@ public:
     /// Given a world-space coordinate (which may have negative
     /// values) set the block at that point in space to the given type.
     void setBlockAt(int x, int y, int z, BlockType t);
-
+    void setBlockAt(glm::vec3, BlockType);
 
     /// Adds a block at the center of the screen, updates the terrain
     void addBlock(glm::vec3 eye, glm::vec3 look);

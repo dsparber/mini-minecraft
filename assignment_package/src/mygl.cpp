@@ -5,6 +5,9 @@
 #include <QApplication>
 #include <QKeyEvent>
 #include <QDateTime>
+#include <QThreadPool>
+#include "random-walks/randomwalk.h"
+#include "random-walks/tunnelwalk.h"
 
 #define TEXTURE_SLOT_MINECRAFT_BLOCK 2
 #define TEXTURE_SLOT_POST_PROCESS 1
@@ -89,6 +92,9 @@ void MyGL::initializeGL()
     // Initializes the terrain
     mp_terrain->initialize();
     createTextures();
+
+    RandomWalk::start(mkS<TunnelWalk>(mp_terrain.get(), glm::vec3(-17, 130, 10)));
+    QThreadPool::globalInstance()->waitForDone();
 
     // Create rivers
     River* rivers = new River(mp_terrain.get());

@@ -14,7 +14,9 @@ enum BlockType: unsigned char
     WATER,
     ICE,
     SNOW,
-    GLASS
+    GLASS,
+    COAL,
+    ORE,
 };
 
 bool isSolid(BlockType);
@@ -22,5 +24,7 @@ bool isSolid(BlockType);
 bool isOpaque(BlockType);
 
 bool isLiquid(BlockType);
+
+bool drawBorder(BlockType, BlockType);
 
 #endif // BLOCKTYPE_H

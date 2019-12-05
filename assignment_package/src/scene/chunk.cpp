@@ -140,20 +140,21 @@ void Chunk::compute(){
                                 nc.x < 16 && nc.y < 256 && nc.z < 16)
                         {
                             BlockType adj = getBlockAt(nc.x, nc.y,nc.z);
-                            if(isOpaque(b) && (!isOpaque(adj))) {
-                                Chunk::drawFace(glm::vec4(x,y,z,1.f), idx, op, i, siOp);
-                                //printf("solid face drawn!\n");
-                            } else if (!isOpaque(b) && adj == EMPTY){
-                                Chunk::drawFace(glm::vec4(x,y,z,1.f), nIdx, nonOp, i, siNonOp);
-                                //printf("opaque face drawn!\n");
+                            if (drawBorder(b, adj)) {
+                                if(isOpaque(b)) {
+                                    Chunk::drawFace(glm::vec4(x,y,z,1.f), idx, op, i, siOp);
+                                } else {
+                                    Chunk::drawFace(glm::vec4(x,y,z,1.f), nIdx, nonOp, i, siNonOp);
+                                }
                             }
+
                         } else {
                             if (isOpaque(b)){
-                                Chunk::drawOutFace(glm::vec4(x,y,z,1.f), idx, op, i, siOp, true);
+                                Chunk::drawOutFace(glm::vec4(x,y,z,1.f), idx, op, i, siOp, b);
                                 //printf("outface drawn!\n");
                             } else {
                                 //check adjacent chunks and draw faces if adjacent block is empty
-                                Chunk::drawOutFace(glm::vec4(x,y,z,1.f), nIdx, nonOp, i, siNonOp, false);
+                                Chunk::drawOutFace(glm::vec4(x,y,z,1.f), nIdx, nonOp, i, siNonOp, b);
                             }
                         }
                     }
@@ -295,6 +296,18 @@ void Chunk::drawFace(glm::vec4 pos, std::vector<GLuint>& idx, std::vector<glm::v
                                          (3 + offsetUVs[i].y)/16,
                                          25, 1.f)));
                 break;
+            case COAL:
+                all.push_back(glm::vec4(0.5f, 0.5f, 0.5f, 1.f));
+                all.push_back((glm::vec4((2 + offsetUVs[i].x)/16,
+                                         (13 + offsetUVs[i].y)/16,
+                                         2, 0)));
+                break;
+            case ORE:
+                all.push_back(glm::vec4(0.5f, 0.5f, 0.5f, 1.f));
+                all.push_back((glm::vec4((0 + offsetUVs[i].x)/16,
+                                         (13 + offsetUVs[i].y)/16,
+                                         4, 0)));
+                break;
             default:
                 // Other types are as of yet not define
                 all.push_back(glm::vec4(0));
@@ -305,7 +318,7 @@ void Chunk::drawFace(glm::vec4 pos, std::vector<GLuint>& idx, std::vector<glm::v
     }
 }
 
-void Chunk::drawOutFace(glm::vec4 pos, std::vector<GLuint>& idx, std::vector<glm::vec4>& all, int faceNum, int& si, bool opaque){
+void Chunk::drawOutFace(glm::vec4 pos, std::vector<GLuint>& idx, std::vector<glm::vec4>& all, int faceNum, int& si, BlockType b){
     Chunk* adjC = nullptr;
     glm::vec4 adjPos;
     if(faceNum == 0){
@@ -323,7 +336,7 @@ void Chunk::drawOutFace(glm::vec4 pos, std::vector<GLuint>& idx, std::vector<glm
     }
 
     BlockType adj = (adjC == nullptr) ? EMPTY : adjC->getBlockAt(adjPos.x, adjPos.y, adjPos.z);
-    if((opaque && !isOpaque(adj)) || (!opaque && (isOpaque(adj) || adj == EMPTY))){
+    if(drawBorder(b, adj)){
         //draw the current face
         drawFace(pos, idx, all, faceNum, si);
     }

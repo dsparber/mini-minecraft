@@ -64,6 +64,13 @@ void CreateChunkRunnable::run() {
 
             for (int i = 0; i < 128; i++) {
                 chunk->setBlockAt(x, i, z, STONE);
+                if (i < 124) {
+                    if ((random + i) % 7 == 0) {
+                        chunk->setBlockAt(x, i, z, ORE);
+                    } else if ((random + i) % 5 == 0) {
+                        chunk->setBlockAt(x, i, z, COAL);
+                    }
+                }
             }
 
             for (int i = 128; i <= intFBM; i++) {

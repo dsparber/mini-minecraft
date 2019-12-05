@@ -23,7 +23,12 @@ SOURCES += \
     $$PWD/scene/createchunkrunnable.cpp \
     $$PWD/scene/quad.cpp \
     $$PWD/shaderprograms/postprocessshader.cpp \
-    $$PWD/shaderprograms/shaderprogram.cpp
+    $$PWD/shaderprograms/shaderprogram.cpp \
+    $$PWD/random-walks/randomwalkstate.cpp \
+    $$PWD/random-walks/randomwalk.cpp \
+    $$PWD/random-walks/tunnelwalk.cpp \
+    $$PWD/random-walks/cavecreation.cpp \
+    $$PWD/scene/terrainutils.cpp
 
 HEADERS += \
     $$PWD/la.h \
@@ -48,4 +53,9 @@ HEADERS += \
     $$PWD/scene/createchunkrunnable.h \
     $$PWD/scene/quad.h \
     $$PWD/shaderprograms/postprocessshader.h \
-    $$PWD/shaderprograms/shaderprogram.h
+    $$PWD/shaderprograms/shaderprogram.h \
+    $$PWD/random-walks/randomwalkstate.h \
+    $$PWD/random-walks/randomwalk.h \
+    $$PWD/random-walks/tunnelwalk.h \
+    $$PWD/random-walks/cavecreation.h \
+    $$PWD/scene/terrainutils.h
