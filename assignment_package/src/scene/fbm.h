@@ -12,8 +12,6 @@ float noise1D(int x);
 
 glm::vec2 random2(glm::vec2 p);
 
-float WorleyNoise(glm::vec2 uv);
-
-float worleyFBM(glm::vec2 uv);
+glm::vec3 WorleyNoise(glm::vec2 uv);
 
 #endif // FBM_H

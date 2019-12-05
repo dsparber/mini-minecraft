@@ -49,60 +49,27 @@ glm::vec2 random2(glm::vec2 p) {
 }
 
 
-float WorleyNoise(glm::vec2 uv) {
-    //uv *= 2.0; // Now the space is 10x10 instead of 1x1. Change this to any number you want.
+glm::vec3 WorleyNoise(glm::vec2 uv) {
     glm::vec2 uvInt = glm::floor(uv);
     glm::vec2 uvFract = glm::fract(uv);
-    float minDist = 1.0; // Minimum distance initialized to max.
+    float minDist = 1.f; // Minimum distance initialized to max.
+    float temp = 0.f;
+    float bump = 0.f;
     for(int y = -1; y <= 1; ++y) {
         for(int x = -1; x <= 1; ++x) {
             glm::vec2 neighbor = glm::vec2(float(x), float(y)); // Direction in which neighbor cell lies
             glm::vec2 point = random2(uvInt + neighbor); // Get the Voronoi centerpoint for the neighboring cell
             glm::vec2 diff = neighbor + point - uvFract; // Distance between fragment coord and neighbor’s Voronoi point
             float dist = glm::length(diff);
-            minDist = glm::min(minDist, dist);
+
+            if (minDist > dist) {
+                temp = fbm(point.x, point.y);
+                bump = fbm(point.x * 2, point.y * 2);
+                minDist = dist;
+            }
         }
     }
-    return minDist;
+    return glm::vec3(temp, bump, minDist);
 }
 
-//float WorleyNoise(glm::vec2 uv)
-//{
-//    // Tile the space
-//    glm::vec2 uvInt = glm::floor(uv);
-//    glm::vec2 uvFract = glm::fract(uv);
-
-//    float minDist = 1.0; // Minimum distance initialized to max.
-
-//    // Search all neighboring cells and this cell for their point
-//    for(int y = -1; y <= 1; y++)
-//    {
-//        for(int x = -1; x <= 1; x++)
-//        {
-//            glm::vec2 neighbor = glm::vec2(float(x), float(y));
-
-//            // Random point inside current neighboring cell
-//            glm::vec2 point = random2(uvInt + neighbor);
-
-//            // Compute the distance b/t the point and the fragment
-//            // Store the min dist thus far
-//            glm::vec2 diff = neighbor + point - uvFract;
-//            float dist = glm::length(diff);
-//            minDist = glm::min(minDist, dist);
-//        }
-//    }
-//    return minDist;
-//}
-
-float worleyFBM(glm::vec2 uv) {
-    float sum = 0;
-    float freq = 4;
-    float amp = 0.5;
-    for(int i = 0; i < 8; i++) {
-        sum += WorleyNoise(uv * freq) * amp;
-        freq *= 2;
-        amp *= 0.5;
-    }
-    return sum;
-}
 

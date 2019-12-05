@@ -29,16 +29,9 @@ float mountainNoise(float x, float z)
     return height;
 }
 
-float moistNoise(float x, float z)
+glm::vec3 mbNoise(float x, float z)
 {
     return WorleyNoise(glm::vec2(x, z));
-}
-
-float bumpNoise(float x, float z)
-{
-    return worleyFBM(glm::vec2(x, z));
-    //return fbm(x, z);
-    //return WorleyNoise(glm::vec2(x, z) / 5.f);
 }
 
 BiomeType getCurrBiome(glm::vec2 mb)

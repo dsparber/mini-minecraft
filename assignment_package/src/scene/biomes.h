@@ -11,9 +11,7 @@ float grasslandNoise(float x, float z);
 
 float mountainNoise(float x, float z);
 
-float moistNoise(float x, float z);
-
-float bumpNoise(float x, float z);
+glm::vec3 mbNoise(float x, float z);
 
 BiomeType getCurrBiome(glm::vec2 mb);
 

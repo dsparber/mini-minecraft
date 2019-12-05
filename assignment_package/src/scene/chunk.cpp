@@ -297,8 +297,8 @@ void Chunk::drawFace(glm::vec4 pos, std::vector<GLuint>& idx, std::vector<glm::v
                 break;
             case SAND:
                 all.push_back(glm::vec4(0.f, 0.f, 0.f, 1.f));
-                all.push_back((glm::vec4((13 + offsetUVs[i].x)/16,
-                                         (3 + offsetUVs[i].y)/16,
+                all.push_back((glm::vec4((2 + offsetUVs[i].x)/16,
+                                         (14 + offsetUVs[i].y)/16,
                                          1, 0.f)));
                 break;
             default:

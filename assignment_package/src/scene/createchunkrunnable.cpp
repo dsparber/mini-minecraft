@@ -6,11 +6,10 @@
 #include "biometype.h"
 
 CreateChunkRunnable::CreateChunkRunnable(OpenGLContext* context, Chunk* chunk, std::vector<Chunk*>* completedChunks, QMutex* mutex) :
-    context(context),
     chunk(chunk),
     completedChunks(completedChunks),
-    terrainMutex(mutex)
-
+    terrainMutex(mutex),
+    context(context)
 { }
 
 void CreateChunkRunnable::create(
@@ -62,22 +61,30 @@ void CreateChunkRunnable::run() {
             //float rawFBM = fbm(fbmX / 64.f, fbmZ / 64.f);
             //float fbmVal = 25.f * powf(rawFBM, 3.f);
 
-            // Get temperature and moisture values
-            glm::vec2 mb(moistNoise(fbmX / 256.f, fbmZ / 256.f), bumpNoise(fbmX / 64.f, fbmZ / 64.f));
+            // Get moisture and bumpiness values
+            glm::vec3 mb(mbNoise(fbmX / 256.f, fbmZ / 256.f));
 
             // Get the current biome we are in
-            BiomeType currBiome = getCurrBiome(mb);
+            BiomeType currBiome = getCurrBiome(glm::vec2(mb.x, mb.y));
 
             // Get height values from each biome
             glm::vec4 biomeHeights(desertNoise(fbmX / 64.f, fbmZ / 64.f), wetlandNoise(fbmX / 64.f, fbmZ / 64.f),
                                   grasslandNoise(fbmX / 64.f, fbmZ / 64.f), mountainNoise(fbmX / 64.f, fbmZ / 64.f));
 
-            // Interpolate height values
-            // Put currPos between 0 and 1
-            // use max value of current terrain rendered, set very large and small values
-
             glm::vec2 currPos(fbmX, fbmZ);
-            float fbmVal = interpolateBiomes(biomeHeights, currBiome, currPos);
+
+            //float fbmVal = interpolateBiomes(biomeHeights, currBiome, currPos);
+            float fbmVal = 0.f;
+
+            if (currBiome == DESERT) {
+                fbmVal = glm::mix(biomeHeights.x, biomeHeights.z, glm::smoothstep(0.45f, 0.55f, mb.z));
+            } else if (currBiome == WETLAND) {
+                fbmVal = glm::mix(biomeHeights.y, biomeHeights.z, glm::smoothstep(0.45f, 0.55f, mb.z));
+            } else if (currBiome == GRASSLAND) {
+                fbmVal = glm::mix(biomeHeights.z, biomeHeights.z, glm::smoothstep(0.45f, 0.55f, mb.z));
+            } else {
+                fbmVal = glm::mix(biomeHeights.w, biomeHeights.z, glm::smoothstep(0.45f, 0.55f, mb.z));
+            }
 
             int intFBM = 128 + glm::round(fbmVal);
             int random = rand() % 4;

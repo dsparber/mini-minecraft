@@ -6,11 +6,11 @@ BlockType getBlockType(BiomeType b) {
     }
     else if (b == DESERT)
     {
-        return LAVA;
+        return SAND;
     }
     else if (b == MOUNTAINS)
     {
-        return SNOW;
+        return STONE;
     }
     else
     {

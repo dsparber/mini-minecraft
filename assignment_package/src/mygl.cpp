@@ -91,12 +91,12 @@ void MyGL::initializeGL()
     createTextures();
 
     // Create rivers
-    River* rivers = new River(mp_terrain.get());
-    rivers->createRiver1(-50, -55);
-    rivers->createRiver2(100, 30);
-    for(Chunk* c : mp_terrain->getChunksToDraw()){
-        c->update();
-    }
+//    River* rivers = new River(mp_terrain.get());
+//    rivers->createRiver1(-50, -55);
+//    rivers->createRiver2(100, 30);
+//    for(Chunk* c : mp_terrain->getChunksToDraw()){
+//        c->update();
+//    }
 
     // We have to have a VAO bound in OpenGL 3.2 Core. But if we're not
     // using multiple VAOs, we can just bind one once.
