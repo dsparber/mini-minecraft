@@ -67,7 +67,6 @@ void CreateChunkRunnable::run() {
 
             // Get the current biome we are in
             BiomeType currBiome = getCurrBiome(mb);
-            std::cout << currBiome << std::endl;
 
             // Get height values from each biome
             glm::vec4 biomeHeights(desertNoise(fbmX / 64.f, fbmZ / 64.f), wetlandNoise(fbmX / 64.f, fbmZ / 64.f),

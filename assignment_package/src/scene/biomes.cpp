@@ -36,8 +36,9 @@ float moistNoise(float x, float z)
 
 float bumpNoise(float x, float z)
 {
-    float worley = WorleyNoise(glm::vec2(x, z) * 2.f);
-    return worley * 0.33;
+    return worleyFBM(glm::vec2(x, z));
+    //return fbm(x, z);
+    //return WorleyNoise(glm::vec2(x, z) / 5.f);
 }
 
 BiomeType getCurrBiome(glm::vec2 mb)
