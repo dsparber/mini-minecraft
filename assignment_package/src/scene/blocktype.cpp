@@ -8,7 +8,8 @@ bool isSolid(BlockType type) {
             || type == LEAF
             || type == BEDROCK
             || type == ICE
-            || type == SNOW;
+            || type == SNOW
+            || type == SAND;
 }
 
 bool isOpaque(BlockType type) {

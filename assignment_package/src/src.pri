@@ -23,7 +23,9 @@ SOURCES += \
     $$PWD/scene/createchunkrunnable.cpp \
     $$PWD/scene/quad.cpp \
     $$PWD/shaderprograms/postprocessshader.cpp \
-    $$PWD/shaderprograms/shaderprogram.cpp
+    $$PWD/shaderprograms/shaderprogram.cpp \
+    $$PWD/scene/biomes.cpp \
+    $$PWD/scene/biometype.cpp
 
 HEADERS += \
     $$PWD/la.h \
@@ -48,4 +50,6 @@ HEADERS += \
     $$PWD/scene/createchunkrunnable.h \
     $$PWD/scene/quad.h \
     $$PWD/shaderprograms/postprocessshader.h \
-    $$PWD/shaderprograms/shaderprogram.h
+    $$PWD/shaderprograms/shaderprogram.h \
+    $$PWD/scene/biomes.h \
+    $$PWD/scene/biometype.h

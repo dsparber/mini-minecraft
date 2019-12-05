@@ -1,7 +1,9 @@
 #include "createchunkrunnable.h"
 #include "fbm.h"
+#include "biomes.h"
 #include <iostream>
 #include <QThreadPool>
+#include "biometype.h"
 
 CreateChunkRunnable::CreateChunkRunnable(OpenGLContext* context, Chunk* chunk, std::vector<Chunk*>* completedChunks, QMutex* mutex) :
     context(context),
@@ -57,8 +59,27 @@ void CreateChunkRunnable::run() {
             int fbmX = chunk->pos.x + x - 40;
             int fbmZ = chunk->pos.z + z - 120;
 
-            float rawFBM = fbm(fbmX / 64.f, fbmZ / 64.f);
-            float fbmVal = 80.f * powf(rawFBM, 4.f);
+            //float rawFBM = fbm(fbmX / 64.f, fbmZ / 64.f);
+            //float fbmVal = 25.f * powf(rawFBM, 3.f);
+
+            // Get temperature and moisture values
+            glm::vec2 mb(moistNoise(fbmX / 256.f, fbmZ / 256.f), bumpNoise(fbmX / 64.f, fbmZ / 64.f));
+
+            // Get the current biome we are in
+            BiomeType currBiome = getCurrBiome(mb);
+            std::cout << currBiome << std::endl;
+
+            // Get height values from each biome
+            glm::vec4 biomeHeights(desertNoise(fbmX / 64.f, fbmZ / 64.f), wetlandNoise(fbmX / 64.f, fbmZ / 64.f),
+                                  grasslandNoise(fbmX / 64.f, fbmZ / 64.f), mountainNoise(fbmX / 64.f, fbmZ / 64.f));
+
+            // Interpolate height values
+            // Put currPos between 0 and 1
+            // use max value of current terrain rendered, set very large and small values
+
+            glm::vec2 currPos(fbmX, fbmZ);
+            float fbmVal = interpolateBiomes(biomeHeights, currBiome, currPos);
+
             int intFBM = 128 + glm::round(fbmVal);
             int random = rand() % 4;
 
@@ -66,23 +87,33 @@ void CreateChunkRunnable::run() {
                 chunk->setBlockAt(x, i, z, STONE);
             }
 
-            for (int i = 128; i <= intFBM; i++) {
-                if (i > 148 + random) {
-                    chunk->setBlockAt(x, i, z, SNOW);
-                } else if(i == intFBM){
-                    chunk->setBlockAt(x, intFBM, z, GRASS);
+            BlockType currBlock = getBlockType(currBiome);
 
+            for (int i = 128; i <= intFBM; i++) {
+                if (i == intFBM) {
+                    chunk->setBlockAt(x, intFBM, z, currBlock);
                 } else {
                     chunk->setBlockAt(x, i, z, DIRT);
                 }
             }
+//            for (int i = 128; i <= intFBM; i++) {
+//                if (i > 148 + random) {
+//                    chunk->setBlockAt(x, i, z, SNOW);
+//                } else if(i == intFBM){
+//                    chunk->setBlockAt(x, intFBM, z, GRASS);
 
-            if (intFBM == 128) {
-                fbmVal = 5 * rawFBM;
-                for (int i = 0; i < fbmVal; i++) {
-                    chunk->setBlockAt(x, 128 - i, z, WATER);
-                }
-            }
+//                } else {
+//                    chunk->setBlockAt(x, i, z, DIRT);
+//                }
+//            }
+
+//            if (intFBM == 128) {
+//                //fbmVal = 5 * rawFBM;
+//                fbmVal = 5 * fbmVal;
+//                for (int i = 0; i < fbmVal; i++) {
+//                    chunk->setBlockAt(x, 128 - i, z, WATER);
+//                }
+//            }
         }
     }
 

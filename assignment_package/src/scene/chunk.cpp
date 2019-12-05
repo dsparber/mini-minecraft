@@ -240,7 +240,7 @@ void Chunk::drawFace(glm::vec4 pos, std::vector<GLuint>& idx, std::vector<glm::v
                 all.push_back((glm::vec4((2 + offsetUVs[i].x)/16.f,
                                          (15 + offsetUVs[i].y)/16.f,
                                          4, 0.f)));
-                        break;
+                break;
             case GRASS:
                 all.push_back(glm::vec4(95.f, 159.f, 53.f, 255.f) / 255.f);
 
@@ -271,7 +271,6 @@ void Chunk::drawFace(glm::vec4 pos, std::vector<GLuint>& idx, std::vector<glm::v
                                          (11 + offsetUVs[i].y)/16.f,
                                          5, 0.f)));
                 break;
-
             case SNOW:
                 all.push_back(glm::vec4(0.f, 0.f, 0.f, 1.f));
                 all.push_back((glm::vec4((2 + offsetUVs[i].x)/16.f,
@@ -284,7 +283,6 @@ void Chunk::drawFace(glm::vec4 pos, std::vector<GLuint>& idx, std::vector<glm::v
                                          (14 + offsetUVs[i].y)/16.f,
                                          5, 0.f)));
                 break;
-
             case LAVA:
                 all.push_back(glm::vec4(1, 0, 0, 0.5));
                 all.push_back((glm::vec4((14 + offsetUVs[i].x)/16.f,
@@ -296,6 +294,12 @@ void Chunk::drawFace(glm::vec4 pos, std::vector<GLuint>& idx, std::vector<glm::v
                 all.push_back((glm::vec4((14 + offsetUVs[i].x)/16,
                                          (3 + offsetUVs[i].y)/16,
                                          1, 1.f)));
+                break;
+            case SAND:
+                all.push_back(glm::vec4(0.f, 0.f, 0.f, 1.f));
+                all.push_back((glm::vec4((13 + offsetUVs[i].x)/16,
+                                         (3 + offsetUVs[i].y)/16,
+                                         1, 0.f)));
                 break;
             default:
                 // Other types are as of yet not define
