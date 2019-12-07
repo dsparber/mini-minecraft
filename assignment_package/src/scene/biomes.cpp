@@ -1,7 +1,6 @@
 #include "biomes.h"
 #include "fbm.h"
 #include "biometype.h"
-#include <iostream>
 
 float forestNoise(float x, float z)
 {
@@ -36,21 +35,19 @@ BiomeType getCurrBiome(glm::vec2 mb)
     float m = mb.x;
     float b = mb.y;
 
-    if (m >= -1.f && m < 0.f) {
-        if (b >= -1.f && b < 0.f) {
+    if (m >= 0.f && m < 0.5f) {
+        if (b >= 0.f && b < 0.5f) {
             return SHIRE;
-        } else if (b >= 0.f && b < 1.f) {
+        } else if (b >= 0.5f && b < 1.f) {
             return MORDOR;
         }
-    } else if (m >= 0.f && m < 1.f) {
-        if (b >= -1.f && b < 0.f) {
+    } else if (m >= 0.5f && m < 1.f) {
+        if (b >= 0.f && b < 0.5f) {
             return FOREST;
-        } else if (b >= 0.f && b < 1.f) {
+        } else if (b >= 0.5f && b < 1.f) {
             return SNOWYMTS;
         }
-    } /*else {
-        std::cout << "ERROR" << std::endl;
-    }*/
+    }
 }
 
 float interpolateBiomes(glm::vec4 biomeHeights, glm::vec2 mb)
@@ -60,3 +57,13 @@ float interpolateBiomes(glm::vec4 biomeHeights, glm::vec2 mb)
     return glm::mix(bilerp1, bilerp2, mb.x);
 }
 
+void createHobbitHole(int x, int z)
+{
+    for (int i = x - 5; i < x + 5; i++) {
+        for (int j = z - 5; j < z + 5; j++) {
+            for (int y = 128; y < 8; y++) {
+                //setBlockAt(i, y, z, GRASS);
+            }
+        }
+    }
+}

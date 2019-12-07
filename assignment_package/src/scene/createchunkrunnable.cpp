@@ -4,6 +4,7 @@
 #include <iostream>
 #include <QThreadPool>
 #include "biometype.h"
+#include "trees.h"
 
 CreateChunkRunnable::CreateChunkRunnable(OpenGLContext* context, Chunk* chunk, std::vector<Chunk*>* completedChunks, QMutex* mutex) :
     chunk(chunk),
@@ -59,47 +60,48 @@ void CreateChunkRunnable::run() {
             int fbmZ = chunk->pos.z + z - 120;
 
             // Get moisture and bumpiness values
-            //glm::vec2 mb(mNoise(fbmX / 256.f, fbmZ / 256.f), bNoise(fbmX / 256.f, fbmZ / 256.f));
             glm::vec2 currentPos = glm::vec2(fbmX, fbmZ);
-            //glm::vec2 mb = glm::vec2(perlinNoise(currentPos), perlinNoise(currentPos + glm::vec2(100.34, 678.98234)));
-            glm::vec2 mb = glm::vec2(perlinNoise(currentPos), perlinNoise(currentPos + glm::vec2(100.34, 678.98234)));
-            //glm::vec2 mb(mNoise(fbmX, fbmZ), bNoise(fbmX, fbmZ));
+            float scale = 0.001;
+            glm::vec2 mb = glm::vec2(fbm(scale * currentPos.x, scale* currentPos.y), fbm((currentPos.x + 100.34) * scale, (currentPos.y +  678.98234) * scale));
 
             // Get the current biome we are in
             BiomeType currBiome = getCurrBiome(mb);
-            ///std::cout << "mb: " << mb.x << ", " << mb.y << std::endl;
-            ///std::cout << currBiome << std::endl;
 
             // Get height values from each biome
             glm::vec4 biomeHeights(forestNoise(fbmX / 64.f, fbmZ / 64.f), mordorNoise(fbmX / 64.f, fbmZ / 64.f),
                                    shireNoise(fbmX / 64.f, fbmZ / 64.f), snowyMtsNoise(fbmX / 64.f, fbmZ / 64.f));
 
-            ///float fbmVal = interpolateBiomes(biomeHeights, mb);
-            float fbmVal = biomeHeights.z;
+            float fbmVal = interpolateBiomes(biomeHeights, mb);
 
             int intFBM = 128 + glm::round(fbmVal);
 
-//            if (currBiome == FOREST) {
-//                for (int i = 0; i < 128; i++) {
-//                    chunk->setBlockAt(x, i, z, STONE);
-//                }
+            if (currBiome == FOREST) {
+                for (int i = 0; i < 128; i++) {
+                    chunk->setBlockAt(x, i, z, STONE);
+                }
 
-//                for (int i = 128; i <= intFBM; i++) {
-//                    if (i == intFBM) {
-//                        chunk->setBlockAt(x, intFBM, z, SAND);
-//                    } else {
-//                        chunk->setBlockAt(x, i, z, DIRT);
-//                    }
-//                }
-//            } else if (currBiome == MORDOR) {
-//                for (int i = 0; i <= intFBM; i++) {
-//                    if (i == intFBM) {
-//                        chunk->setBlockAt(x, intFBM, z, LAVA);
-//                    } else {
-//                        chunk->setBlockAt(x, i, z, DARKSTONE);
-//                    }
-//                }
-//            } else if (currBiome == SHIRE) {
+                for (int i = 128; i <= intFBM; i++) {
+                    if (i == intFBM) {
+                        chunk->setBlockAt(x, intFBM, z, SAND);
+                    } else {
+                        chunk->setBlockAt(x, i, z, DIRT);
+                    }
+                }
+
+                //Generate Ent trees
+                if ((double) rand() / (RAND_MAX) < 0.001) {
+                    Trees* trees = new Trees(chunk);
+                    trees->createEntTree(x, 128, z);
+                }
+            } else if (currBiome == MORDOR) {
+                for (int i = 0; i <= intFBM; i++) {
+                    if (i == intFBM) {
+                        chunk->setBlockAt(x, intFBM, z, LAVA);
+                    } else {
+                        chunk->setBlockAt(x, i, z, DARKSTONE);
+                    }
+                }
+            } else if (currBiome == SHIRE) {
                 for (int i = 0; i < 128; i++) {
                     chunk->setBlockAt(x, i, z, STONE);
                 }
@@ -113,18 +115,38 @@ void CreateChunkRunnable::run() {
                 }
 
                 // Create Hobbit holes
+                if ((double) rand() / (RAND_MAX) < 0.0005) {
+                    int radius = rand() % 8 + 6;
+                    for (int i = x - radius; i < x + radius; i++) {
+                        for (int j = z - radius; j < z + radius; j++) {
+                            for (int y = 128; y < 143; y++)
+                            {
+                                glm::vec4 center(x, 128, z, 0);
+                                glm::vec4 pos2(i, y, j, 0);
 
-                // Generate trees
+                                if (glm::distance(center, pos2) < radius && glm::distance(center, pos2) > radius - 2.f)
+                                {
+                                    chunk->setBlockAt(i, y, j, HILLGRASS);
+                                }
+                            }
+                        }
+                    }
+                }
 
-//            } else {
-//                for (int i = 0; i <= intFBM; i++) {
-//                    if (i == intFBM) {
-//                        chunk->setBlockAt(x, intFBM, z, SNOW);
-//                    } else {
-//                        chunk->setBlockAt(x, i, z, STONE);
-//                    }
+//                // Generate shire trees
+//                if ((double) rand() / (RAND_MAX) < 0.001) {
+//                    Trees* trees = new Trees(chunk);
+//                    trees->createShireTree(x, 128, z);
 //                }
-//            }
+            } else {
+                for (int i = 0; i <= intFBM; i++) {
+                    if (i == intFBM) {
+                        chunk->setBlockAt(x, intFBM, z, SNOW);
+                    } else {
+                        chunk->setBlockAt(x, i, z, STONE);
+                    }
+                }
+            }
         }
     }
 

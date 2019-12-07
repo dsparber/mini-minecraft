@@ -259,6 +259,12 @@ void Chunk::drawFace(glm::vec4 pos, std::vector<GLuint>& idx, std::vector<glm::v
                                              3, 0.f)));
                 }
                 break;
+            case HILLGRASS:
+                all.push_back(glm::vec4(95.f, 159.f, 53.f, 255.f) / 255.f);
+                all.push_back((glm::vec4((8 + offsetUVs[i].x)/16.f,
+                                         (13 + offsetUVs[i].y)/16.f,
+                                         3, 0.f)));
+                break;
             case STONE:
                 all.push_back(glm::vec4(0.5f, 0.5f, 0.5f, 1.f));
                 all.push_back((glm::vec4((1 + offsetUVs[i].x)/16.f,
@@ -311,6 +317,12 @@ void Chunk::drawFace(glm::vec4 pos, std::vector<GLuint>& idx, std::vector<glm::v
                 all.push_back(glm::vec4(0.f, 0.f, 0.f, 1.f));
                 all.push_back((glm::vec4((1 + offsetUVs[i].x)/16,
                                          (8 + offsetUVs[i].y)/16,
+                                         1, 0.f)));
+                break;
+            case BARK:
+                all.push_back(glm::vec4(0.f, 0.f, 0.f, 1.f));
+                all.push_back((glm::vec4((6 + offsetUVs[i].x)/16,
+                                         (10 + offsetUVs[i].y)/16,
                                          1, 0.f)));
                 break;
             default:

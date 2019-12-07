@@ -2,30 +2,32 @@
 #define TREES_H
 
 #include <iostream>
-#include "turtle.h"
+#include "turtle3D.h"
 #include <QHash>
 #include <QStack>
 #include <QChar>
 #include <QString>
 #include <map>
+#include "chunk.h"
 
 class Trees
 {
     typedef void (Trees::*Rule)(void);
 
 public:
-    QStack<Turtle> stack;
+    Chunk* currChunk;
+    QStack<Turtle3D> stack;
     QHash<QChar, QString> expanRules;
     QHash<QChar, Rule> drawRules;
-    Turtle t;
+    Turtle3D t;
     float radius;
 
-    Trees();
+    Trees(Chunk* chunk);
     ~Trees();
 
     /// Create each type of tree
-    void createEntTrees(int x, int z);
-    void createShireTrees(int x, int z);
+    void createEntTree(int x, int y, int z);
+    void createShireTree(int x, int y, int z);
 
     /// Expand the given string using expansion rules
     QString expandString(int numIterations, QString axiomString);
@@ -35,8 +37,9 @@ public:
 
     /// Drawing rules for river generation
     void moveAndDrawLine();
-    void rotateLeft();
-    void rotateRight();
+    void rotateX();
+    void rotateY();
+    void rotateZ();
     void savePosition();
     void storePosition();
     // When X char is read, do nothing, keep current Turtle

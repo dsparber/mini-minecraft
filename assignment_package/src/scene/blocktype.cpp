@@ -11,7 +11,9 @@ bool isSolid(BlockType type) {
             || type == SNOW
             || type == SAND
             || type == DARKSTONE
-            || type == VOLCANO;
+            || type == VOLCANO
+            || type == BARK
+            || type == HILLGRASS;
 }
 
 bool isOpaque(BlockType type) {

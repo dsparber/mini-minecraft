@@ -15,4 +15,6 @@ BiomeType getCurrBiome(glm::vec2 mb);
 
 float interpolateBiomes(glm::vec4 biomeHeights, glm::vec2 mb);
 
+void createHobbitHole(int x, int z);
+
 #endif // BIOMES_H

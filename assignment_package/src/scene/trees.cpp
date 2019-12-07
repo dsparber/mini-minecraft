@@ -1,7 +1,7 @@
 #include "trees.h"
 
-Trees::Trees()
-    : stack(), expanRules(), drawRules(), t(), radius(2.f)
+Trees::Trees(Chunk* chunk)
+    : currChunk(chunk), stack(), expanRules(), drawRules(), t(), radius(2.f)
 {
     /// Fill maps with expansion and drawing rules
     expanRules.insert('X', "F[-X][+X]");
@@ -10,6 +10,7 @@ Trees::Trees()
     expanRules.insert('G', "GG");
     expanRules.insert('+', "+");
     expanRules.insert('-', "-");
+    expanRules.insert('=', "=");
     expanRules.insert('[', "[");
     expanRules.insert(']', "]");
 
@@ -17,8 +18,9 @@ Trees::Trees()
     drawRules.insert('G', &Trees::moveAndDrawLine);
     drawRules.insert('X', &Trees::doNothing);
     drawRules.insert('Y', &Trees::doNothing);
-    drawRules.insert('+', &Trees::rotateLeft);
-    drawRules.insert('-', &Trees::rotateRight);
+    drawRules.insert('+', &Trees::rotateX);
+    drawRules.insert('-', &Trees::rotateY);
+    drawRules.insert('=', &Trees::rotateZ);
     drawRules.insert('[', &Trees::savePosition);
     drawRules.insert(']', &Trees::storePosition);
 }
@@ -26,22 +28,22 @@ Trees::Trees()
 
 Trees::~Trees() {}
 
-void Trees::createEntTrees(int x, int z)
+void Trees::createEntTree(int x, int y, int z)
 {
     /// Set initial values
-    t.pos = glm::vec2(x, z);
-    t.look = glm::vec2(0.f, 1.f);
+    t.pos = glm::vec3(x, y, z);
+    t.look = glm::vec3(0.f, 1.f, 0.f);
     QString axiom = "X";
 
     QString expanded = expandString(8, axiom);
     drawString(expanded);
 }
 
-void Trees::createShireTrees(int x, int z)
+void Trees::createShireTree(int x, int y, int z)
 {
     /// Set initial values
-    t.pos = glm::vec2(x, z);
-    t.look = glm::vec2(0.f, 1.f);
+    t.pos = glm::vec3(x, y, z);
+    t.look = glm::vec3(0.f, 1.f, 0.f);
     radius = 2.f;
     QString axiom = "Y";
 
@@ -75,60 +77,61 @@ void Trees::drawString(QString s)
 
 void Trees::moveAndDrawLine()
 {
-    glm::vec2 currPos = t.pos;
+    glm::vec3 currPos = t.pos;
     float step = 1.f;
 
-    for (int i = 0; i < 6; i++)
+    for (int i = 0; i < 4; i++)
     {
         currPos = currPos + step * t.look;
 
         int x = glm::floor(currPos.x);
-        int z = glm::floor(currPos.y);
+        int y = glm::floor(currPos.y);
+        int z = glm::floor(currPos.z);
 
-        /// Loop through x & z to shape tree
-        for (int i = x - radius; i < x + radius; i++) {
-            for (int j = z - radius; j < z + radius; j++) {
-                for (int y = 128; y < 128 + 6; y++)
-                {
-                    glm::vec4 center(x, 128, z, 0);
-                    glm::vec4 pos2(i, y, j, 0);
-
-                    /// If block is within radius, set to bark
-                    if (glm::distance(center, pos2) < radius)
-                    {
-                        //terrain->setBlockAt(i, y, j, BARK);
-                    }
-                }
-            }
-        }
+        currChunk->setBlockAt(x, y, z, BARK);
     }
 
     t.pos = currPos;
 }
 
-void Trees::rotateLeft()
+void Trees::rotateX()
 {
     /// Include random numbers for path orientation
     float angle = rand() % 45 + 30;
     float angleRad = angle * M_PI / 180.f;
 
-    t.look = glm::mat2(cos(angleRad), -sin(angleRad), sin(angleRad), cos(angleRad)) * t.look;
+    t.look = glm::mat3(glm::vec3(1.f, 0.f, 0.f),
+                       glm::vec3(0.f, cos(angleRad), sin(angleRad)),
+                       glm::vec3(0.f, -sin(angleRad), cos(angleRad))) * t.look;
 }
 
-void Trees::rotateRight()
+void Trees::rotateY()
 {
     /// Include random numbers for path orientation
     float angle = rand() % 45 + 30;
     float angleRad = angle * M_PI / 180.f;
 
-    t.look = glm::mat2(cos(angleRad), sin(angleRad), -sin(angleRad), cos(angleRad)) * t.look;
+    t.look = glm::mat3(glm::vec3(cos(angleRad), 0.f, -sin(angleRad)),
+                       glm::vec3(0.f, 1.f, 0.f),
+                       glm::vec3(sin(angleRad), 0.f, cos(angleRad))) * t.look;
+}
+
+void Trees::rotateZ()
+{
+    /// Include random numbers for path orientation
+    float angle = rand() % 45 + 30;
+    float angleRad = angle * M_PI / 180.f;
+
+    t.look = glm::mat3(glm::vec3(cos(angleRad), sin(angleRad), 0.f),
+                       glm::vec3(-sin(angleRad), cos(angleRad), 0.f),
+                       glm::vec3(0.f, 0.f, 1.f)) * t.look;
 }
 
 void Trees::savePosition()
 {
     /// Decrease tree width for branches
     radius = radius - 0.5;
-    stack.push(Turtle(t));
+    stack.push(Turtle3D(t));
 }
 
 void Trees::storePosition()

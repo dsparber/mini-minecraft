@@ -26,7 +26,8 @@ SOURCES += \
     $$PWD/shaderprograms/shaderprogram.cpp \
     $$PWD/scene/biomes.cpp \
     $$PWD/scene/biometype.cpp \
-    $$PWD/scene/trees.cpp
+    $$PWD/scene/trees.cpp \
+    $$PWD/scene/turtle3d.cpp
 
 HEADERS += \
     $$PWD/la.h \
@@ -54,4 +55,5 @@ HEADERS += \
     $$PWD/shaderprograms/shaderprogram.h \
     $$PWD/scene/biomes.h \
     $$PWD/scene/biometype.h \
-    $$PWD/scene/trees.h
+    $$PWD/scene/trees.h \
+    $$PWD/scene/turtle3d.h
