@@ -127,7 +127,21 @@ void MyGL::resizeGL(int w, int h)
     mp_waterShader->setDimensions(glm::ivec2(w, h));
     mp_lavaShader->setDimensions(glm::ivec2(w, h));
 
+    // reset frame buffer
+    glBindFramebuffer(GL_FRAMEBUFFER, mp_frameBuffer);
+    glBindTexture(GL_TEXTURE_2D, mp_renderedTexture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, this->width() * this->devicePixelRatio(), this->height() * this->devicePixelRatio(), 0, GL_RGB, GL_UNSIGNED_BYTE, (void*)0);
+
+    // Set the render settings for the texture we've just created.
+    // Essentially zero filtering on the "texture" so it appears exactly as rendered
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    // Clamp the colors at the edge of our texture
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
     printGLErrorLog();
+
 }
 
 
