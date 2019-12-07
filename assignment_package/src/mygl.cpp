@@ -93,16 +93,16 @@ void MyGL::initializeGL()
     mp_terrain->initialize();
     createTextures();
 
-    RandomWalk::start(mkS<TunnelWalk>(mp_terrain.get(), glm::vec3(-17, 130, 10)));
+    //RandomWalk::start(mkS<TunnelWalk>(mp_terrain.get(), glm::vec3(-17, 130, 10)));
     QThreadPool::globalInstance()->waitForDone();
 
-    // Create rivers
-    River* rivers = new River(mp_terrain.get());
-    rivers->createRiver1(-50, -55);
-    rivers->createRiver2(100, 30);
-    for(Chunk* c : mp_terrain->getChunksToDraw()){
-        c->update();
-    }
+//    // Create rivers
+//    River* rivers = new River(mp_terrain.get());
+//    rivers->createRiver1(-50, -55);
+//    rivers->createRiver2(100, 30);
+//    for(Chunk* c : mp_terrain->getChunksToDraw()){
+//        c->update();
+//    }
 
     // We have to have a VAO bound in OpenGL 3.2 Core. But if we're not
     // using multiple VAOs, we can just bind one once.
