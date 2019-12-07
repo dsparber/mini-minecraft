@@ -1,6 +1,7 @@
 #ifndef FBM_H
 #define FBM_H
 #include "la.h"
+#include "vector"
 
 float rand(glm::vec2 n);
 
@@ -8,10 +9,10 @@ float interpNoise2D(float x, float y);
 
 float fbm(float x, float z);
 
-float noise1D(int x);
-
 glm::vec2 random2(glm::vec2 p);
 
-glm::vec3 WorleyNoise(glm::vec2 uv);
+float surflet(glm::vec2 p, glm::vec2 gridPoint);
+
+float perlinNoise(glm::vec2 uv);
 
 #endif // FBM_H

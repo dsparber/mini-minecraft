@@ -14,7 +14,9 @@ enum BlockType: unsigned char
     WATER,
     ICE,
     SNOW,
-    SAND
+    SAND,
+    DARKSTONE,
+    VOLCANO
 };
 
 bool isSolid(BlockType);

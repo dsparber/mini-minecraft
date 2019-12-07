@@ -58,66 +58,71 @@ void CreateChunkRunnable::run() {
             int fbmX = chunk->pos.x + x - 40;
             int fbmZ = chunk->pos.z + z - 120;
 
-            //float rawFBM = fbm(fbmX / 64.f, fbmZ / 64.f);
-            //float fbmVal = 25.f * powf(rawFBM, 3.f);
-
             // Get moisture and bumpiness values
-            glm::vec3 mb(mbNoise(fbmX / 256.f, fbmZ / 256.f));
+            //glm::vec2 mb(mNoise(fbmX / 256.f, fbmZ / 256.f), bNoise(fbmX / 256.f, fbmZ / 256.f));
+            glm::vec2 currentPos = glm::vec2(fbmX, fbmZ);
+            //glm::vec2 mb = glm::vec2(perlinNoise(currentPos), perlinNoise(currentPos + glm::vec2(100.34, 678.98234)));
+            glm::vec2 mb = glm::vec2(perlinNoise(currentPos), perlinNoise(currentPos + glm::vec2(100.34, 678.98234)));
+            //glm::vec2 mb(mNoise(fbmX, fbmZ), bNoise(fbmX, fbmZ));
 
             // Get the current biome we are in
-            BiomeType currBiome = getCurrBiome(glm::vec2(mb.x, mb.y));
+            BiomeType currBiome = getCurrBiome(mb);
+            ///std::cout << "mb: " << mb.x << ", " << mb.y << std::endl;
+            ///std::cout << currBiome << std::endl;
 
             // Get height values from each biome
-            glm::vec4 biomeHeights(desertNoise(fbmX / 64.f, fbmZ / 64.f), wetlandNoise(fbmX / 64.f, fbmZ / 64.f),
-                                  grasslandNoise(fbmX / 64.f, fbmZ / 64.f), mountainNoise(fbmX / 64.f, fbmZ / 64.f));
+            glm::vec4 biomeHeights(forestNoise(fbmX / 64.f, fbmZ / 64.f), mordorNoise(fbmX / 64.f, fbmZ / 64.f),
+                                   shireNoise(fbmX / 64.f, fbmZ / 64.f), snowyMtsNoise(fbmX / 64.f, fbmZ / 64.f));
 
-            glm::vec2 currPos(fbmX, fbmZ);
-
-            //float fbmVal = interpolateBiomes(biomeHeights, currBiome, currPos);
-            float fbmVal = 0.f;
-
-            if (currBiome == DESERT) {
-                fbmVal = glm::mix(biomeHeights.x, biomeHeights.z, glm::smoothstep(0.45f, 0.55f, mb.z));
-            } else if (currBiome == WETLAND) {
-                fbmVal = glm::mix(biomeHeights.y, biomeHeights.z, glm::smoothstep(0.45f, 0.55f, mb.z));
-            } else if (currBiome == GRASSLAND) {
-                fbmVal = glm::mix(biomeHeights.z, biomeHeights.z, glm::smoothstep(0.45f, 0.55f, mb.z));
-            } else {
-                fbmVal = glm::mix(biomeHeights.w, biomeHeights.z, glm::smoothstep(0.45f, 0.55f, mb.z));
-            }
+            ///float fbmVal = interpolateBiomes(biomeHeights, mb);
+            float fbmVal = biomeHeights.z;
 
             int intFBM = 128 + glm::round(fbmVal);
-            int random = rand() % 4;
 
-            for (int i = 0; i < 128; i++) {
-                chunk->setBlockAt(x, i, z, STONE);
-            }
-
-            BlockType currBlock = getBlockType(currBiome);
-
-            for (int i = 128; i <= intFBM; i++) {
-                if (i == intFBM) {
-                    chunk->setBlockAt(x, intFBM, z, currBlock);
-                } else {
-                    chunk->setBlockAt(x, i, z, DIRT);
-                }
-            }
-//            for (int i = 128; i <= intFBM; i++) {
-//                if (i > 148 + random) {
-//                    chunk->setBlockAt(x, i, z, SNOW);
-//                } else if(i == intFBM){
-//                    chunk->setBlockAt(x, intFBM, z, GRASS);
-
-//                } else {
-//                    chunk->setBlockAt(x, i, z, DIRT);
+//            if (currBiome == FOREST) {
+//                for (int i = 0; i < 128; i++) {
+//                    chunk->setBlockAt(x, i, z, STONE);
 //                }
-//            }
 
-//            if (intFBM == 128) {
-//                //fbmVal = 5 * rawFBM;
-//                fbmVal = 5 * fbmVal;
-//                for (int i = 0; i < fbmVal; i++) {
-//                    chunk->setBlockAt(x, 128 - i, z, WATER);
+//                for (int i = 128; i <= intFBM; i++) {
+//                    if (i == intFBM) {
+//                        chunk->setBlockAt(x, intFBM, z, SAND);
+//                    } else {
+//                        chunk->setBlockAt(x, i, z, DIRT);
+//                    }
+//                }
+//            } else if (currBiome == MORDOR) {
+//                for (int i = 0; i <= intFBM; i++) {
+//                    if (i == intFBM) {
+//                        chunk->setBlockAt(x, intFBM, z, LAVA);
+//                    } else {
+//                        chunk->setBlockAt(x, i, z, DARKSTONE);
+//                    }
+//                }
+//            } else if (currBiome == SHIRE) {
+                for (int i = 0; i < 128; i++) {
+                    chunk->setBlockAt(x, i, z, STONE);
+                }
+
+                for (int i = 128; i <= intFBM; i++) {
+                    if (i == intFBM) {
+                        chunk->setBlockAt(x, intFBM, z, GRASS);
+                    } else {
+                        chunk->setBlockAt(x, i, z, DIRT);
+                    }
+                }
+
+                // Create Hobbit holes
+
+                // Generate trees
+
+//            } else {
+//                for (int i = 0; i <= intFBM; i++) {
+//                    if (i == intFBM) {
+//                        chunk->setBlockAt(x, intFBM, z, SNOW);
+//                    } else {
+//                        chunk->setBlockAt(x, i, z, STONE);
+//                    }
 //                }
 //            }
         }

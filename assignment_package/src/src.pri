@@ -25,7 +25,8 @@ SOURCES += \
     $$PWD/shaderprograms/postprocessshader.cpp \
     $$PWD/shaderprograms/shaderprogram.cpp \
     $$PWD/scene/biomes.cpp \
-    $$PWD/scene/biometype.cpp
+    $$PWD/scene/biometype.cpp \
+    $$PWD/scene/trees.cpp
 
 HEADERS += \
     $$PWD/la.h \
@@ -52,4 +53,5 @@ HEADERS += \
     $$PWD/shaderprograms/postprocessshader.h \
     $$PWD/shaderprograms/shaderprogram.h \
     $$PWD/scene/biomes.h \
-    $$PWD/scene/biometype.h
+    $$PWD/scene/biometype.h \
+    $$PWD/scene/trees.h

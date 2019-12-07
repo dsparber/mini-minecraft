@@ -4,13 +4,11 @@
 
 enum BiomeType: unsigned char
 {
-    WETLAND,
-    GRASSLAND,
-    DESERT,
-    MOUNTAINS
+    FOREST,
+    MORDOR,
+    SHIRE,
+    SNOWYMTS
 };
-
-BlockType getBlockType(BiomeType);
 
 #endif // BIOMETYPE_H
 

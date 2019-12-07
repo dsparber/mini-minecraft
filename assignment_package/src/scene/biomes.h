@@ -3,18 +3,16 @@
 #include "la.h"
 #include "biometype.h"
 
-float desertNoise(float x, float z);
+float forestNoise(float x, float z);
 
-float wetlandNoise(float x, float z);
+float mordorNoise(float x, float z);
 
-float grasslandNoise(float x, float z);
+float shireNoise(float x, float z);
 
-float mountainNoise(float x, float z);
-
-glm::vec3 mbNoise(float x, float z);
+float snowyMtsNoise(float x, float z);
 
 BiomeType getCurrBiome(glm::vec2 mb);
 
-float interpolateBiomes(glm::vec4 biomeHeights, BiomeType currBiome, glm::vec2 currPos);
+float interpolateBiomes(glm::vec4 biomeHeights, glm::vec2 mb);
 
 #endif // BIOMES_H

@@ -301,6 +301,18 @@ void Chunk::drawFace(glm::vec4 pos, std::vector<GLuint>& idx, std::vector<glm::v
                                          (14 + offsetUVs[i].y)/16,
                                          1, 0.f)));
                 break;
+            case DARKSTONE:
+                all.push_back(glm::vec4(0.f, 0.f, 0.f, 1.f));
+                all.push_back((glm::vec4((5 + offsetUVs[i].x)/16,
+                                         (13 + offsetUVs[i].y)/16,
+                                         1, 0.f)));
+                break;
+            case VOLCANO:
+                all.push_back(glm::vec4(0.f, 0.f, 0.f, 1.f));
+                all.push_back((glm::vec4((1 + offsetUVs[i].x)/16,
+                                         (8 + offsetUVs[i].y)/16,
+                                         1, 0.f)));
+                break;
             default:
                 // Other types are as of yet not define
                 all.push_back(glm::vec4(0));
