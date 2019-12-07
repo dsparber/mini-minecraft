@@ -31,6 +31,7 @@ public:
     int unifSampler;
     int unifTime;
     int unifCamPos;
+    int unifDimensions;
 public:
     ShaderProgram(OpenGLContext* context);
     // Sets up the requisite GL data and shaders from the given .glsl files

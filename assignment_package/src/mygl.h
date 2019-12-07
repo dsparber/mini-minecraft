@@ -33,6 +33,9 @@ private:
     /// A shader program that uses "flat" reflection (no shadowing at all)
     uPtr<ShaderProgram> mp_progFlat;
 
+    /// Shader program for sky
+    uPtr<ShaderProgram> mp_progSky;
+
     /// PostProcessShader for water
     uPtr<PostProcessShader> mp_waterShader;
 

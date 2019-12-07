@@ -16,6 +16,7 @@ MyGL::MyGL(QWidget *parent)
     : OpenGLContext(parent),
       mp_progLambert(mkU<ShaderProgram>(this)),
       mp_progFlat(mkU<ShaderProgram>(this)),
+      mp_progSky(mkU<ShaderProgram>(this)),
       mp_camera(mkU<Camera>()),
       mp_player(mkU<Player>()),
       mp_terrain(mkU<Terrain>(this)),
@@ -126,6 +127,11 @@ void MyGL::resizeGL(int w, int h)
     mp_plainShader->setDimensions(glm::ivec2(w, h));
     mp_waterShader->setDimensions(glm::ivec2(w, h));
     mp_lavaShader->setDimensions(glm::ivec2(w, h));
+    mp_progSky->setViewProjMatrix(glm::inverse(viewproj));
+    // Sky
+    mp_progSky->useMe();
+    this->glUniform2i(mp_progSky->unifDimensions, width(), height());
+    this->glUniform3f(mp_progSky->unifCamPos, mp_camera->eye.x, mp_camera->eye.y, mp_camera->eye.z);
 
     // reset frame buffer
     glBindFramebuffer(GL_FRAMEBUFFER, mp_frameBuffer);
@@ -139,6 +145,7 @@ void MyGL::resizeGL(int w, int h)
     // Clamp the colors at the edge of our texture
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
 
     printGLErrorLog();
 
@@ -186,6 +193,7 @@ void MyGL::paintGL()
     mp_waterShader->setTime(mp_time);
     mp_lavaShader->setTime(mp_time);
     mp_progLambert->setTime(mp_time);
+    mp_progSky->setTime(mp_time);
     ++mp_time;
 }
 
@@ -203,6 +211,10 @@ void MyGL::GLDrawScene()
     // Clear the screen so that we only see newly drawn images
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    mp_progSky->setViewProjMatrix(glm::inverse(mp_camera->getViewProj()));
+    mp_progSky->useMe();
+    this->glUniform3f(mp_progSky->unifCamPos, mp_camera->eye.x, mp_camera->eye.y, mp_camera->eye.z);
+    mp_progSky->draw(mp_geomQuad, false, 0);
 
 
     // Opaque
@@ -313,6 +325,10 @@ void MyGL::createShaders()
 
     mp_waterShader = mkU<PostProcessShader>(this);
     mp_waterShader->create(":/glsl/passthrough.vert.glsl", ":/glsl/water.frag.glsl");
+
+    mp_progSky = mkU<PostProcessShader>(this);
+    mp_progSky->create(":/glsl/sky.vert.glsl", ":/glsl/sky.frag.glsl");
+
 }
 
 

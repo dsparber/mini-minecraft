@@ -77,6 +77,7 @@ void ShaderProgram::create(const char *vertfile, const char *fragfile)
     unifSampler = context->glGetUniformLocation(prog, "u_Texture");
     unifTime = context->glGetUniformLocation(prog, "u_Time");
     unifCamPos = context->glGetUniformLocation(prog, "u_camPos");
+    unifDimensions = context->glGetUniformLocation(prog, "u_Dimensions");
 
     context->printGLErrorLog();
 

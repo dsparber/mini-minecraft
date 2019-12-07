@@ -16,7 +16,6 @@ void PostProcessShader::create(const char *vertfile, const char *fragfile)
     ShaderProgram::create(vertfile, fragfile);
     unifTime = context->glGetUniformLocation(prog, "u_Time");
     unifSampler2D = context->glGetUniformLocation(prog, "u_RenderedTexture");
-    unifDimensions = context->glGetUniformLocation(prog, "u_Dimensions");
 }
 
 void PostProcessShader::setDimensions(glm::ivec2 dims)
