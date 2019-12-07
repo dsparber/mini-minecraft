@@ -51,16 +51,25 @@ void main()
         // Avoid negative lighting values
         diffuseTerm = clamp(diffuseTerm, 0, 1);
 
-        float rise = 0.2;
-        float noon = -0.3;
+        float rise = 0.1;
+        float night = -0.1;
 
         //ambientTerm changes with u_Time
-        float wt = abs(sin(u_Time/1000.0));
-        float ambientTerm;
-        //day
-        ambientTerm = mix(rise, noon, wt);
+        float freq = 500.0;
+        float dayTime = sin(u_Time/freq*2);
+        float wt = abs(sin(u_Time/freq*2));
+        float ambientTerm = 0.0;
+        float contrast = 1.0;
+        if(dayTime < 0){
+            //night
+            ambientTerm = mix(0, night, wt);
+            contrast = mix(0.8, 0.2, wt);
+        } else {
+            ambientTerm = mix(-0.1, 0.2, wt);
+            contrast = mix(1.0, 0.8, wt);
+        }
 
-        float contrast = mix(1.5, 0.2, wt);
+        //day
 
         float lightIntensity = (diffuseTerm  + ambientTerm) * contrast;   //Add a small float value to the color multiplier
                                                             //to simulate ambient lighting. This ensures that faces that are not

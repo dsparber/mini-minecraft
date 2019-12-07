@@ -185,25 +185,30 @@ void main()
     vec3 duskColor = uvToDusk(uv + offset * 0.1);
 
     outColor = sunsetColor;
-
+    //frequency of one day and night cycle
+    float freq = 500.0;
     // Add a glowing sun in the sky
-    float wt = abs(sin(u_Time/500.0));
+    float wt = abs(sin(u_Time/(freq)));
     //sun directions
-    vec3 sunDir = normalize(vec3(0, 0, 1.0));
-//    vec4 dir = normalize(vec4(0, 0, 1.0, 1.0));
+    vec3 sunDir;
+    vec3 rise = normalize(vec3(0.5,0.1,0.1));
+    vec3 noon = normalize(vec3(-0.1,0.12,0.1));
+    vec3 fall = normalize(vec3(-0.6,0.1,-0.1));
+
+    vec3 night = normalize(vec3(-0.1,-0.2,0.1));
+
+    //    vec4 dir = normalize(vec4(0, 0, 1.0, 1.0));
     float sunSize = 30;
-//    mat4 rotationMatrix = rotationMatrix(vec3(0.f,0.f,1.f),wt);
-//    dir = dir * rotationMatrix;
-//    sunDir = vec3(dir);
+    //    mat4 rotationMatrix = rotationMatrix(vec3(0.f,0.f,1.f),wt);
+    //    dir = dir * rotationMatrix;
+    //    sunDir = vec3(dir);
 
-    if(wt<0.5){
-        sunDir = normalize(vec3(1.0 - wt*2, wt-0.2, 1.0 - wt*2));
-        //sunSize += wt*5;
+    if(wt < 0.5){
+        sunDir = normalize(vec3(0.9 - wt*2, 0.1+(wt*0.04), 0.1));
     } else {
-        sunDir = normalize(vec3(1.0 - wt*2, 0.8 - wt, 1.0 - wt*2));
-        //sunSize -= (1-wt)*5;
+        sunDir = normalize(vec3(0.9 - wt*2, 0.12-((wt-0.5)*0.04), 0.1 - (wt-0.5)*0.2));
     }
-
+    //sunDir = night;
 
     //sunSize = 5;
     float angle = acos(dot(rayDir, sunDir)) * 360.0 / PI;
@@ -238,12 +243,18 @@ void main()
         }
     }
     //night color;
-    float weight = abs(sin(u_Time/1000.0));
+    float weight = abs(sin(u_Time/freq));
     vec3 nightColor = mix(duskColor, vec3(0,0,0),weight);
 
     float threshold = random2(uv).x;
-    if(uv.y > 0.3 && threshold > 0.995) {
-        nightColor = vec3(uv,1);
+    if(uv.y > 0.3 && threshold > 0.996) {
+        //make the stars shiney
+        float uvi = random2(uv).y;
+        if(uvi > 0.25){
+            nightColor = mix(vec3(uv,1),nightColor,sin(u_Time/10.0));
+        } else if (uvi > 0.75){
+            nightColor = mix(nightColor,vec3(uv,uv.x),sin(u_Time/10.0));
+        }
     } else if(uv.y > 0.65 && threshold > 0.993) {
         nightColor = vec3(uv,1);
     } else if(uv.y > 0.8 && (threshold > 0.99)) {
@@ -251,11 +262,14 @@ void main()
     } else if (threshold > 0.97 && random2(uv).y > 0.97){
         nightColor = vec3(uv,0.95);
     }
-    //weight = abs(sin(u_Time/1000.0));
-    if(weight > 0.25){
-    outColor = mix(outColor,nightColor,weight);
-    }
 
+    float dayTime = sin(u_Time/freq*2);
+    weight = abs(sin(u_Time/freq*2));
+    if(dayTime < 0 ){
+        outColor = mix(outColor,duskColor,weight);
+        outColor = mix(outColor,nightColor, weight);
+    }
     out_Col = vec4(outColor,1);
+
 }
 
