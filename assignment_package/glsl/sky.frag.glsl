@@ -251,8 +251,8 @@ void main()
     } else if (threshold > 0.97 && random2(uv).y > 0.97){
         nightColor = vec3(uv,0.95);
     }
-    weight = abs(sin(u_Time/1000.0));
-    if(wt > 0.25){
+    //weight = abs(sin(u_Time/1000.0));
+    if(weight > 0.25){
     outColor = mix(outColor,nightColor,weight);
     }
 
