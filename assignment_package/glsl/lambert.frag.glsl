@@ -51,9 +51,18 @@ void main()
         // Avoid negative lighting values
         diffuseTerm = clamp(diffuseTerm, 0, 1);
 
-        float ambientTerm = 0.2;
+        float rise = 0.2;
+        float noon = -0.3;
 
-        float lightIntensity = diffuseTerm + ambientTerm;   //Add a small float value to the color multiplier
+        //ambientTerm changes with u_Time
+        float wt = abs(sin(u_Time/1000.0));
+        float ambientTerm;
+        //day
+        ambientTerm = mix(rise, noon, wt);
+
+        float contrast = mix(1.5, 0.2, wt);
+
+        float lightIntensity = (diffuseTerm  + ambientTerm) * contrast;   //Add a small float value to the color multiplier
                                                             //to simulate ambient lighting. This ensures that faces that are not
                                                             //lit by our point light are not completely black.
 
