@@ -335,13 +335,11 @@ void MyGL::createShaders()
     mp_water2Shader = mkU<PostProcessShader>(this);
     mp_water2Shader->create(":/glsl/passthrough.vert.glsl", ":/glsl/water2.frag.glsl");
 
-
     mp_lava2Shader = mkU<PostProcessShader>(this);
-    mp_lava2Shader->create(":/glsl/passthrough.vert.glsl", ":/glsl/custom.frag.glsl");
-
+    mp_lava2Shader->create(":/glsl/passthrough.vert.glsl", ":/glsl/lava2.frag.glsl");
 
     mp_customShader = mkU<PostProcessShader>(this);
-    mp_customShader->create(":/glsl/passthrough.vert.glsl", ":/glsl/lava.frag.glsl");
+    mp_customShader->create(":/glsl/passthrough.vert.glsl", ":/glsl/custom.frag.glsl");
 
     mp_BWShader = mkU<PostProcessShader>(this);
     mp_BWShader->create(":/glsl/passthrough.vert.glsl", ":/glsl/bw.frag.glsl");
