@@ -94,6 +94,25 @@ void Trees::moveAndDrawLine()
     t.pos = currPos;
 }
 
+void Trees::moveAndDrawLeaf()
+{
+    glm::vec3 currPos = t.pos;
+    float step = 1.f;
+
+    for (int i = 0; i < 4; i++)
+    {
+        currPos = currPos + step * t.look;
+
+        int x = glm::floor(currPos.x);
+        int y = glm::floor(currPos.y);
+        int z = glm::floor(currPos.z);
+
+        currChunk->setBlockAt(x, y, z, LEAF);
+    }
+
+    t.pos = currPos;
+}
+
 void Trees::rotateX()
 {
     /// Include random numbers for path orientation

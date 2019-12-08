@@ -62,7 +62,7 @@ void CreateChunkRunnable::run() {
             // Get moisture and bumpiness values
             glm::vec2 currentPos = glm::vec2(fbmX, fbmZ);
             float scale = 0.001;
-            glm::vec2 mb = glm::vec2(fbm(scale * currentPos.x, scale* currentPos.y), fbm((currentPos.x + 100.34) * scale, (currentPos.y +  678.98234) * scale));
+            glm::vec2 mb = glm::vec2(fbm(scale * currentPos.x, scale * currentPos.y), fbm((currentPos.x + 100.34) * scale, (currentPos.y +  678.98234) * scale));
 
             // Get the current biome we are in
             BiomeType currBiome = getCurrBiome(mb);
@@ -111,25 +111,6 @@ void CreateChunkRunnable::run() {
                         chunk->setBlockAt(x, intFBM, z, GRASS);
                     } else {
                         chunk->setBlockAt(x, i, z, DIRT);
-                    }
-                }
-
-                // Create Hobbit holes
-                if ((double) rand() / (RAND_MAX) < 0.0005) {
-                    int radius = rand() % 8 + 6;
-                    for (int i = x - radius; i < x + radius; i++) {
-                        for (int j = z - radius; j < z + radius; j++) {
-                            for (int y = 128; y < 143; y++)
-                            {
-                                glm::vec4 center(x, 128, z, 0);
-                                glm::vec4 pos2(i, y, j, 0);
-
-                                if (glm::distance(center, pos2) < radius && glm::distance(center, pos2) > radius - 2.f)
-                                {
-                                    chunk->setBlockAt(i, y, j, HILLGRASS);
-                                }
-                            }
-                        }
                     }
                 }
 

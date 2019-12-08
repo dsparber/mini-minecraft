@@ -42,39 +42,3 @@ glm::vec2 random2(glm::vec2 p) {
     return glm::fract(a);
 }
 
-float surflet(glm::vec2 p, glm::vec2 gridPoint) {
-    // Compute the distance between p and the grid point along each axis, and warp it with a
-    // quintic function so we can smooth our cells
-    glm::vec2 diff = glm::abs(p - gridPoint);
-
-    glm::vec2 pow5(glm::pow(diff.x, 5.f), glm::pow(diff.y, 5.f));
-    glm::vec2 pow4(glm::pow(diff.x, 4.f), glm::pow(diff.y, 4.f));
-    glm::vec2 pow3(glm::pow(diff.x, 3.f), glm::pow(diff.y, 3.f));
-
-    glm::vec2 t = glm::vec2(1.f, 1.f) - 6.f * pow5 - 15.f * pow4 + 10.f * pow3;
-    // Get the random vector for the grid point (assume we wrote a function random2)
-    glm::vec2 gradient = random2(gridPoint);
-    // Get the vector from the grid point to P
-    diff = p - gridPoint;
-    // Get the value of our height field by dotting grid->P with our gradient
-    float height = glm::dot(diff, gradient);
-
-    // Scale our height field (i.e. reduce it) by our polynomial falloff function
-    return height * t.x * t.y;
-}
-
-float perlinNoise(glm::vec2 uv) {
-    float surfletSum = 0.f;
-    // Iterate over the four integer corners surrounding uv
-    for (int dx = 0; dx <= 1; ++dx)
-    {
-        for(int dy = 0; dy <= 1; ++dy)
-        {
-
-            surfletSum += surflet(uv, glm::floor(uv) + glm::vec2(dx, dy));
-            float s = surflet(uv, glm::floor(uv) + glm::vec2(dx, dy));
-        }
-    }
-    return glm::clamp(surfletSum, -1.f, 1.f);
-}
-

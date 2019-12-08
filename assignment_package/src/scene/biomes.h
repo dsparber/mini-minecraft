@@ -13,8 +13,8 @@ float snowyMtsNoise(float x, float z);
 
 BiomeType getCurrBiome(glm::vec2 mb);
 
-float interpolateBiomes(glm::vec4 biomeHeights, glm::vec2 mb);
+int currBiomeNumb(BiomeType b);
 
-void createHobbitHole(int x, int z);
+float interpolateBiomes(glm::vec4 biomeHeights, glm::vec2 mb);
 
 #endif // BIOMES_H

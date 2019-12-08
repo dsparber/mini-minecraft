@@ -37,6 +37,7 @@ public:
 
     /// Drawing rules for river generation
     void moveAndDrawLine();
+    void moveAndDrawLeaf();
     void rotateX();
     void rotateY();
     void rotateZ();
