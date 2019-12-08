@@ -145,3 +145,29 @@ After a chunk was created it is inserted into a vector which the main thread lat
 #### Difficulties
 
 - None
+
+
+## Milestone 3
+
+### Amelia
+
+### Daniel
+
+#### Video 
+
+[Video](https://youtu.be/Pr75L229qrg)
+
+#### Implementation
+
+- *Fog:* The vertex shader glsl calculates the alpha value based on the z distance. The fragment shader applies the alpha value to the sampled color.
+
+- *Post process shaders:* The pipline was taken from homework 5. The frame buffer is used with a new texture slot (different from normal texture slot). The water and lava shader both use worley noise and a time unform. The noise for lava is more vivid and more fine grained than for water. The colors are also modified. 
+
+- *Random walks / caves:* I defined a new class for a random walk state. The state has a step() and a next() method. The step method executes an arbitrary operation, the next method returns the next state. The driver class (RandomWalk) calls the step and next method as long as the next state is not null. The random walk is executed as a runnable on the thread pool. For this assignment I implemented two concrete random walk states: tunnel and cave. The tunnel step hollows out some terrain around the current position and moves into a random direction. To span side tunnels, the tunnel state randomly spans a new random walk from time to time. The tunnel has a time to live value. As long as this value is greater 0, the next state is also tunnel. Otherwise, the next state is cave. The cave hollows out a larger volume and fills the lower third with lava. The cave has no next state. 
+
+#### Difficulties
+
+- None
+
+
+### Veronice
