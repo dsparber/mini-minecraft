@@ -20,11 +20,12 @@ MyGL::MyGL(QWidget *parent)
       mp_camera(mkU<Camera>()),
       mp_player(mkU<Player>()),
       mp_terrain(mkU<Terrain>(this)),
-      m_texture(std::make_shared<Texture>(this)), 
+      m_texture(std::make_shared<Texture>(this)),
       mp_currentTex(nullptr),
       lastUpdate(0),
       mp_time(0),
       mp_lavaShader(),
+      mp_BWShader(),
       mp_waterShader(),
       mp_plainShader(),
       mp_geomQuad(this),
@@ -89,7 +90,7 @@ void MyGL::initializeGL()
     mp_geomQuad.create();
 
     createShaders();
-
+    currShader = mp_plainShader.get();
     // Initializes the terrain
     mp_terrain->initialize();
     createTextures();
@@ -97,13 +98,13 @@ void MyGL::initializeGL()
     //RandomWalk::start(mkS<TunnelWalk>(mp_terrain.get(), glm::vec3(-17, 130, 10)));
     QThreadPool::globalInstance()->waitForDone();
 
-//    // Create rivers
-//    River* rivers = new River(mp_terrain.get());
-//    rivers->createRiver1(-50, -55);
-//    rivers->createRiver2(100, 30);
-//    for(Chunk* c : mp_terrain->getChunksToDraw()){
-//        c->update();
-//    }
+    //    // Create rivers
+    //    River* rivers = new River(mp_terrain.get());
+    //    rivers->createRiver1(-50, -55);
+    //    rivers->createRiver2(100, 30);
+    //    for(Chunk* c : mp_terrain->getChunksToDraw()){
+    //        c->update();
+    //    }
 
     // We have to have a VAO bound in OpenGL 3.2 Core. But if we're not
     // using multiple VAOs, we can just bind one once.
@@ -127,6 +128,7 @@ void MyGL::resizeGL(int w, int h)
     mp_plainShader->setDimensions(glm::ivec2(w, h));
     mp_waterShader->setDimensions(glm::ivec2(w, h));
     mp_lavaShader->setDimensions(glm::ivec2(w, h));
+    mp_BWShader->setDimensions(glm::ivec2(w, h));
     mp_progSky->setViewProjMatrix(glm::inverse(viewproj));
     // Sky
     mp_progSky->useMe();
@@ -192,6 +194,10 @@ void MyGL::paintGL()
 
     mp_waterShader->setTime(mp_time);
     mp_lavaShader->setTime(mp_time);
+    mp_water2Shader->setTime(mp_time);
+    mp_lava2Shader->setTime(mp_time);
+    mp_customShader->setTime(mp_time);
+    mp_BWShader->setTime(mp_time);
     mp_progLambert->setTime(mp_time);
     mp_progSky->setTime(mp_time);
     ++mp_time;
@@ -259,8 +265,8 @@ void MyGL::performPostprocessRenderPass()
     } else if (blockType == LAVA) {
         mp_lavaShader->draw(mp_geomQuad, false, TEXTURE_SLOT_POST_PROCESS);
     } else {
-        mp_plainShader->draw(mp_geomQuad, false, TEXTURE_SLOT_POST_PROCESS);
-    }
+        currShader->draw(mp_geomQuad, false, TEXTURE_SLOT_POST_PROCESS);
+     }
 }
 
 void MyGL::createRenderBuffers()
@@ -326,6 +332,20 @@ void MyGL::createShaders()
     mp_waterShader = mkU<PostProcessShader>(this);
     mp_waterShader->create(":/glsl/passthrough.vert.glsl", ":/glsl/water.frag.glsl");
 
+    mp_water2Shader = mkU<PostProcessShader>(this);
+    mp_water2Shader->create(":/glsl/passthrough.vert.glsl", ":/glsl/water2.frag.glsl");
+
+
+    mp_lava2Shader = mkU<PostProcessShader>(this);
+    mp_lava2Shader->create(":/glsl/passthrough.vert.glsl", ":/glsl/custom.frag.glsl");
+
+
+    mp_customShader = mkU<PostProcessShader>(this);
+    mp_customShader->create(":/glsl/passthrough.vert.glsl", ":/glsl/lava.frag.glsl");
+
+    mp_BWShader = mkU<PostProcessShader>(this);
+    mp_BWShader->create(":/glsl/passthrough.vert.glsl", ":/glsl/bw.frag.glsl");
+
     mp_progSky = mkU<PostProcessShader>(this);
     mp_progSky->create(":/glsl/sky.vert.glsl", ":/glsl/sky.frag.glsl");
 
@@ -336,6 +356,22 @@ void MyGL::keyPressEvent(QKeyEvent *e)
 {
     mp_player->handleKeyEvent(e);
     mp_progLambert->updateCameraPos(glm::vec4(mp_camera->eye,1));
+    if (e->key() == Qt::Key_1) {
+        currShader = mp_BWShader.get();
+    } else if (e->key() == Qt::Key_2) {
+        currShader = mp_waterShader.get();
+    } else if (e->key() == Qt::Key_3) {
+        currShader = mp_lavaShader.get();
+    } else if (e->key() == Qt::Key_4) {
+        currShader = mp_water2Shader.get();
+    } else if (e->key() == Qt::Key_5) {
+        currShader = mp_lava2Shader.get();
+    } else if (e->key() == Qt::Key_6) {
+        currShader = mp_customShader.get();
+    } else if (e->key() == Qt::Key_0) {
+        currShader = mp_plainShader.get();
+    }
+
 }
 
 void MyGL::keyReleaseEvent(QKeyEvent *e)

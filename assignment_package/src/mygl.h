@@ -39,11 +39,25 @@ private:
     /// PostProcessShader for water
     uPtr<PostProcessShader> mp_waterShader;
 
+    /// PostProcessShader for water2
+    uPtr<PostProcessShader> mp_water2Shader;
+
     /// PostProcessShader for lava
     uPtr<PostProcessShader> mp_lavaShader;
 
+    /// PostProcessShader for lava2
+    uPtr<PostProcessShader> mp_lava2Shader;
+
+    /// PostProcessShader for black and white
+    uPtr<PostProcessShader> mp_BWShader;
+
     /// No modification PostProcessShader
     uPtr<PostProcessShader> mp_plainShader;
+
+    /// PostProcessShader for custom
+    uPtr<PostProcessShader> mp_customShader;
+
+    ShaderProgram* currShader;
 
     /// A handle for our vertex array object. This will store the VBOs created in our geometry classes.
     /// Don't worry too much about this. Just know it is necessary in order to render geometry.
