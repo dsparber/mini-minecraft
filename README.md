@@ -4,6 +4,9 @@ Amelia Peng, Daniel Sparber, Veronica Bristol
 ## Milestone 3
 
 ### Amelia
+
+#### Video
+- [https://vimeo.com/378304192]
 #### Implementation
 - *Day and night cycle:* implemented a procedural sky background using the ray cast method. The sun's position and sky color is changed smoothly overtime using time variable in sky shader. The sky goes from sun rise to sun set to night with stary sky implemented using noise functions, where very light color(as the stars) is only drawn when it's above a certain threshold from the output of worley noise. The color of the terrain is also changed over time relative to the sky color by modifying the lambert shader using mix function.  
 - *Post process shaders:* modified from the pipline seted up from the last milestone, fixed frame buffers, and implemented another set of water and lava shader as well as a set of costume shaders using worley noise and random functions. Implement a set of key press behaviors, so when the player presses number 1~9, different shaders could be viewed as follows:
