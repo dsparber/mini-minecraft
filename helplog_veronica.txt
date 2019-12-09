@@ -61,3 +61,41 @@ A: Didn’t really get an answer
 
 Resourcs:
 https://www.geeksforgeeks.org/bresenhams-line-generation-algorithm/
+
+
+
+Final Project Milestone 3 Help Log:
+
+Tuesday:
+Q: How to approach biomes
+A: Get noise functions for each biome, use temperature and bumpiness to determine which biome I’m in at a given position, then use weights to combine the height values from each biome to get the height at the current position.
+
+Wednesday:
+Q: Can’t get smooth step function to work in my desert noise function
+A: needed 0.45f not 0.45
+
+Q: Getting noise1D in fbm.cpp to compile
+A: —ask Adam
+
+Q: Getting the weights for each biome
+A: Need to put currPos values within bounds of 0 and 1
+
+Thursday:
+Q: How to interpolate properly? How to get currPos between 0 and 1?
+A: Need to include 2nd closest Worley point and interpolate between the closest and 2nd closest
+
+Q: How to set up temp and moisture to separate biomes properly?
+A: Can use Worley noise but want to use same Worley noise for both, just manipulate final value for one
+
+Friday:
+Q: Getting terrain heights to look correct and transition correctly
+-Interpolation, check inputs to mbNoise
+A: Simpler interpolation function Adam gave me
+
+Saturday:
+Q: Fixing interpolation, getting mb values to work, check interpolation
+A: Needed to switch back to using fbm functions for moisture and bumpiness and multiply the input values by a very small scale value to make the output less noisy
+
+Resources:
+http://parzivail.com/procedural-terrain-generaion/
+https://glm.g-truc.net/0.9.4/api/a00129.html#ga3f64b3986efe205cf30300700667e761

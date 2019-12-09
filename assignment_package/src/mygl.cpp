@@ -98,10 +98,11 @@ void MyGL::initializeGL()
     RandomWalk::start(mkS<TunnelWalk>(mp_terrain.get(), glm::vec3(-17, 130, 10)));
     QThreadPool::globalInstance()->waitForDone();
 
-    // Create rivers
+     Create rivers
     River* rivers = new River(mp_terrain.get());
     rivers->createRiver1(-50, -55);
     rivers->createRiver2(100, 30);
+
     for(Chunk* c : mp_terrain->getChunksToDraw()) {
         c->update();
     }

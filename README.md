@@ -49,6 +49,21 @@ Amelia Peng, Daniel Sparber, Veronica Bristol
 
 ### Veronica
 
+#### Implementation
+
+- *Biomes:* I wanted to implement a Lord of the Rings theme for our Minecraft world. I thus made our biomes resemble Mordor, the Shire, the Snowy Mountains, and the Ent forest. The shire has relatively flat terrain with some hills while the forest is slightly flatter and has a thick forest. The snowy moutains are huge mountains, very steep with high elevation, and Mordor is also rocky and tumultuous, although much flatter than the mountains. I implemented the biomes by first developing my four fbm functions for the four biomes. I then implemented two noise functions for moisture and bumpiness, at first using Worley noise but then switching to simpler fbm functions. I then use moisture and bumpiness values to determine which biome I am in and I interpolate between the four biomes when close to the borders using billinear interpolation. I fnially set the block type based on the current biome that I'm in and add in my tree assets.
+
+- *Trees:* I created a new 3D turtle class so that I would have a turtle to use when creating trees that could rotate in all 3 directions. I then used an online site to develop a grammar for my trees and implemented the trees class similar to how rivers were implemented. The difference is that I added colors to my grammar that each changed the current block being used (bark or leaves) and I added rotation and movement in the y direction.
+
+#### Difficulties
+
+- It took forever to get my biomes to interpolate correctly. There were so many small changes and random numbers but we figured it out. I really struggled at first because I was trying to interpolate using Worley noise; however, switching to simple bilinear interpolation made the whole thing a lot simpler, and I was then able to figure it out.
+- I also struggled to get my trees to actually look good. Getting the leaves to appear at the top where leaves would be was very hard, even when testing my L-Systems beforehand. 
+
+#### Notes:
+
+- I removed the rivers from milestone 2 because they didn't go with my vision for the biomes or the Lord of the Rings theme. They can still be seen in our video, but are commented out in the most recent code.
+
 
 ## Milestone 2
 
