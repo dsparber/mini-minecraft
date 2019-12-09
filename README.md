@@ -2,7 +2,7 @@
 Amelia Peng, Daniel Sparber, Veronica Bristol
 
 ## Milestone 3
-###Final Video
+### Final Video
 - [https://www.youtube.com/watch?v=KZW3J8Ed634&feature=youtu.be]
 
 ### Amelia
