@@ -355,15 +355,15 @@ void MyGL::keyPressEvent(QKeyEvent *e)
     mp_player->handleKeyEvent(e);
     mp_progLambert->updateCameraPos(glm::vec4(mp_camera->eye,1));
     if (e->key() == Qt::Key_1) {
-        currShader = mp_BWShader.get();
-    } else if (e->key() == Qt::Key_2) {
         currShader = mp_waterShader.get();
-    } else if (e->key() == Qt::Key_3) {
+    } else if (e->key() == Qt::Key_2) {
         currShader = mp_lavaShader.get();
-    } else if (e->key() == Qt::Key_4) {
+    } else if (e->key() == Qt::Key_3) {
         currShader = mp_water2Shader.get();
-    } else if (e->key() == Qt::Key_5) {
+    } else if (e->key() == Qt::Key_4) {
         currShader = mp_lava2Shader.get();
+    } else if (e->key() == Qt::Key_5) {
+        currShader = mp_BWShader.get();
     } else if (e->key() == Qt::Key_6) {
         currShader = mp_customShader.get();
     } else if (e->key() == Qt::Key_0) {

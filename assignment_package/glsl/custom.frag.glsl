@@ -53,9 +53,9 @@ const float PI = 3.1415926535;
 //}
 
 
-uniform float vx_offset = 1.0;
+uniform float vx_offset = 0.5; //how much effect is on screen
  float hatch_y_offset = 5.0; // 5.0
- float lum_threshold_1 = 1.0; // 1.0
+ float lum_threshold_1 = 1.5; // 1.0
  float lum_threshold_2 = 0.7; // 0.7
  float lum_threshold_3 = 0.5; // 0.5
  float lum_threshold_4 = 0.3; // 0.3
@@ -92,7 +92,7 @@ void main()
         tc = vec3(0.0, 0.0, 0.0);
     }
   }
-  else if (fs_UV.x>=(vx_offset+0.005))
+  else if (fs_UV.x>=(vx_offset+0.001))
   {
     tc = texture(u_RenderedTexture, fs_UV).rgb;
   }

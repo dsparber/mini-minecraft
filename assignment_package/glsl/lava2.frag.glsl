@@ -10,7 +10,7 @@ out vec4 color;
 uniform sampler2D u_RenderedTexture;
 
 //how much normal effect fills the screen
-const float mouse_x_offset = 0.0;
+const float mouse_x_offset = 0.5;
 
 const float edge_thres = 0.2; // 0.2;
 const float edge_thres2 = 5.0; // 5.0;
@@ -192,7 +192,7 @@ void main()
     vec3 vRGB = (edg >= edge_thres)? vec3(0.0,0.0,0.0):HSVtoRGB(vHSV.x,vHSV.y,vHSV.z);
     tc = vec4(vRGB.x,vRGB.y,vRGB.z, 1);
   }
-  else if (uv.x < (mouse_x_offset-0.002))
+  else if (uv.x < (mouse_x_offset-0.001))
   {
     tc = texture(u_RenderedTexture, uv);
   }
