@@ -51,11 +51,17 @@ private:
     /// PostProcessShader for black and white
     uPtr<PostProcessShader> mp_BWShader;
 
+    uPtr<PostProcessShader> mp_hatchingShader;
+    uPtr<PostProcessShader> mp_toonifyShader;
+    uPtr<PostProcessShader> mp_Shader7;
+    uPtr<PostProcessShader> mp_Shader8;
+    uPtr<PostProcessShader> mp_Shader9;
+
+
+
     /// No modification PostProcessShader
     uPtr<PostProcessShader> mp_plainShader;
 
-    /// PostProcessShader for custom
-    uPtr<PostProcessShader> mp_customShader;
 
     ShaderProgram* currShader;
 

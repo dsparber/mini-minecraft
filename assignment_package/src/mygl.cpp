@@ -129,6 +129,7 @@ void MyGL::resizeGL(int w, int h)
     mp_waterShader->setDimensions(glm::ivec2(w, h));
     mp_lavaShader->setDimensions(glm::ivec2(w, h));
     mp_BWShader->setDimensions(glm::ivec2(w, h));
+    mp_waterShader->setDimensions(glm::ivec2(w, h));
     mp_progSky->setViewProjMatrix(glm::inverse(viewproj));
     // Sky
     mp_progSky->useMe();
@@ -196,8 +197,12 @@ void MyGL::paintGL()
     mp_lavaShader->setTime(mp_time);
     mp_water2Shader->setTime(mp_time);
     mp_lava2Shader->setTime(mp_time);
-    mp_customShader->setTime(mp_time);
+    mp_toonifyShader->setTime(mp_time);
     mp_BWShader->setTime(mp_time);
+    mp_hatchingShader->setTime(mp_time);
+    mp_Shader7->setTime(mp_time);
+    mp_Shader8->setTime(mp_time);
+    mp_Shader9->setTime(mp_time);
     mp_progLambert->setTime(mp_time);
     mp_progSky->setTime(mp_time);
     ++mp_time;
@@ -338,8 +343,20 @@ void MyGL::createShaders()
     mp_lava2Shader = mkU<PostProcessShader>(this);
     mp_lava2Shader->create(":/glsl/passthrough.vert.glsl", ":/glsl/lava2.frag.glsl");
 
-    mp_customShader = mkU<PostProcessShader>(this);
-    mp_customShader->create(":/glsl/passthrough.vert.glsl", ":/glsl/custom.frag.glsl");
+    mp_toonifyShader = mkU<PostProcessShader>(this);
+    mp_toonifyShader->create(":/glsl/passthrough.vert.glsl", ":/glsl/toonify.frag.glsl");
+
+    mp_hatchingShader = mkU<PostProcessShader>(this);
+    mp_hatchingShader->create(":/glsl/passthrough.vert.glsl", ":/glsl/hatching.frag.glsl");
+
+    mp_Shader7 = mkU<PostProcessShader>(this);
+    mp_Shader7->create(":/glsl/passthrough.vert.glsl", ":/glsl/shader7.frag.glsl");
+
+    mp_Shader8 = mkU<PostProcessShader>(this);
+    mp_Shader8->create(":/glsl/passthrough.vert.glsl", ":/glsl/shader8.frag.glsl");
+
+    mp_Shader9 = mkU<PostProcessShader>(this);
+    mp_Shader9->create(":/glsl/passthrough.vert.glsl", ":/glsl/shader9.frag.glsl");
 
     mp_BWShader = mkU<PostProcessShader>(this);
     mp_BWShader->create(":/glsl/passthrough.vert.glsl", ":/glsl/bw.frag.glsl");

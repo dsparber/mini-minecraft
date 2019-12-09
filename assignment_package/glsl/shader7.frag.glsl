@@ -1,15 +1,12 @@
 #version 150
-// shader8.vert.glsl:
 
-in vec4 vs_Pos;
-in vec2 vs_UV;
+in vec2 fs_UV;
 
-out vec2 fs_UV;
-out vec4 fs_Pos;
+out vec4 color;
+
+uniform sampler2D u_RenderedTexture;
 
 void main()
 {
-    fs_UV = vs_UV;
-    gl_Position = vs_Pos;
-    fs_Pos = vs_Pos;
+    color = texture(u_RenderedTexture, fs_UV);
 }

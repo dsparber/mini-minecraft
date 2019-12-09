@@ -13,10 +13,10 @@
         <file>glsl/bw.frag.glsl</file>
         <file>glsl/water2.frag.glsl</file>
         <file>glsl/lava2.frag.glsl</file>
-        <file>glsl/custom.frag.glsl</file>
         <file>glsl/shader8.frag.glsl</file>
         <file>glsl/shader9.frag.glsl</file>
         <file>glsl/shader7.frag.glsl</file>
         <file>glsl/toonify.frag.glsl</file>
+        <file>glsl/hatching.frag.glsl</file>
     </qresource>
 </RCC>
