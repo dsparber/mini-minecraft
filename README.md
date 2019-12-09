@@ -151,25 +151,28 @@ After a chunk was created it is inserted into a vector which the main thread lat
 
 ### Amelia
 #### Implementation
-- *Day and night cycle:* implemented a procedural sky background using the ray cast method. The sun's position and sky color is changed smoothly overtime using time variable in sky shader. The sky goes from sun rise to sun set to night with stary sky implemented using noise functions. The color of the terrain is also changed over time relative to the sky color by modifying the lambert shader.  
-- *Post process shaders:* modified from the pipline seted up from the last milestone, fixed frame buffers, and implemented another set of water and lava shader as well as a set of costume shaders. Implement a set of key press behaviors, so when the player presses number 1~8, different shaders could be viewed as follows:
+- *Day and night cycle:* implemented a procedural sky background using the ray cast method. The sun's position and sky color is changed smoothly overtime using time variable in sky shader. The sky goes from sun rise to sun set to night with stary sky implemented using noise functions, where very light color(as the stars) is only drawn when it's above a certain threshold from the output of worley noise. The color of the terrain is also changed over time relative to the sky color by modifying the lambert shader using mix function.  
+- *Post process shaders:* modified from the pipline seted up from the last milestone, fixed frame buffers, and implemented another set of water and lava shader as well as a set of costume shaders using worley noise and random functions. Implement a set of key press behaviors, so when the player presses number 1~9, different shaders could be viewed as follows:
     - 1: underwater (by Daniel)
     - 2: underlava (by Daniel)
     - 3: underwater
     - 4: underlava 
-    - 5: old movie 
+    - 5: horror movie
     - 6: toonify (modified from shader library*)
     - 7: hatchings (modified from shader library*)
+    - 8: old movie (modified from shader toy*)
+    - 9: kaledoscope
     - 0: orginal
 #### Difficulties
-- implementing sky shader: I struggled a lot implementing the sky shader into exisiting code. At first
-- sun's transition: I tried many thing to 
-- color mixing:  
-- timing of the day and night cycle
-- post process shader screen ratio: 
-- ways to fit more shaders: 
+- implementing sky shader: I struggled a lot implementing the sky shader into exisiting code. At first the sky was not showing up at all, then I experimented with a lot of different shaders, frame buffers, and changing the sky shader to a single color. It began to show up when I comment out some code, but is gone again after I run it with the same code, which makes it even harder to debug. It was finally solved by drawing it after the frame buffer is bindede using the same quad as the post process shaders and setting it to "transparent" when drawing the block for the purpose of vbo ordering.  
+- sun's transition and color mixing: I tried many thing to make the sun transition smoothy, which does not work with using mix function with three hardcoded directions. I ended up calculate functions that changes the sun direction's xyz sepereatly, each in a different relation to u_Time. 
+- timing of the day and night cycle: I experimented a lot to get the cycle right and make sure the sky don't go from night to day again when the sun still haven't "reset". I ended up keeping a variable that keep track of the global weight relatively to time, and in each mix function I re-calculate the weight if needed for different purposes(changing day to night, start shining, sun rising) . 
+- post process shader screen ratio: There was a blue bar on top of my scene but not on my group partners, and I found it's gone when I commented post process shaders out. I debug from there and fixed it by resetting the framebuffer each time when resizeGL() is called. 
+- ways to fit more shaders: Daniel and I accidentally did post process shader at the same time and we ended up using his for under water and lava effects. To save my work from being discarded, I set up a current shader pipeline and certain post process shader is used to draw all blocks when certain key is pressed. The water and lava shader I made can be seen by pressing 3 and 4, and I experimented and added a lot more shaders using noises and online resources.
+- tested the game for too long when I went back to coding I felt that the screen is rotating XD
 
 *Shader library: https://www.geeks3d.com/shader-library/
+*Shader Toy Old Movie Effect: https://www.shadertoy.com/view/4dKfDm
 
 ### Daniel
 
