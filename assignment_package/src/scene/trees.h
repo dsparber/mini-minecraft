@@ -2,7 +2,7 @@
 #define TREES_H
 
 #include <iostream>
-#include "turtle3D.h"
+#include "turtle3d.h"
 #include <QHash>
 #include <QStack>
 #include <QChar>
@@ -21,6 +21,7 @@ public:
     QHash<QChar, Rule> drawRules;
     Turtle3D t;
     float radius;
+    BlockType currBlock;
 
     Trees(Chunk* chunk);
     ~Trees();
@@ -38,6 +39,9 @@ public:
     /// Drawing rules for river generation
     void moveAndDrawLine();
     void moveAndDrawLeaf();
+    void setCurrBlock0();
+    void setCurrBlock1();
+    void setCurrBlock2();
     void rotateX();
     void rotateY();
     void rotateZ();

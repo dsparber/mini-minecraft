@@ -6,6 +6,7 @@ bool isSolid(BlockType type) {
             || type == DIRT
             || type == WOOD
             || type == LEAF
+            || type == DARKLEAF
             || type == BEDROCK
             || type == ICE
             || type == SNOW

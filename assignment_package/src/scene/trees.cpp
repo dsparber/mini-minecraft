@@ -1,13 +1,15 @@
 #include "trees.h"
 
 Trees::Trees(Chunk* chunk)
-    : currChunk(chunk), stack(), expanRules(), drawRules(), t(), radius(2.f)
+    : currChunk(chunk), stack(), expanRules(), drawRules(), t(), radius(2.f), currBlock(BARK)
 {
     /// Fill maps with expansion and drawing rules
-    expanRules.insert('X', "F[-X][+X]");
-    expanRules.insert('F', "F");
-    expanRules.insert('Y', "G-[[Y]+Y]+G[+GY]-Y");
+    expanRules.insert('F', "0FF-[1-F=F+F]+[2+F=F-F]");
+    expanRules.insert('Y', "0G-[[Y]+Y]+1G[+GY]-Y");
     expanRules.insert('G', "GG");
+    expanRules.insert('0', "0");
+    expanRules.insert('1', "1");
+    expanRules.insert('2', "2");
     expanRules.insert('+', "+");
     expanRules.insert('-', "-");
     expanRules.insert('=', "=");
@@ -18,6 +20,9 @@ Trees::Trees(Chunk* chunk)
     drawRules.insert('G', &Trees::moveAndDrawLine);
     drawRules.insert('X', &Trees::doNothing);
     drawRules.insert('Y', &Trees::doNothing);
+    drawRules.insert('0', &Trees::setCurrBlock0);
+    drawRules.insert('1', &Trees::setCurrBlock1);
+    drawRules.insert('2', &Trees::setCurrBlock2);
     drawRules.insert('+', &Trees::rotateX);
     drawRules.insert('-', &Trees::rotateY);
     drawRules.insert('=', &Trees::rotateZ);
@@ -33,9 +38,9 @@ void Trees::createEntTree(int x, int y, int z)
     /// Set initial values
     t.pos = glm::vec3(x, y, z);
     t.look = glm::vec3(0.f, 1.f, 0.f);
-    QString axiom = "X";
+    QString axiom = "F";
 
-    QString expanded = expandString(8, axiom);
+    QString expanded = expandString(4, axiom);
     drawString(expanded);
 }
 
@@ -80,7 +85,7 @@ void Trees::moveAndDrawLine()
     glm::vec3 currPos = t.pos;
     float step = 1.f;
 
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < 3; i++)
     {
         currPos = currPos + step * t.look;
 
@@ -88,35 +93,31 @@ void Trees::moveAndDrawLine()
         int y = glm::floor(currPos.y);
         int z = glm::floor(currPos.z);
 
-        currChunk->setBlockAt(x, y, z, BARK);
+        currChunk->setBlockAt(x, y, z, currBlock);
     }
 
     t.pos = currPos;
 }
 
-void Trees::moveAndDrawLeaf()
+void Trees::setCurrBlock0()
 {
-    glm::vec3 currPos = t.pos;
-    float step = 1.f;
+    currBlock = BARK;
+}
 
-    for (int i = 0; i < 4; i++)
-    {
-        currPos = currPos + step * t.look;
+void Trees::setCurrBlock1()
+{
+    currBlock = LEAF;
+}
 
-        int x = glm::floor(currPos.x);
-        int y = glm::floor(currPos.y);
-        int z = glm::floor(currPos.z);
-
-        currChunk->setBlockAt(x, y, z, LEAF);
-    }
-
-    t.pos = currPos;
+void Trees::setCurrBlock2()
+{
+    currBlock = DARKLEAF;
 }
 
 void Trees::rotateX()
 {
     /// Include random numbers for path orientation
-    float angle = rand() % 45 + 30;
+    float angle = 22.f;
     float angleRad = angle * M_PI / 180.f;
 
     t.look = glm::mat3(glm::vec3(1.f, 0.f, 0.f),
@@ -127,7 +128,7 @@ void Trees::rotateX()
 void Trees::rotateY()
 {
     /// Include random numbers for path orientation
-    float angle = rand() % 45 + 30;
+    float angle = 22.f;
     float angleRad = angle * M_PI / 180.f;
 
     t.look = glm::mat3(glm::vec3(cos(angleRad), 0.f, -sin(angleRad)),

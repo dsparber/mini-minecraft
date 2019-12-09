@@ -325,6 +325,18 @@ void Chunk::drawFace(glm::vec4 pos, std::vector<GLuint>& idx, std::vector<glm::v
                                          (10 + offsetUVs[i].y)/16,
                                          1, 0.f)));
                 break;
+            case LEAF:
+                all.push_back(glm::vec4(0.f, 0.f, 0.f, 1.f));
+                all.push_back((glm::vec4((4 + offsetUVs[i].x)/16,
+                                         (12 + offsetUVs[i].y)/16,
+                                         1, 0.f)));
+                break;
+            case DARKLEAF:
+                all.push_back(glm::vec4(0.f, 0.f, 0.f, 1.f));
+                all.push_back((glm::vec4((5 + offsetUVs[i].x)/16,
+                                         (12 + offsetUVs[i].y)/16,
+                                         1, 0.f)));
+                break;
             default:
                 // Other types are as of yet not define
                 all.push_back(glm::vec4(0));

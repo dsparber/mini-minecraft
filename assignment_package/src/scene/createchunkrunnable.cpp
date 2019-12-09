@@ -82,23 +82,23 @@ void CreateChunkRunnable::run() {
 
                 for (int i = 128; i <= intFBM; i++) {
                     if (i == intFBM) {
-                        chunk->setBlockAt(x, intFBM, z, SAND);
+                        chunk->setBlockAt(x, intFBM, z, GRASS);
                     } else {
                         chunk->setBlockAt(x, i, z, DIRT);
                     }
                 }
 
                 //Generate Ent trees
-                if ((double) rand() / (RAND_MAX) < 0.001) {
+                if ((double) rand() / (RAND_MAX) < 0.01) {
                     Trees* trees = new Trees(chunk);
                     trees->createEntTree(x, 128, z);
                 }
             } else if (currBiome == MORDOR) {
                 for (int i = 0; i <= intFBM; i++) {
                     if (i == intFBM) {
-                        chunk->setBlockAt(x, intFBM, z, LAVA);
+                        chunk->setBlockAt(x, intFBM, z, DARKSTONE);
                     } else {
-                        chunk->setBlockAt(x, i, z, DARKSTONE);
+                        chunk->setBlockAt(x, i, z, LAVA);
                     }
                 }
             } else if (currBiome == SHIRE) {
