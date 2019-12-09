@@ -5,10 +5,12 @@ enum BlockType: unsigned char
 {
     EMPTY,
     GRASS,
+    HILLGRASS,
     DIRT,
     STONE,
     WOOD,
     LEAF,
+    DARKLEAF,
     BEDROCK,
     LAVA,
     WATER,
@@ -17,6 +19,10 @@ enum BlockType: unsigned char
     GLASS,
     COAL,
     ORE,
+    SAND,
+    DARKSTONE,
+    VOLCANO,
+    BARK
 };
 
 bool isSolid(BlockType);

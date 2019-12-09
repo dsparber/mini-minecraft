@@ -1,10 +1,8 @@
 #include "fbm.h"
 
-
 float rand(glm::vec2 n) {
     return (glm::fract(sin(glm::dot(n, glm::vec2(12.9898, 4.1414))) * 43758.5453));
 }
-
 
 float interpNoise2D(float x, float y) {
     float intX = glm::floor(x);
@@ -36,3 +34,11 @@ float fbm(float x, float z) {
     }
     return total;
 }
+
+glm::vec2 random2(glm::vec2 p) {
+    glm::vec2 a = glm::sin(glm::vec2(glm::dot(p, glm::vec2(127.1,311.7)), glm::dot(p, glm::vec2(269.5,183.3))));
+    a.x *= 43758.5453;
+    a.y *= 43758.5453;
+    return glm::fract(a);
+}
+

@@ -28,7 +28,11 @@ SOURCES += \
     $$PWD/random-walks/randomwalk.cpp \
     $$PWD/random-walks/tunnelwalk.cpp \
     $$PWD/random-walks/cavecreation.cpp \
-    $$PWD/scene/terrainutils.cpp
+    $$PWD/scene/terrainutils.cpp \
+    $$PWD/scene/biomes.cpp \
+    $$PWD/scene/biometype.cpp \
+    $$PWD/scene/trees.cpp \
+    $$PWD/scene/turtle3d.cpp
 
 HEADERS += \
     $$PWD/la.h \
@@ -58,4 +62,8 @@ HEADERS += \
     $$PWD/random-walks/randomwalk.h \
     $$PWD/random-walks/tunnelwalk.h \
     $$PWD/random-walks/cavecreation.h \
-    $$PWD/scene/terrainutils.h
+    $$PWD/scene/terrainutils.h \
+    $$PWD/scene/biomes.h \
+    $$PWD/scene/biometype.h \
+    $$PWD/scene/trees.h \
+    $$PWD/scene/turtle3d.h
