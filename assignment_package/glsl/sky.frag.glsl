@@ -186,7 +186,7 @@ void main()
 
     outColor = sunsetColor;
     //frequency of one day and night cycle
-    float freq = 500.0;
+    float freq = 2000.0;
     // Add a glowing sun in the sky
     float wt = abs(sin(u_Time/(freq)));
     //sun directions

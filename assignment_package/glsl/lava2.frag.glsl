@@ -44,6 +44,5 @@ void main()
     vec4 noiseC = texture(u_RenderedTexture, fs_UV + tPos / 15.0);
 
     // Get color
-    //color = texture(u_RenderedTexture, fs_UV + displacement);
-    color = .7 * noiseC + .3 * vec4(0, .4, 1, 1 / .3);
+    color = .7 * noiseC + .3 * vec4(1, .1, .1, 1 / .3);
     }

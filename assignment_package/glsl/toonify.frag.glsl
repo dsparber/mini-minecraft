@@ -191,10 +191,14 @@ void main()
     float edg = IsEdge(uv);
     vec3 vRGB = (edg >= edge_thres)? vec3(0.0,0.0,0.0):HSVtoRGB(vHSV.x,vHSV.y,vHSV.z);
     tc = vec4(vRGB.x,vRGB.y,vRGB.z, 1);
+    //make the color less green
+
+    tc = vec4(tc.r,tc.b,tc.g,1.0);
   }
   else if (uv.x < (mouse_x_offset-0.001))
   {
     tc = texture(u_RenderedTexture, uv);
   }
+  //make the color less green
   color = tc;
 }
