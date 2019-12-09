@@ -55,7 +55,7 @@ void main()
         float night = -0.1;
 
         //ambientTerm changes with u_Time
-        float freq = 500.0;
+        float freq = 2000.0;
         float dayTime = sin(u_Time/freq*2);
         float wt = abs(sin(u_Time/freq*2));
         float ambientTerm = 0.0;
@@ -69,7 +69,6 @@ void main()
             contrast = mix(1.0, 0.8, wt);
         }
 
-        //day
 
         float lightIntensity = (diffuseTerm  + ambientTerm) * contrast;   //Add a small float value to the color multiplier
                                                             //to simulate ambient lighting. This ensures that faces that are not
