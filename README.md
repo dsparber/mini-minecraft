@@ -153,14 +153,14 @@ After a chunk was created it is inserted into a vector which the main thread lat
 #### Implementation
 - *Day and night cycle:* implemented a procedural sky background using the ray cast method. The sun's position and sky color is changed smoothly overtime using time variable in sky shader. The sky goes from sun rise to sun set to night with stary sky implemented using noise functions. The color of the terrain is also changed over time relative to the sky color by modifying the lambert shader.  
 - *Post process shaders:* modified from the pipline seted up from the last milestone, fixed frame buffers, and implemented another set of water and lava shader as well as a set of costume shaders. Implement a set of key press behaviors, so when the player presses number 1~8, different shaders could be viewed as follows:
-    1: underwater (by Daniel)
-    2: underlava (by Daniel)
-    3: underwater
-    4: underlava 
-    5: old movie 
-    6: toonify (modified from shader library*)
-    7: hatchings (modified from shader library*)
-    0: orginal
+    *1: underwater (by Daniel)
+    *2: underlava (by Daniel)
+    *3: underwater
+    *4: underlava 
+    *5: old movie 
+    *6: toonify (modified from shader library*)
+    *7: hatchings (modified from shader library*)
+    *0: orginal
 #### Difficulties
 - implementing sky shader: I struggled a lot implementing the sky shader into exisiting code. At first
 - sun's transition: I tried many thing to 
