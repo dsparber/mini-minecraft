@@ -9,5 +9,9 @@ hw9 help log
 * 2019-11-20 6:30 pm: Kathryn explained me how two interleaving vbos work
 * 2019-11-21 4:23 pm: Adam helped me make my texture show up by adding the qrc file
 
- 
-
+Milestone3: 
+* looked up cool shaders on https://www.geeks3d.com/shader-library/ and implemented 2 of the existing algorithms from the library (tonify and hatching)
+* looked up how to mix at https://stackoverflow.com/questions/24356075/glsl-shader-interpolate-between-more-than-two-textures/24358237
+* experimented with color mixing at https://thebookofshaders.com/glossary/?search=mix
+* Adam and Hannah explained how procedural skybox work during office hours
+* looked up remapping at https://stackoverflow.com/questions/24063247/color-interpolation-in-fragment-shader-glsl

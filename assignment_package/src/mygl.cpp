@@ -365,8 +365,15 @@ void MyGL::keyPressEvent(QKeyEvent *e)
     } else if (e->key() == Qt::Key_5) {
         currShader = mp_BWShader.get();
     } else if (e->key() == Qt::Key_6) {
-        currShader = mp_customShader.get();
-    } else if (e->key() == Qt::Key_0) {
+        currShader = mp_toonifyShader.get();
+    } else if (e->key() == Qt::Key_7) {
+        currShader = mp_hatchingShader.get();
+    } else if (e->key() == Qt::Key_8) {
+        currShader = mp_Shader8.get();
+    } else if (e->key() == Qt::Key_9) {
+        currShader = mp_Shader9.get();
+    }
+    else if (e->key() == Qt::Key_0) {
         currShader = mp_plainShader.get();
     }
 

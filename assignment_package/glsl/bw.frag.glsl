@@ -11,12 +11,12 @@ void main()
 {
     vec4 diffuseColor = texture(u_RenderedTexture, fs_UV);
     vec3 c = vec3(diffuseColor.rgb);
-    color = vec3(0.21 * c.r + 0.72 * c.g + 0.07 * c.b);
+    color = vec3(0.21 * c.r + 0.72 * c.g + 0.07 * c.b)*1.1;
 
     //vignette
     //find the distance at which a fragment lies from the screen's center
     float dist = sqrt(pow(fs_UV.x - 0.5, 2) + pow(fs_UV.y - 0.5, 2));
     //larger distance, darker brightness.
-    color = (1 - dist * 1)  * color;
+    color = (1 - dist * 1.2)  * color;
     out_Col = vec4(color,1);
 }
