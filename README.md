@@ -1,5 +1,6 @@
-# Mini Minecraft: ADVenture
-Amelia Peng, Daniel Sparber, Veronica Bristol
+# Mini Minecraft
+
+By: Amelia Peng, Daniel Sparber, Veronica Bristol
 
 ## Milestone 3
 ### Final Video
