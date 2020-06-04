@@ -2,6 +2,8 @@
 
 By: Amelia Peng, Daniel Sparber, Veronica Bristol
 
+The overall goal of this project is to create an interactive 3D world exploration and alteration program in the style of the popular computer game Minecraft. 
+
 ## Milestone 3
 ### Final Video
 - [https://www.youtube.com/watch?v=KZW3J8Ed634&feature=youtu.be]
